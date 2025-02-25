@@ -31,6 +31,8 @@ def email(name, user_id):
     last_name = unidecode.unidecode(ten_parts[-1]).lower()
     user = last_name.lower() + short_name.lower() + user_id
     email = f"{last_name.lower()}{short_name.lower()}{user_id}@user.libma"
+    if user not in usernames:
+        usernames.add(user)
     if email not in emails:
         emails.add(email)
     return user, email
