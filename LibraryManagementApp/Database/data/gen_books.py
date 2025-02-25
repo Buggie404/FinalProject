@@ -2,10 +2,10 @@ import sqlite3
 import random
 import pandas as pd
 
-connect = sqlite3.connect('C:/Users/Admin/Documents/1. HỌC TẬP/5. KỸ THUẬT LẬP TRÌNH/3. FINAL PROJECT/database.db')
+connect = sqlite3.connect('LibraryManagementApp/Database/library.db')
 cursor = connect.cursor()
 
-df_path = "C:/Users/Admin/Documents/1. HỌC TẬP/5. KỸ THUẬT LẬP TRÌNH/3. FINAL PROJECT/data/books.csv"
+df_path = "LibraryManagementApp/Database/data/books.csv"
 df = pd.read_csv(df_path, delimiter = ";", encoding='ISO-8859-1', on_bad_lines='skip', low_memory=False, nrows=150)
 df["ISBN"] = pd.to_numeric(df["ISBN"], errors='coerce')
 

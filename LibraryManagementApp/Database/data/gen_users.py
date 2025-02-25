@@ -3,8 +3,18 @@ import random
 import faker
 import unidecode
 
-connect = sqlite3.connect('C:/Users/Admin/Documents/1. HỌC TẬP/5. KỸ THUẬT LẬP TRÌNH/3. FINAL PROJECT/database.db')
+connect = sqlite3.connect('LibraryManagementApp/Database/library.db')
 cursor = connect.cursor()
+
+admin_list = [
+    (111, 'Hoàng Nguyễn Mai Anh', 'anhhnm0111', 'anhhnm0111@admin.libma', '123456789', '2005-02-24', 'Admin'),
+    (112, 'Nguyễn Phương Anh', 'anhnp0112', 'anhnp0112@admin.libma', '123456789', '2005-03-15', 'Admin'),
+    (113, 'Đỗ Nguyễn Quỳnh Duyên', 'duyendnq0113', 'duyendnq0113@admin.libma', '123456789', '2005-06-20', 'Admin'),
+    (114, 'Nguyễn Ngọc Bảo Nguyên', 'nguyennnb0114', 'nguyennnb0114@admin.libma', '123456789', '2005-12-30', 'Admin'),
+    (115, 'Mã Bích Nhi', 'nhimb0115', 'nhimb0115@admin.libma', '123456789', '2005-08-14', 'Admin'),
+    (116, 'Trần Thụy Vy', 'vytt0116', 'vytt0116@admin.libma', '123456789', '2005-10-26', 'Admin')
+]
+cursor.executemany("insert into Users values (?, ?, ?, ?, ?, ?, ?)", admin_list)
 
 fake = faker.Faker("vi_VN")
 
