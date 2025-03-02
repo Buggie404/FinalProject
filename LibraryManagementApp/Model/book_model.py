@@ -47,3 +47,9 @@ class Book:
                           (f'%{keyword}%', keyword if keyword.isdigit() else -1, f'%{keyword}%'))
         return db.cursor.fetchall()
 
+    @staticmethod
+        def get_book_by_category(category):
+            db = Database()
+            db.cursor.execute("SELECT * FROM Books WHERE category = ?", (category,))
+            return db.cursor.fetchall()
+
