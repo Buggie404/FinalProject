@@ -48,8 +48,7 @@ class Book:
         return db.cursor.fetchall()
 
     @staticmethod
-        def get_book_by_category(category):
-            db = Database()
-            db.cursor.execute("SELECT * FROM Books WHERE category = ?", (category,))
-            return db.cursor.fetchall()
-
+    def get_book_by_category(category):
+        db = Database()
+        db.cursor.execute("SELECT * FROM Books WHERE category = ?", (category,))
+        return db.cursor.fetchall()
