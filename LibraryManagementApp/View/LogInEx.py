@@ -1,4 +1,4 @@
-from Log_In import Ui_MainWindow
+from Homepage_User import Ui_MainWindow
 
 class BMI_Ext(Ui_MainWindow):
     def setupUi(self, MainWindow):
