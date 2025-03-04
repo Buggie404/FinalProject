@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="Icon">
+    <file>Icon/book_man_1.png</file>
+    <file>Icon/user_man_1.png</file>
     <file>Icon/borrow_1.png</file>
     <file>Icon/statistics_1.png</file>
     <file>Icon/account_man_1.png</file>
