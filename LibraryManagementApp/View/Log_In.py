@@ -12,156 +12,204 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(750, 620)
-        MainWindow.setMinimumSize(QtCore.QSize(750, 620))
-        MainWindow.setStyleSheet("QMainWindow {\n"
-"border-image: url(:/Log in/Log in.png);\n"
+        MainWindow.resize(1252, 599)
+        MainWindow.setStyleSheet("/*Set style for Title widget*/\n"
+"#widgetTitle {\n"
+"    background-color: #0A66C2;\n"
+"    border-top-left-radius: 20px;\n"
+"    border-bottom-left-radius: 20px;\n"
+"}\n"
+"\n"
+"#label_2, #label_3 {\n"
+"    color: rgb(255, 255, 255);\n"
+"    font-family: \"Righteous\";\n"
+"    font-size: 30px;\n"
+"}\n"
+"\n"
+"/*Set style for Log In widget*/\n"
+"#widgetLogIn {\n"
+"    background-color: rgb(255, 255, 255);\n"
+"    border-top-right-radius: 20px;\n"
+"    border-bottom-right-radius: 20px;\n"
+"}\n"
+"\n"
+"#label_4 {\n"
+"    color: rgb(0, 0, 0);\n"
+"    font-family: \"Neue Einstellung SemiBold\";\n"
+"    font-size: 30px;\n"
+"}\n"
+"\n"
+"#lblAccountInvalid {\n"
+"    color: rgb(255, 0, 0);\n"
+"    font-family: \"Montserrat SemiBold\";\n"
+"    font-size: 20px;\n"
+"}\n"
+"\n"
+"/*Set style for QLineEdit*/\n"
+"#widgetLogIn QLineEdit {\n"
+"    background-color: #FFFBFB;\n"
+"    border: 1px solid #e5ebf0;\n"
+"    border-radius: 10px;\n"
+"    padding: 5px 10px;\n"
+"    font-family: \"Montserrat Medium\";\n"
+"    font-size: 15px;\n"
+"}\n"
+"\n"
+"#widgetLogIn QLineEdit:focus {\n"
+"    border-color: #0A66C2;\n"
+"}\n"
+"\n"
+"/*Set style for Log In button*/\n"
+"#btnLogIn {\n"
+"    background-color: #0A66C2;\n"
+"    font-family: \"Montserrat SemiBold\";\n"
+"    font-size: 20px;\n"
+"    border-radius: 10px;\n"
+"    color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"#btnLogIn:pressed {\n"
+"    padding-left: 15px;\n"
+"}\n"
+"\n"
+"#btnLogIn:hover, #btnLogIn:pressed {\n"
+"    background-color: rgb(8, 88, 168);\n"
 "}")
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout_3 = QtWidgets.QGridLayout(self.centralwidget)
-        self.gridLayout_3.setObjectName("gridLayout_3")
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout_3.addItem(spacerItem, 3, 0, 1, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout_3.addItem(spacerItem1, 2, 0, 1, 1)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 100, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout_3.addItem(spacerItem2, 1, 0, 1, 1)
-        self.widget = QtWidgets.QWidget(parent=self.centralwidget)
-        self.widget.setObjectName("widget")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.widget)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName("gridLayout")
-        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout.addItem(spacerItem3, 3, 2, 1, 1)
-        spacerItem4 = QtWidgets.QSpacerItem(97, 17, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.gridLayout.addItem(spacerItem4, 1, 0, 1, 1)
-        spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout.addItem(spacerItem5, 0, 5, 1, 1)
-        spacerItem6 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout.addItem(spacerItem6, 0, 7, 1, 1)
-        spacerItem7 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout.addItem(spacerItem7, 3, 6, 1, 1)
-        spacerItem8 = QtWidgets.QSpacerItem(20, 100, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.gridLayout.addItem(spacerItem8, 3, 3, 1, 1)
-        spacerItem9 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout.addItem(spacerItem9, 3, 1, 1, 1)
-        spacerItem10 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout.addItem(spacerItem10, 3, 7, 1, 1)
-        spacerItem11 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout.addItem(spacerItem11, 0, 6, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(24, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.gridLayout.addItem(spacerItem, 0, 0, 1, 1)
+        spacerItem1 = QtWidgets.QSpacerItem(24, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.gridLayout.addItem(spacerItem1, 0, 3, 1, 1)
+        self.widgetTitle = QtWidgets.QWidget(parent=self.centralwidget)
+        self.widgetTitle.setMinimumSize(QtCore.QSize(300, 391))
+        self.widgetTitle.setMaximumSize(QtCore.QSize(325, 605))
+        self.widgetTitle.setObjectName("widgetTitle")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.widgetTitle)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        spacerItem2 = QtWidgets.QSpacerItem(20, 103, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.verticalLayout_3.addItem(spacerItem2)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_2.setContentsMargins(-1, 10, -1, 5)
-        self.verticalLayout_2.setSpacing(20)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.horizontalLayout.addItem(spacerItem3)
+        self.lblBook = QtWidgets.QLabel(parent=self.widgetTitle)
+        self.lblBook.setMinimumSize(QtCore.QSize(80, 80))
+        self.lblBook.setMaximumSize(QtCore.QSize(150, 150))
+        self.lblBook.setText("")
+        self.lblBook.setPixmap(QtGui.QPixmap("LibraryManagementApp/Ultilities/Icon/book.png"))
+        self.lblBook.setScaledContents(True)
+        self.lblBook.setObjectName("lblBook")
+        self.horizontalLayout.addWidget(self.lblBook)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.horizontalLayout.addItem(spacerItem4)
+        self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.verticalLayout.setContentsMargins(-1, 0, -1, -1)
-        self.verticalLayout.setSpacing(15)
+        self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.lineEditEmail = QtWidgets.QLineEdit(parent=self.widget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.lineEditEmail.sizePolicy().hasHeightForWidth())
-        self.lineEditEmail.setSizePolicy(sizePolicy)
-        self.lineEditEmail.setMinimumSize(QtCore.QSize(90, 40))
-        font = QtGui.QFont()
-        font.setFamily("Montserrat Medium")
-        font.setPointSize(11)
-        self.lineEditEmail.setFont(font)
-        self.lineEditEmail.setToolTipDuration(2)
-        self.lineEditEmail.setStyleSheet("background-color: rgb(255, 251, 251);\n"
-"border-style: outset;\n"
-"border-width: 1px;\n"
-"border-radius: 10px;\n"
-"border-color: rgb(10, 102, 194);")
-        self.lineEditEmail.setText("")
-        self.lineEditEmail.setCursorPosition(0)
-        self.lineEditEmail.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeading|QtCore.Qt.AlignmentFlag.AlignLeft|QtCore.Qt.AlignmentFlag.AlignVCenter)
-        self.lineEditEmail.setObjectName("lineEditEmail")
-        self.verticalLayout.addWidget(self.lineEditEmail)
-        self.lineEditPassword = QtWidgets.QLineEdit(parent=self.widget)
-        self.lineEditPassword.setEnabled(True)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.lineEditPassword.sizePolicy().hasHeightForWidth())
-        self.lineEditPassword.setSizePolicy(sizePolicy)
-        self.lineEditPassword.setMinimumSize(QtCore.QSize(90, 40))
-        font = QtGui.QFont()
-        font.setFamily("Montserrat Medium")
-        font.setPointSize(11)
-        font.setUnderline(False)
-        font.setStrikeOut(False)
-        font.setKerning(True)
-        font.setStyleStrategy(QtGui.QFont.StyleStrategy.PreferDefault)
-        self.lineEditPassword.setFont(font)
-        self.lineEditPassword.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.IBeamCursor))
-        self.lineEditPassword.setTabletTracking(False)
-        self.lineEditPassword.setStyleSheet("background-color: rgb(255, 251, 251);\n"
-"border-style: outset;\n"
-"border-width: 1px;\n"
-"border-radius: 10px;\n"
-"border-color: rgb(10, 102, 194);")
-        self.lineEditPassword.setText("")
-        self.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
-        self.lineEditPassword.setCursorPosition(0)
-        self.lineEditPassword.setObjectName("lineEditPassword")
-        self.verticalLayout.addWidget(self.lineEditPassword)
+        self.label_2 = QtWidgets.QLabel(parent=self.widgetTitle)
+        self.label_2.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.label_2.setObjectName("label_2")
+        self.verticalLayout.addWidget(self.label_2)
+        self.label_3 = QtWidgets.QLabel(parent=self.widgetTitle)
+        self.label_3.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.label_3.setObjectName("label_3")
+        self.verticalLayout.addWidget(self.label_3)
         self.verticalLayout_2.addLayout(self.verticalLayout)
-        self.btnLogIn = QtWidgets.QPushButton(parent=self.widget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.verticalLayout_3.addLayout(self.verticalLayout_2)
+        spacerItem5 = QtWidgets.QSpacerItem(20, 102, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.verticalLayout_3.addItem(spacerItem5)
+        self.verticalLayout_4.addLayout(self.verticalLayout_3)
+        self.gridLayout.addWidget(self.widgetTitle, 0, 1, 1, 1)
+        self.widgetLogIn = QtWidgets.QWidget(parent=self.centralwidget)
+        self.widgetLogIn.setMinimumSize(QtCore.QSize(898, 391))
+        self.widgetLogIn.setMaximumSize(QtCore.QSize(898, 605))
+        self.widgetLogIn.setObjectName("widgetLogIn")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.widgetLogIn)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.verticalLayout_9 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_9.setSpacing(40)
+        self.verticalLayout_9.setObjectName("verticalLayout_9")
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_5.setSpacing(3)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setSpacing(0)
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem6)
+        self.label = QtWidgets.QLabel(parent=self.widgetLogIn)
+        self.label.setMinimumSize(QtCore.QSize(80, 80))
+        self.label.setMaximumSize(QtCore.QSize(150, 150))
+        self.label.setText("")
+        self.label.setPixmap(QtGui.QPixmap("LibraryManagementApp/Ultilities/Icon/book_2.png"))
+        self.label.setScaledContents(True)
+        self.label.setObjectName("label")
+        self.horizontalLayout_2.addWidget(self.label)
+        spacerItem7 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem7)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_2)
+        self.label_4 = QtWidgets.QLabel(parent=self.widgetLogIn)
+        self.label_4.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.label_4.setObjectName("label_4")
+        self.verticalLayout_5.addWidget(self.label_4)
+        self.verticalLayout_9.addLayout(self.verticalLayout_5)
+        self.verticalLayout_8 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_8.setSpacing(30)
+        self.verticalLayout_8.setObjectName("verticalLayout_8")
+        self.verticalLayout_6 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_6.setSpacing(10)
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
+        self.lineEditEmail = QtWidgets.QLineEdit(parent=self.widgetLogIn)
+        self.lineEditEmail.setMinimumSize(QtCore.QSize(400, 40))
+        self.lineEditEmail.setClearButtonEnabled(True)
+        self.lineEditEmail.setObjectName("lineEditEmail")
+        self.verticalLayout_6.addWidget(self.lineEditEmail)
+        self.lineEditPassword = QtWidgets.QLineEdit(parent=self.widgetLogIn)
+        self.lineEditPassword.setMinimumSize(QtCore.QSize(400, 40))
+        self.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
+        self.lineEditPassword.setClearButtonEnabled(True)
+        self.lineEditPassword.setObjectName("lineEditPassword")
+        self.verticalLayout_6.addWidget(self.lineEditPassword)
+        self.verticalLayout_8.addLayout(self.verticalLayout_6)
+        self.verticalLayout_7 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_7.setSpacing(15)
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.btnLogIn = QtWidgets.QPushButton(parent=self.widgetLogIn)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(10)
+        sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.btnLogIn.sizePolicy().hasHeightForWidth())
         self.btnLogIn.setSizePolicy(sizePolicy)
-        self.btnLogIn.setMinimumSize(QtCore.QSize(90, 40))
-        font = QtGui.QFont()
-        font.setFamily("Montserrat SemiBold")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btnLogIn.setFont(font)
-        self.btnLogIn.setStyleSheet("background-color: rgb(10, 102, 194);\n"
-"color: rgb(255, 255, 255);\n"
-"border-radius: 10px;")
+        self.btnLogIn.setMinimumSize(QtCore.QSize(0, 40))
         self.btnLogIn.setObjectName("btnLogIn")
-        self.verticalLayout_2.addWidget(self.btnLogIn)
-        self.gridLayout.addLayout(self.verticalLayout_2, 1, 3, 1, 1)
-        spacerItem12 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout.addItem(spacerItem12, 0, 4, 1, 1)
-        self.lbl_Invalid = QtWidgets.QLabel(parent=self.widget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.lbl_Invalid.sizePolicy().hasHeightForWidth())
-        self.lbl_Invalid.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setFamily("Montserrat SemiBold")
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setWeight(75)
-        self.lbl_Invalid.setFont(font)
-        self.lbl_Invalid.setStyleSheet("color: rgb(255, 0, 0)")
-        self.lbl_Invalid.setText("")
-        self.lbl_Invalid.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.lbl_Invalid.setObjectName("lbl_Invalid")
-        self.gridLayout.addWidget(self.lbl_Invalid, 2, 3, 1, 1)
-        spacerItem13 = QtWidgets.QSpacerItem(20, 100, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.gridLayout.addItem(spacerItem13, 0, 3, 1, 1)
-        self.gridLayout_2.addLayout(self.gridLayout, 0, 0, 1, 1)
-        self.gridLayout_3.addWidget(self.widget, 4, 0, 1, 1)
-        spacerItem14 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.gridLayout_3.addItem(spacerItem14, 0, 0, 1, 1)
+        self.verticalLayout_7.addWidget(self.btnLogIn)
+        self.lblAccountInvalid = QtWidgets.QLabel(parent=self.widgetLogIn)
+        self.lblAccountInvalid.setText("")
+        self.lblAccountInvalid.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.lblAccountInvalid.setObjectName("lblAccountInvalid")
+        self.verticalLayout_7.addWidget(self.lblAccountInvalid)
+        self.verticalLayout_8.addLayout(self.verticalLayout_7)
+        self.verticalLayout_9.addLayout(self.verticalLayout_8)
+        self.gridLayout_2.addLayout(self.verticalLayout_9, 1, 1, 1, 1)
+        spacerItem8 = QtWidgets.QSpacerItem(228, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.gridLayout_2.addItem(spacerItem8, 1, 0, 1, 1)
+        spacerItem9 = QtWidgets.QSpacerItem(20, 59, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.gridLayout_2.addItem(spacerItem9, 0, 1, 1, 1)
+        spacerItem10 = QtWidgets.QSpacerItem(228, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.gridLayout_2.addItem(spacerItem10, 1, 2, 1, 1)
+        spacerItem11 = QtWidgets.QSpacerItem(20, 59, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.gridLayout_2.addItem(spacerItem11, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.widgetLogIn, 0, 2, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 750, 21))
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(parent=MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -169,6 +217,9 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.label_2.setText(_translate("MainWindow", "Library"))
+        self.label_3.setText(_translate("MainWindow", "Management"))
+        self.label_4.setText(_translate("MainWindow", "WELCOME BACK"))
         self.lineEditEmail.setPlaceholderText(_translate("MainWindow", "Email"))
         self.lineEditPassword.setPlaceholderText(_translate("MainWindow", "Password"))
-        self.btnLogIn.setText(_translate("MainWindow", "LOG IN"))
+        self.btnLogIn.setText(_translate("MainWindow", "Log In"))
