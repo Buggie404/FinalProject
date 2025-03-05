@@ -10,5 +10,9 @@ w = QMainWindow()
 f = BMI_Ext()
 f.setupUi(w)
 
+# role = "user"
+role = "admin"
+f.setPermissions(role)
+
 w.show()
 sys.exit(app.exec())

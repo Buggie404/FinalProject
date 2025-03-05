@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1252</width>
+    <width>949</width>
     <height>599</height>
    </rect>
   </property>
@@ -124,13 +124,13 @@
      <widget class="QWidget" name="widgetTitle" native="true">
       <property name="minimumSize">
        <size>
-        <width>300</width>
+        <width>260</width>
         <height>391</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>325</width>
+        <width>260</width>
         <height>605</height>
        </size>
       </property>
@@ -258,13 +258,13 @@
      <widget class="QWidget" name="widgetLogIn" native="true">
       <property name="minimumSize">
        <size>
-        <width>898</width>
+        <width>600</width>
         <height>391</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>898</width>
+        <width>600</width>
         <height>605</height>
        </size>
       </property>

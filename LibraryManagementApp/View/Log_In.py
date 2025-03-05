@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1252, 599)
+        MainWindow.resize(949, 599)
         MainWindow.setStyleSheet("/*Set style for Title widget*/\n"
 "#widgetTitle {\n"
 "    background-color: #0A66C2;\n"
@@ -86,8 +86,8 @@ class Ui_MainWindow(object):
         spacerItem1 = QtWidgets.QSpacerItem(24, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.gridLayout.addItem(spacerItem1, 0, 3, 1, 1)
         self.widgetTitle = QtWidgets.QWidget(parent=self.centralwidget)
-        self.widgetTitle.setMinimumSize(QtCore.QSize(300, 391))
-        self.widgetTitle.setMaximumSize(QtCore.QSize(325, 605))
+        self.widgetTitle.setMinimumSize(QtCore.QSize(260, 391))
+        self.widgetTitle.setMaximumSize(QtCore.QSize(260, 605))
         self.widgetTitle.setObjectName("widgetTitle")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.widgetTitle)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
@@ -105,7 +105,7 @@ class Ui_MainWindow(object):
         self.lblBook.setMinimumSize(QtCore.QSize(80, 80))
         self.lblBook.setMaximumSize(QtCore.QSize(150, 150))
         self.lblBook.setText("")
-        self.lblBook.setPixmap(QtGui.QPixmap("LibraryManagementApp/Ultilities/Icon/book.png"))
+        self.lblBook.setPixmap(QtGui.QPixmap(":/Icon/Icon/book.png"))
         self.lblBook.setScaledContents(True)
         self.lblBook.setObjectName("lblBook")
         self.horizontalLayout.addWidget(self.lblBook)
@@ -130,8 +130,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addLayout(self.verticalLayout_3)
         self.gridLayout.addWidget(self.widgetTitle, 0, 1, 1, 1)
         self.widgetLogIn = QtWidgets.QWidget(parent=self.centralwidget)
-        self.widgetLogIn.setMinimumSize(QtCore.QSize(898, 391))
-        self.widgetLogIn.setMaximumSize(QtCore.QSize(898, 605))
+        self.widgetLogIn.setMinimumSize(QtCore.QSize(600, 391))
+        self.widgetLogIn.setMaximumSize(QtCore.QSize(600, 605))
         self.widgetLogIn.setObjectName("widgetLogIn")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.widgetLogIn)
         self.gridLayout_2.setObjectName("gridLayout_2")
@@ -150,7 +150,7 @@ class Ui_MainWindow(object):
         self.label.setMinimumSize(QtCore.QSize(80, 80))
         self.label.setMaximumSize(QtCore.QSize(150, 150))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("LibraryManagementApp/Ultilities/Icon/book_2.png"))
+        self.label.setPixmap(QtGui.QPixmap(":/Icon/Icon/book_2.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.horizontalLayout_2.addWidget(self.label)
