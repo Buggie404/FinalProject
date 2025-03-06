@@ -490,7 +490,7 @@
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QPushButton" name="btnStatistics">
+                    <widget class="QPushButton" name="btnBookManage">
                      <property name="minimumSize">
                       <size>
                        <width>100</width>
@@ -508,7 +508,7 @@
                      </property>
                      <property name="icon">
                       <iconset resource="../Ultilities/Res.qrc">
-                       <normaloff>:/Icon/Icon/statistics_1.png</normaloff>:/Icon/Icon/statistics_1.png</iconset>
+                       <normaloff>:/Icon/Icon/book_man_1.png</normaloff>:/Icon/Icon/book_man_1.png</iconset>
                      </property>
                      <property name="iconSize">
                       <size>
@@ -536,7 +536,7 @@
                  <item>
                   <widget class="QLabel" name="lbl_Statistics">
                    <property name="text">
-                    <string>Statistics</string>
+                    <string>Books Management</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -675,7 +675,7 @@
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QPushButton" name="btnBooksManage">
+                    <widget class="QPushButton" name="btnStatistics">
                      <property name="minimumSize">
                       <size>
                        <width>100</width>
@@ -693,7 +693,7 @@
                      </property>
                      <property name="icon">
                       <iconset resource="../Ultilities/Res.qrc">
-                       <normaloff>:/Icon/Icon/book_man_1.png</normaloff>:/Icon/Icon/book_man_1.png</iconset>
+                       <normaloff>:/Icon/Icon/statistics_1.png</normaloff>:/Icon/Icon/statistics_1.png</iconset>
                      </property>
                      <property name="iconSize">
                       <size>
@@ -721,7 +721,7 @@
                  <item>
                   <widget class="QLabel" name="lbl_BooksManage">
                    <property name="text">
-                    <string>Books Management</string>
+                    <string>Statistics</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
