@@ -43,3 +43,11 @@ class Receipt:
                           (return_date, receipt_id))
         db.conn.commit()
         return True
+    
+    @staticmethod
+    def get_status_by_receipt_id(receipt_id):
+        """Fetch the status of a receipt based on its ID."""
+        db = Database()
+        db.cursor.execute("SELECT status FROM receipts WHERE receipt_id = ?", (receipt_id,))
+        result = db.cursor.fetchone()
+        return result[0] if result else None  # Return status if found, else None
