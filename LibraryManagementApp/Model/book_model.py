@@ -58,3 +58,14 @@ class Book:
         keyword = str(keyword) if keyword is not None else ""
         db.cursor.execute("SELECT * FROM books WHERE title LIKE ?", (f'%{keyword}%',))
         return db.cursor.fetchall()
+    
+    @staticmethod
+    def get_quantity(book_id):
+        db = Database()
+        db.cursor.execute("SELECT quantity FROM Books WHERE id = ?", (book_id,))
+        result = db.cursor.fetchone()  # Fetch one row
+        
+        if result:  # Check if result is not None
+            return result[0]  # Return quantity
+        else:
+            return None  # Handle case where book_id does not exist
