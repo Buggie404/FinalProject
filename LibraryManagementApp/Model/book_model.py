@@ -18,16 +18,16 @@ class Book:
         self.db.cursor.execute("INSERT INTO Books (title, author, published_year, category, quantity) VALUES (?, ?, ?, ?, ?, ?)", 
                                (self.book_id, self.title, self.author, self.pulished_year, self.category, self.quantity)) 
         self.db.conn.commit()
+        self.book_id = self.db.cursor.lastrowid # Update book_id with the new id
 
     def update_book(self, new_data): #Update book information 
         """
         Update existing book details in the database.
         Only the title, author, category, published year, and quantity can be updated.
         """
-        self.db.cursor.execute("UPDATE books SET title = ?, author = ?, category = ?, published_year = ?, quantity = ?", 
-                               (new_data['title'], new_data['author'], new_data['category'], new_data['published_year'], self.book_id))
+        self.db.cursor.execute("UPDATE books SET title = ?, author = ?, category = ?, published_year = ?, quantity = ? WHERE id = ?", 
+                               (new_data['title'], new_data['author'], new_data['category'], new_data['published_year'], new_data['quantity'], self.book_id))
         self.db.conn.commit()
-        self.book_id = self.db.cursor.lastrowid # Update book_id with the new id
 
     @staticmethod
     def get_book_by_id(book_id): # Search book by ID
