@@ -1,6 +1,5 @@
 # Import Lib
 from tkinter import *
-from LogIn import LoginApplication
 
 
 # Import First_Sub_Win and Current_sub_Win
@@ -180,6 +179,8 @@ class Sign_Out():  # To Sign out, when clicked "Yes" -> switch to Log_In window
                command=lambda: self.sign_out.destroy()).pack(pady=(10, 10))
 
     def switch_to_log_in(self):
+        # Only import here so that it would crash if LogIn file also imported this file
+        from LogIn import LoginApplication
         self.sign_out.destroy()  # Close the Sign_Out window
         self.root.destroy()  # Close the main root
 

@@ -1,5 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Button, PhotoImage
+from Homepage import HomepageApp 
+
 
 class LoginApplication:
     def __init__(self, root, assets_path=None):
@@ -184,8 +186,21 @@ class LoginApplication:
     def on_login_clicked(self):
         """Handle login button click event"""
         print("btn_LogIn clicked")
-        # email = self.lnE_Email.get()
+        email = self.lnE_Email.get() # Nhớ thêm hàm check role trong Controller nha
         # password = self.lnE_Password.get()
+        # if account is valid -> cho chuyển sang Homepage
+        if email == "":
+            self.root.destroy()
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
+        # else -> cho hiện Invalid(self.root, 'account')
+        else:
+            from noti_tab_view_1 import Invalid
+            Invalid(self.root, 'account')
+
+
+
 
 if __name__ == "__main__":
     window = Tk()
