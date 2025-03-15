@@ -5,7 +5,7 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Button, PhotoImage
 
 
-class ProfileApp:
+class AccountManagement:
     def __init__(self, root,assets_path=None):
         # Initialize the main window
         self.root = root
@@ -76,25 +76,6 @@ class ProfileApp:
         # Hình chữ nhật lớn nằm ngang (bo góc)
         self.create_rounded_rectangle(285.0, 257.0, 871.0, 560.0, radius=10, color="#F1F1F1")
         self.create_rounded_rectangle(285.0, 56.0, 871.0, 201.0, radius=10, color="#F1F1F1")
-
-    # def create_background(self):
-    #     """Create the main background elements"""
-    #     # Left sidebar background
-    #     self.canvas.create_rectangle(
-    #         0.0, 0.0, 262.0, 605.0,
-    #         fill="#0A66C2", outline=""
-    #     )
-    #
-    #     # Main content areas
-    #     self.canvas.create_rectangle(
-    #         285.0, 257.0, 871.0, 560.0,
-    #         fill="#F0F0F0", outline=""
-    #     )
-    #
-    #     self.canvas.create_rectangle(
-    #         285.0, 56.0, 871.0, 201.0,
-    #         fill="#F0F0F0", outline=""
-    #     )
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -212,5 +193,5 @@ class ProfileApp:
 
 if __name__ == "__main__":
     window = Tk()
-    app = ProfileApp(window)
+    app = AccountManagement(window)
     window.mainloop()
