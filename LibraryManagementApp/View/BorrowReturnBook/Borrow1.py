@@ -224,4 +224,4 @@ class Borrow1App:
 if __name__ == "__main__":
     window = Tk()
     app = Borrow1App(window)
-    window.mainloop() #alo
+    window.mainloop()
