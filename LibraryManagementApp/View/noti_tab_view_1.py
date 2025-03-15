@@ -1,5 +1,6 @@
 #Import Lib
 from tkinter import *
+# from Log_In import LoginApp
 
 # Import First_Sub_Win and Current_sub_Win
 # from first-sub-win import frst-sub class
@@ -138,7 +139,33 @@ class Drop_Off():
         # if receipt_status == 'overdue': -> switch to overdue window, else: -> switch back to first-window
 
 class Sign_Out(): # To Sign out, when clicked "Yes" -> switch to Log_In window
-    pass
+    def __init__(self, root):
+        # Setup tab
+        self.root = root
+        self.sign_out = Toplevel(root)
+        self.sign_out.title(" ")
+        self.sign_out.geometry("400x200")
+        self.sign_out.resizable(False, False)
+        self.sign_out.config(bg = 'white')
+
+        # Title Label
+        Label(self.sign_out, text = "Sign Out", font = ('Montserrat', 18, 'bold'), bg = 'white', fg = 'black').pack(pady = (20,10))
+        # Message Label
+        Label(self.sign_out, text = "Are you sure you want to sign out?", font = ("Montserrat", 12), bg = 'white', fg = 'black').pack(pady = (10,10))
+
+        # Yes Button
+        Button(self.sign_out, width = 13, text = "Yes", highlightbackground= 'white', highlightthickess = 1, command = lambda: self.switch_to_log_in()).pack(pady = (10,10))
+        # No Button
+        Button(self.sign_out, width = 13, text = "No", highlightbackground= 'white', highlightthickess = 1, command = lambda: self.sign_out.destroy()).pack(pady = (10,10))
+
+    # def switch_to_log_in(self):
+    #     # Define new root to return to Log In window
+    #     log_in_root = Tk()
+    #     app = Log_In(log_in_root)
+    #     app.mainloop()
+    #     # Destroy current window
+    #     self.sign_out.destroy()
+    #     self.sign_out.master.destroy()
 
 class Print_Receipt(): # To print out receipt, when clicked 'Print Receipt?' -> switch to Print_Receipt window
     pass
