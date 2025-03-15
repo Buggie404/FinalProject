@@ -20,7 +20,7 @@ class AccountManagement:
             self.assets_path = Path(assets_path)
         else:
             # Fix path - remove the "dcmTvT/" from the beginning
-            self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frame0")
+            self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameAccountManagement")
 
 
         # Create canvas
