@@ -121,11 +121,14 @@ class LoginApplication:
                 image=self.images[image_name]
             )
         
+        is_password = "Password" in image_name
+        
         entry = Entry(
             bd=0,
             bg="#E7DCDC",
             fg="#000716",
-            highlightthickness=0
+            highlightthickness=0,
+            show="•" if is_password else ""
         )
         
         entry.place(
