@@ -15,7 +15,7 @@ class AccountManagementApp:
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
-            self.assets_path = self.output_path / Path(r"build/assets/frameAccountChangePassword")
+            self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameAccountChangePassword")
 
         # Create canvas
         self.canvas = Canvas(
