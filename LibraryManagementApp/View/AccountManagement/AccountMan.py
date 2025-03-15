@@ -3,7 +3,7 @@
 
 from pathlib import Path
 from tkinter import Tk, Canvas, Button, PhotoImage
-
+import os
 
 class ProfileApp:
     def __init__(self, root,assets_path=None):
@@ -19,7 +19,7 @@ class ProfileApp:
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
-            self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameAccountMan")
+            self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameAccountManagement")
 
 
         # Create canvas
@@ -94,6 +94,25 @@ class ProfileApp:
     #         285.0, 56.0, 871.0, 201.0,
     #         fill="#F0F0F0", outline=""
     #     )
+
+    def load_image(self, image_name, position):
+        """Load an image and place it on the canvas"""
+        file_path = self.relative_to_assets(f"{image_name}.png")
+
+        # Debug: Kiểm tra file có tồn tại không
+        print(f"🔍 Đang tìm ảnh: {file_path}")
+
+        if not os.path.exists(file_path):
+            print(f"❌ LỖI: Không tìm thấy file {file_path}")
+            return
+
+        # Nếu file tồn tại, load vào chương trình
+        self.images[image_name] = PhotoImage(file=file_path)
+
+        self.canvas.create_image(
+            position[0], position[1],
+            image=self.images[image_name]
+        )
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -172,16 +191,16 @@ class ProfileApp:
             font=("Montserrat Medium", 18 * -1)
         )
 
-    def load_image(self, image_name, position):
-        """Load an image and place it on the canvas"""
-        self.images[image_name] = PhotoImage(
-            file=self.relative_to_assets(f"{image_name}.png")
-        )
-        self.canvas.create_image(
-            position[0],
-            position[1],
-            image=self.images[image_name]
-        )
+    # def load_image(self, image_name, position):
+    #     """Load an image and place it on the canvas"""
+    #     self.images[image_name] = PhotoImage(
+    #         file=self.relative_to_assets(f"{image_name}.png")
+    #     )
+    #     self.canvas.create_image(
+    #         position[0],
+    #         position[1],
+    #         image=self.images[image_name]
+    #     )
 
     def create_button(self, button_name, dimensions):
         """Create a button with the given name and dimensions"""
