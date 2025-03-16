@@ -58,7 +58,8 @@ class User:
         db.cursor.execute("SELECT * FROM Users")
         return db.cursor.fetchall()
 
-
-
-
-        
+    @staticmethod
+    def get_user_by_email(email): # Search user by email
+        db = Database()
+        db.cursor.execute("SELECT * FROM Users WHERE email = ?", (email,))
+        return db.cursor.fetchone()   

@@ -2,10 +2,10 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Button, PhotoImage
 
 class HomepageApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, role=None, assets_path=None):
         self.root = root
         # self.role = "user"  # Default role
-        self.role = "admin"
+        self.role = role
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
