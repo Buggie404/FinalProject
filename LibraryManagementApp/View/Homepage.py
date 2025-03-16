@@ -1,5 +1,13 @@
+# Import Lib
 from pathlib import Path
 from tkinter import Tk, Canvas, Button, PhotoImage
+import sys
+import os
+
+# Determine functions file path
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(base_dir, "View"))
+sys.path.append(base_dir)
 
 class HomepageApp:
     def __init__(self, root, role=None, assets_path=None):
@@ -49,9 +57,9 @@ class HomepageApp:
     def create_main_buttons(self):
         """Create main buttons on the homepage"""
         self.create_button("btn_AccountManagement.png", 348.0, 88.0, 228.0, 202.6666717529297, self.on_account_management_clicked)
-        self.create_button("btn_UserManagement.png", 613.0, 88.0, 228.0, 203.0, self.on_user_management_clicked)
+        self.create_button("btn_BookManagement.png", 613.0, 88.0, 228.0, 203.0, self.on_book_management_clicked)
         self.create_button("btn_BorrowReturnBook.png", 480.0, 315.0, 228.0, 203.0, self.on_borrow_return_clicked)
-        self.create_button("btn_BookManagement.png", 613.0, 315.0, 228.0, 203.0, self.on_book_management_clicked)
+        self.create_button("btn_UserManagement.png", 613.0, 315.0, 228.0, 203.0, self.on_user_management_clicked)
         
         self.update_ui_based_on_role()
     
@@ -60,9 +68,9 @@ class HomepageApp:
         if hasattr(self, "btn_BookManagement"):
             if self.role == "admin":
                 self.btn_BorrowReturnBook.place(x=348.0, y=315.0, width=228.0, height=203.0)
-                self.btn_BookManagement.place(x=613.0, y=315.0, width=228.0, height=203.0)
+                self.btn_UserMangement.place(x=613.0, y=315.0, width=228.0, height=203.0)
             else:
-                self.btn_BookManagement.place_forget()
+                self.btn_UserManagement.place_forget()
     
     def create_button(self, image_name, x, y, width, height, command):
         if image_name not in self.images:
@@ -86,15 +94,35 @@ class HomepageApp:
     
     def on_account_management_clicked(self):
         print("btn_AccountManagement clicked")
+        self.root.destroy()
+        from AccountManagement.AccountMan import AccountManagement 
+        accountmnt_root = Tk()
+        accountmnt = AccountManagement(accountmnt_root)
+        accountmnt_root.mainloop()
     
     def on_user_management_clicked(self):
         print("btn_UserManagement clicked")
+        self.root.destroy()
+        from UserManagement.UserManagement import UserManagementApp
+        usermgmt_root = Tk()
+        usermgmt = UserManagementApp(usermgmt_root)
+        usermgmt_root.mainloop()
     
     def on_borrow_return_clicked(self):
         print("btn_BorrowReturnBook clicked")
+        self.root.destroy()
+        from BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
+        borrow_return_root = Tk()
+        borrow_return = BorrowReturnApp(borrow_return_root)
+        borrow_return_root.mainloop()
     
     def on_book_management_clicked(self):
         print("btn_BookManagement clicked")
+        # self.root.destroy()
+        # from BookManagement.BookManagement import BookManagementApp
+        # bookmgmt_root = Tk()
+        # bookmgmt = BookManagementApp(bookmgmt_root)
+        # bookmgmt_root.mainloop()
 
 if __name__ == "__main__":
     window = Tk()
