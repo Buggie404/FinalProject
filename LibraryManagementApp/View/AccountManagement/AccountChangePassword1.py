@@ -133,7 +133,7 @@ class AccountChangePw1App:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
-        if button_name == "btn_ChangePassword" or button_name == "btn_Return": # Go back to AccountMan window
+        if button_name == "btn_Return": # Go back to AccountMan window
             self.root.destroy()
             from AccountMan import AccountManagement
             accountman_root = Tk()
@@ -145,6 +145,12 @@ class AccountChangePw1App:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root)
             homepage_root.mainloop()
+        elif button_name == "btn_ChangePassword": # When clicked change pass in success/failed window -> go back to first AccountChangePassword window
+            self.root.destroy()
+            from AccountChangePassword import AccountChangePwApp
+            changepass_root = Tk()
+            changepass = AccountChangePwApp(changepass_root)
+            changepass_root.mainloop()
         else: # If clicked on Edit Pass Account Information, nothing happends 
             pass
 
