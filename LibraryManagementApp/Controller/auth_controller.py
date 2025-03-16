@@ -26,4 +26,7 @@ class Authen():
     @staticmethod
     def check_account_role(email):
         # To check account role 
-        user_data = User.get_user_by_email(email)
+        if 'admin' in email:
+            return 'admin'
+        else:
+            return 'user'
