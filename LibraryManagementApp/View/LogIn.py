@@ -3,7 +3,7 @@ from tkinter import Tk, Canvas, Entry, Button, PhotoImage
 from Homepage import HomepageApp 
 
 
-class LoginApplication:
+class LogInApp:
     def __init__(self, root, assets_path=None):
         self.root = root
         self.root.geometry("898x605")
@@ -204,5 +204,5 @@ class LoginApplication:
 
 if __name__ == "__main__":
     window = Tk()
-    app = LoginApplication(window)
+    app = LogInApp(window)
     window.mainloop()
