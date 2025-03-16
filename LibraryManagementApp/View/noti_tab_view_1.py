@@ -180,13 +180,13 @@ class Sign_Out():  # To Sign out, when clicked "Yes" -> switch to Log_In window
 
     def switch_to_log_in(self):
         # Only import here so that it would crash if LogIn file also imported this file
-        from LogIn import LoginApplication
+        from LogIn import LogInApp
         self.sign_out.destroy()  # Close the Sign_Out window
         self.root.destroy()  # Close the main root
 
         # Create a new root for LogIn
         log_in_root = Tk()
-        LoginApplication(log_in_root)  # Assuming you have a LogIn class
+        LogInApp(log_in_root)  # Assuming you have a LogIn class
         log_in_root.mainloop()
 
 
