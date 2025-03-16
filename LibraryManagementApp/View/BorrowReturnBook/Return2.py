@@ -1,7 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
-class Return1App:
+class Return2App:
     def __init__(self, root, assets_path=None):
         self.root = root
         self.root.geometry("898x605")
@@ -13,7 +13,7 @@ class Return1App:
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
-            self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameReturn1")
+            self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameReturn2")
         
         self.images = {}
         self.canvas = Canvas(
@@ -31,7 +31,6 @@ class Return1App:
         self.create_main_layout()
         self.create_sidebar()
         self.create_main_content()
-        self.create_entry_fields()
         self.create_buttons()
     
     def relative_to_assets(self, path: str) -> Path:
@@ -41,13 +40,11 @@ class Return1App:
         """Load all image assets"""
         image_files = [
             "image_1.png",
-            "image_2.png",
-            "image_4.png",
-            "lnE_ReceiptID.png",
+            "image_3.png",
             "btn_BackToHomepage.png",
             "btn_ReturnBook.png",
             "btn_BorrowBook.png",
-            "btn_Search.png"
+            "btn_DropOff.png"
         ]
         
         for image_file in image_files:
@@ -56,7 +53,7 @@ class Return1App:
                 self.images[image_file] = PhotoImage(file=full_path)
             except Exception as e:
                 print(f"Error loading image {full_path}: {e}")
-    
+
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Vẽ hình chữ nhật có bo góc."""
         # Bo góc trên bên trái
@@ -85,6 +82,16 @@ class Return1App:
             radius = 10,
             color="#F1F1F1"
         )
+        
+        # Return book table
+        self.tbl_ReturnBook = self.canvas.create_rectangle(
+            395.0,
+            173.0,
+            760.0,
+            416.0,
+            fill="#D9D9D9",
+            outline=""
+        )
     
     def create_sidebar(self):
         """Create the sidebar with buttons and logo"""
@@ -98,12 +105,12 @@ class Return1App:
             outline=""
         )
         
-        # Logo image
-        if "image_4.png" in self.images:
+        # Logo images
+        if "image_3.png" in self.images:
             self.canvas.create_image(
                 130.0,
                 73.0,
-                image=self.images["image_4.png"]
+                image=self.images["image_3.png"]
             )
         
         # Create sidebar buttons
@@ -120,40 +127,10 @@ class Return1App:
                 118.0,
                 image=self.images["image_1.png"]
             )
-        
-        # Receipt ID label image
-        if "image_2.png" in self.images:
-            self.canvas.create_image(
-                397.0,
-                223.0,
-                image=self.images["image_2.png"]
-            )
-    
-    def create_entry_fields(self):
-        """Create entry fields"""
-        if "lnE_ReceiptID.png" in self.images:
-            entry_bg_1 = self.canvas.create_image(
-                684.5,
-                223.0,
-                image=self.images["lnE_ReceiptID.png"]
-            )
-            
-            self.lnE_ReceiptID = Entry(
-                bd=0,
-                bg="#E7DCDC",
-                fg="#000716",
-                highlightthickness=0
-            )
-            self.lnE_ReceiptID.place(
-                x=554.0,
-                y=199.0,
-                width=261.0,
-                height=46.0
-            )
     
     def create_buttons(self):
         """Create action buttons"""
-        self.create_button("btn_Search.png", 420.0, 401.0, 313.0, 48.0, self.on_search_click)
+        self.create_button("btn_DropOff.png", 421.0, 456.0, 313.0, 48.0, self.on_drop_off_click)
     
     def create_button(self, image_name, x, y, width, height, command):
         """Helper method to create buttons"""
@@ -190,14 +167,12 @@ class Return1App:
         print("btn_BackToHomepage clicked")
         # Implement back to homepage functionality here
     
-    def on_search_click(self):
-        print("btn_Search clicked")
-        # Implement search functionality here
-        # receipt_id = self.lnE_ReceiptID.get()
-        # print(f"Searching for receipt ID: {receipt_id}")
+    def on_drop_off_click(self):
+        print("btn_DropOff clicked")
+        # Implement drop off functionality here
 
 # Entry point
 if __name__ == "__main__":
     window = Tk()
-    app = Return1App(window)
+    app = Return2App(window)
     window.mainloop()
