@@ -1,5 +1,13 @@
+# Import Lib
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Button, PhotoImage
+import os
+import sys
+
+# Import base file path
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(base_dir, "View"))
+sys.path.append(base_dir)
 
 
 class AccountChangePwApp:
@@ -164,6 +172,31 @@ class AccountChangePwApp:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+        if button_name == "btn_ChangePassword": # When clicked Change Password on Change Password window -> go back to Account MainWindow
+            self.root.destroy()
+            from AccountMan import AccountManagement
+            accountman_root = Tk()
+            accountman = AccountManagement(accountman_root)
+            accountman_root.mainloop()
+        elif button_name == "btn_EditAccountInformation":
+            self.root.destroy()
+            from AccountEditInfo import AccountEditInfoApp
+            editinfo_root = Tk()
+            editinfo = AccountEditInfoApp(editinfo_root)
+            editinfo_root.mainloop()
+        elif button_name == "btn_BackToHomepage":
+            self.root.destroy()
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
+        # else: # For btn_ChangePasswordConfirm
+        """ changepass_success: check for new_password input, in Controller folder
+        if input of lnE_CurrentPassword ≠ user_password: -> Failed
+        if input of lnE_NewPassword ≠ input of lnE_ConfrimPassword: -> Failed"""
+        #     import Controller that handle the check for password validation
+        #     if changepass_success: # If password changed successfully -> switch to ChangePassword1 window -> update new_password in database through user_model
+        #     else: # Switch to AccountChangePassword2
 
     def run(self):
         """Start the application main loop"""
