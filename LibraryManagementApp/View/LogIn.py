@@ -59,7 +59,6 @@ class LogInApp:
         
         for image_file in image_files:
             full_path = self.relative_to_assets(image_file)
-            print(f"Loading image: {full_path}")
             try:
                 self.images[image_file] = PhotoImage(file=full_path)
             except Exception as e:
