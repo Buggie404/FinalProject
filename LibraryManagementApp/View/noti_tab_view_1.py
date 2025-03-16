@@ -33,7 +33,7 @@ class Delete():  # To confirm delection
             pady=(10, 10))
 
         # Yes Button
-        Button(self.delete_noti, width=13, text="Yes", highlightbackground='white', highlighthickness=1,
+        Button(self.delete_noti, width=13, text="Yes", highlightbackground='white', highlightthickness=1,
                command=lambda: self.choice('yes')).pack(pady=10)
         # No Button
         Button(self.delete_noti, width=13, text="No", highlightbackground='white', highlightthickness=1,
@@ -70,7 +70,7 @@ class Message_1():  # To notify message (Type 1: When clicked 'OK' button -> mes
               fg='black').pack(pady=(20, 10))
 
         # OK Button
-        Button(self.message_1, width=13, text="OK", highlightbackground='white', highlightthickess=1,
+        Button(self.message_1, width=13, text="OK", highlightbackground='white', highlightthickness=1,
                command=self.message_1.destroy).pack(pady=10)
 
 
@@ -92,7 +92,7 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
               fg='black').pack(pady=(20, 10))
 
         # Return Button
-        Button(self.message_2, width=13, text="Return", highlightbackground='white', highlightthickess=1,
+        Button(self.message_2, width=13, text="Return", highlightbackground='white', highlightthickness=1,
                command=lambda: self.back_to_subfun()).pack(pady=10)
 
     # Switch UI to 1st sub-function window
@@ -131,7 +131,7 @@ class Invalid():  # To notify Invalid input
             pady=(10, 10))
 
         # Ok button
-        Button(self.invalid, width=13, text="OK", highlightbackground='white', highlightthickess=1,
+        Button(self.invalid, width=13, text="OK", highlightbackground='white', highlightthickness=1,
                command=lambda: self.invalid.destroy).pack(pady=10)
 
 
