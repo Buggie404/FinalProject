@@ -1,6 +1,13 @@
+# Import Lib
 from pathlib import Path
 from tkinter import Tk, Canvas, Button, PhotoImage
 import os
+import sys
+
+# Import base file path
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(base_dir, "View"))
+sys.path.append(base_dir)
 
 class AccountManagement:
     def __init__(self, root,assets_path=None):
@@ -204,6 +211,28 @@ class AccountManagement:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+        if button_name == "btn_ChangePassword":
+            self.root.destroy()
+            from AccountChangePassword import AccountChangePwApp
+            changepass_root = Tk()
+            changepass = AccountChangePwApp(changepass_root)
+            changepass_root.mainloop()
+        elif button_name == "btn_EditAccountInformation":
+            self.root.destroy()
+            from AccountEditInfo import AccountEditInfoApp
+            editinfo_root = Tk()
+            editinfo = AccountEditInfoApp(editinfo_root)
+            editinfo_root.mainloop()
+        elif button_name == "btn_SignOut":
+            from noti_tab_view_1 import Sign_Out
+            Sign_Out(self.root)
+        else:
+            self.root.destroy()
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
+
 
 
 if __name__ == "__main__":
