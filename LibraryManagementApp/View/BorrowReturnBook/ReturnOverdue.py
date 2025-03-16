@@ -93,7 +93,7 @@ class ReturnOverdueApp:
             fill="#D9D9D9",
             outline=""
         )
-    
+
     def create_sidebar(self):
         """Create the sidebar with buttons and logo"""
         # Blue sidebar background
