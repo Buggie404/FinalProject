@@ -20,7 +20,7 @@ class User:
     @staticmethod
     def login(email, password): # Authenticate user login 
        db = Database()
-       db.cursor.execute("SELECT * FROM Users WHERE email = ? AND password = ? AND status = 'Activated'", (email, password))
+       db.cursor.execute("SELECT * FROM Users WHERE email = ? AND password = ?", (email, password))
        return db.cursor.fetchone()
 
     def change_pass(self, new_password): # Change user password
