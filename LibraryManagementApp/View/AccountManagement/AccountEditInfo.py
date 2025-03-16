@@ -1,8 +1,15 @@
+# Import Lib
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+import os
+import sys
 
+# Import base file path
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(base_dir, "View"))
+sys.path.append(base_dir)
 
-class AccountEditInfoApp:
+class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (lấy input của lnE) -> thêm để bên Controller xử lý tiếp phần này nha
     def __init__(self, root, assets_path=None):
         # Initialize the main window
         self.root = root
@@ -160,8 +167,32 @@ class AccountEditInfoApp:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+        if button_name == "btn_EditAccountInformation": # switch back to Account Mainwindow
+            self.root.destroy()
+            from AccountMan import AccountManagement
+            account_root = Tk()
+            account = AccountManagement(account_root)
+            account.root.mainloop()
+        elif button_name == "btn_ChangePassword": # switch to Change Password window
+            self.root.destroy()
+            from AccountChangePassword import AccountChangePwApp
+            changepass_root = Tk()
+            changepass = AccountChangePwApp(changepass_root)
+            changepass.root.mainloop()
+        elif button_name == "btn_BackToHomepage": # switch back to Homepage
+            self.root.destroy()
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage.root.mainloop()
+        # else: # For btn_Apply
+        #     """have a function to check the input in lnE in Controller"""
+        #     # make sure all lnE are filled
+        #     # check if the username is already in used or not
+        #     # check if the input date in valid: in date format, the input date have to be less than the current month and year
+        #     # if valid -> AccountEditInfo1, else -> AccountEditInfo2
 
-    def run(self):
+    def run(self): # ?!?!
         """Start the application main loop"""
         self.root.mainloop()
 
