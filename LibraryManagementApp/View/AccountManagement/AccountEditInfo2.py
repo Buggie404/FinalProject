@@ -1,6 +1,13 @@
+# Import Lib
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+import os
+import sys
 
+# Import base file path 
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(base_dir, "View"))
+sys.path.append(base_dir)
 
 class AccountEditInfo2App:
     def __init__(self, root, assets_path=None):
@@ -130,6 +137,27 @@ class AccountEditInfo2App:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+        print(f"{button_name} clicked")
+        if button_name == "btn_EditAccountInformation" or button_name == "btn_Redo": # If clicked edit information in success/failed window -> go back to first AccountChangePass
+            self.root.destroy()
+            from AccountEditInfo import AccountEditInfoApp
+            changepass_root = Tk()
+            changeoass = AccountEditInfoApp(changepass_root)
+            changepass_root.mainloop()
+        elif button_name == "btn_Return": # Return to Account MainWindow
+            self.root.destroy()
+            from AccountMan import AccountManagement
+            account_root = Tk()
+            account = AccountManagement(account_root)
+            account_root.mainloop()
+        elif button_name == "btn_BackToHomepage":
+            self.root.destroy()
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
+        else: # If clicked edit account information here, nothing happends
+            pass
 
     def run(self):
         """Start the application main loop"""
