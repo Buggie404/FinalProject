@@ -68,7 +68,7 @@ class HomepageApp:
         if hasattr(self, "btn_BookManagement"):
             if self.role == "admin":
                 self.btn_BorrowReturnBook.place(x=348.0, y=315.0, width=228.0, height=203.0)
-                self.btn_UserMangement.place(x=613.0, y=315.0, width=228.0, height=203.0)
+                self.btn_UserManagement.place(x=613.0, y=315.0, width=228.0, height=203.0)
             else:
                 self.btn_UserManagement.place_forget()
     
