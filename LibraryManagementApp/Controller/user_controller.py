@@ -33,7 +33,6 @@
 from Model.admin_model import Admin
 from Model.user_model import User
 from tkinter import messagebox
-from View.noti_tab_view_1 import Message_1
 
 import re
 import datetime
@@ -262,7 +261,7 @@ class Search_users:
             load_user_func()
 
     @staticmethod
-    def filter_users(tbl_User, search_term, load_user_func):
+    def filter_users(tbl_User, search_term, load_user_func, root = None):
         """
         Filter users by either user_id or username depending on the search term
         
@@ -270,6 +269,7 @@ class Search_users:
             tbl_User: The Treeview widget containing user data
             search_term (str): The search term to filter by
             load_user_func: Function to reload all users
+            root: The root for creating notification
             
         Returns:
             None
@@ -307,13 +307,8 @@ class Search_users:
                     user[6]   # role
                 ))
             else:
-                if is_id:
-                    error_message = result if result != "invalid_id_format" else "Please enter a valid user ID"
-                else:
-                    error_message = "There are no matching usernames!"
-                    
-                messagebox.showinfo("Search Result", error_message)
-                # Reload all users if no match found
+                from View.noti_tab_view_1 import Message_1
+                Message_1(root, "edit_pass_id")
                 load_user_func()
                 
         except Exception as e:
