@@ -178,3 +178,139 @@ class Search_users:
             print(f"Error in original filtering method: {e}")
             # Reload all users if filtering fails
             load_user_func()
+
+    @staticmethod
+    def filter_users_by_username(search_term):
+        """
+        Filter users by exact username match
+        
+        Args:
+            search_term (str): The username to search for
+            
+        Returns:
+            tuple: (success_flag, result)
+                - If successful and user found: (True, user_data)
+                - If successful but no user found: (False, "no_match_username")
+                - If search_term is empty: (False, "empty_search")
+        """
+        if not search_term or search_term.strip() == "" or search_term == "Search":
+            return False, "empty_search"
+            
+        # No need to convert to integer as username can be alphanumeric
+        user = User.get_username(search_term)
+        
+        if user:
+            return True, user
+        else:
+            return False, "no_match_username"
+        
+    @staticmethod
+    def filter_by_username(tbl_User, search_term, load_user_func):
+        """
+        Filter the user table by username
+        
+        Args:
+            tbl_User: The Treeview widget containing user data
+            search_term (str): The search term to filter by
+            load_user_func: Function to reload all users
+            
+        Returns:
+            None
+        """
+        # Skip filtering if the search term is the placeholder or empty
+        if search_term == "Search" or search_term.strip() == "":
+            # Reload all users
+            load_user_func()
+            return
+        
+        print(f"Filtering by username: {search_term}")
+        
+        try:
+            # Use the filter_users_by_username method
+            success, result = Search_users.filter_users_by_username(search_term)
+            
+            if success:
+                # Clear existing data
+                for item in tbl_User.get_children():
+                    tbl_User.delete(item)
+                
+                # Display the single user found
+                user = result
+                tbl_User.insert('', 'end', values=(
+                    user[0],  # User_id
+                    user[1],  # name
+                    user[2],  # username
+                    user[3],  # email
+                    user[5],  # date_of_birth
+                    user[6]   # role
+                ))
+            else:
+                # Show error message
+                messagebox.showinfo("Search Result", result)
+                # Reload all users if no match found
+                load_user_func()
+                
+        except Exception as e:
+            print(f"Error filtering users: {e}")
+            # Reload all users if filtering fails
+            load_user_func()
+
+    @staticmethod
+    def filter_users(tbl_User, search_term, load_user_func):
+        """
+        Filter users by either user_id or username depending on the search term
+        
+        Args:
+            tbl_User: The Treeview widget containing user data
+            search_term (str): The search term to filter by
+            load_user_func: Function to reload all users
+            
+        Returns:
+            None
+        """
+        # Skip filtering if the search term is the placeholder or empty
+        if search_term == "Search" or search_term.strip() == "":
+            # Reload all users
+            load_user_func()
+            return
+        
+        try:
+            # Check if the search term is a number (likely an ID)
+            is_id = search_term.isdigit()
+            
+            if is_id:
+                print(f"Filtering by user_id: {search_term}")
+                success, result = Search_users.filter_users_by_id(search_term)
+            else:
+                print(f"Filtering by username: {search_term}")
+                success, result = Search_users.filter_users_by_username(search_term)
+            
+            if success:
+                # Clear existing data
+                for item in tbl_User.get_children():
+                    tbl_User.delete(item)
+                
+                # Display the single user found
+                user = result
+                tbl_User.insert('', 'end', values=(
+                    user[0],  # User_id
+                    user[1],  # name
+                    user[2],  # username
+                    user[3],  # email
+                    user[5],  # date_of_birth
+                    user[6]   # role
+                ))
+            else:
+                if is_id:
+                    error_message = result if result != "invalid_id_format" else "Please enter a valid user ID"
+                else:
+                    error_message = "There are no matching usernames!"
+                    
+                messagebox.showinfo("Search Result", error_message)
+                # Reload all users if no match found
+                load_user_func()
+                
+        except Exception as e:
+            print(f"Error filtering users: {e}")
+            # Reload all users if filtering fails
+            load_user_func()
