@@ -1,6 +1,11 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+import sys
+import os
 
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(base_dir, "View"))
+sys.path.append(base_dir)
 
 class UserAddAccount2App:
     def __init__(self, root, assets_path=None):
@@ -142,15 +147,7 @@ class UserAddAccount2App:
         """Handle button click events"""
         print(f"{button_name} clicked")
 
-        if button_name == "btn_DeleteAccount":
-            selected_items = self.tbl_User.selection()
-            if selected_items:
-                selected_item = selected_items[0]
-                print(f"Deleting user: {self.tbl_User.item(selected_item, 'values')}")
-                self.tbl_User.delete(selected_item)
-                # Disable the delete button after deletion
-                self.buttons['btn_DeleteAccount'].config(state='disabled')
-        elif button_name == "btn_AddAccount":
+        if button_name == "btn_AddAccount":
             self.root.destroy()
             from UserAddAccount import UserAddAccountApp
             add_user_root = Tk()
@@ -162,6 +159,18 @@ class UserAddAccount2App:
             edit_pass_root = Tk()
             edit_pass = UserEditAccountApp(edit_pass_root)
             edit_pass_root.mainloop()
+        elif button_name == "btn_Redo":
+            self.root.destroy()
+            from UserAddAccount import UserAddAccountApp
+            add_user_root = Tk()
+            add_user = UserAddAccountApp(add_user_root)
+            add_user_root.mainloop()
+        elif button_name == "btn_Return":
+            self.root.destroy()
+            from UserManagement import UserManagementApp
+            user_management_root = Tk()
+            user_management_root = UserManagementApp(user_management_root)
+            user_management_root.mainloop()
         else:
             self.root.destroy()
             from Homepage import HomepageApp
