@@ -230,24 +230,24 @@ class UserManagementApp:
     #         # Reload all users if filtering fails
     #         self.load_user()
 
-    def filter_by_user_id(self):
-        """Filter the user table by user_id"""
-        search_term = self.entries["lnE_Search"].get()
+    # def filter_by_user_id(self):
+    #     """Filter the user table by user_id"""
+    #     search_term = self.entries["lnE_Search"].get()
         
-        try:
-            # Import the controller
-            from Controller.user_controller import Search_users
+    #     try:
+    #         # Import the controller
+    #         from Controller.user_controller import Search_users
             
-            # Call the controller's filter_by_user_id method, passing the necessary arguments
-            Search_users.filter_by_user_id(
-                self.tbl_User,  # The Treeview widget
-                search_term,    # The search term
-                self.load_user  # The function to reload all users
-            )
-        except Exception as e:
-            print(f"Error while filtering users: {e}")
-            # Reload all users if filtering fails
-            self.load_user()
+    #         # Call the controller's filter_by_user_id method, passing the necessary arguments
+    #         Search_users.filter_by_user_id(
+    #             self.tbl_User,  # The Treeview widget
+    #             search_term,    # The search term
+    #             self.load_user  # The function to reload all users
+    #         )
+    #     except Exception as e:
+    #         print(f"Error while filtering users: {e}")
+    #         # Reload all users if filtering fails
+    #         self.load_user()
     
     def filter_by_username(self):
         """Filter the user table by username"""
