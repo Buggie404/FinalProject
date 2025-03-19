@@ -1,11 +1,36 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 import sys
 import os
 
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(base_dir, "View"))
-sys.path.append(base_dir)
+# Path resolution to find modules
+try:
+    # Try to find correct path to Controller and Model files
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    grandparent_dir = os.path.dirname(parent_dir)
+
+    # Add possible paths
+    possible_paths = [
+        grandparent_dir,
+        os.path.join(grandparent_dir, "LibraryManagementApp"),
+        parent_dir,
+        current_dir
+    ]
+
+    for path in possible_paths:
+        if path not in sys.path:
+            sys.path.append(path)
+
+    # Import Controller
+    from Controller.user_controller import add_account
+except ModuleNotFoundError:
+    try:
+        # Try alternative import path
+        from Controller.user_controller import add_account
+    except ModuleNotFoundError:
+        messagebox.showerror("Import Error", "Failed to import controller module. Please check your project structure.")
+        sys.exit(1)
 
 class UserAddAccountApp:
     def __init__(self, root, assets_path=None):
@@ -99,8 +124,74 @@ class UserAddAccountApp:
         self.create_entry_with_icon("lnE_Password", "image_6", (542.0, 343.0, 273.0, 46.0), (678.5, 367.0), (343.0, 366.0))
         self.create_entry_with_icon("lnE_DateOfBirth", "image_7", (542.0, 417.0, 273.0, 46.0), (678.5, 441.0), (356.0, 441.0))
 
+        # Set read-only for auto-generated fields
+        self.entries["lnE_User"].configure(bg="#E7DCDC", relief="flat", readonlybackground="#E7DCDC")
+        self.entries["lnE_Email"].configure(bg="#E7DCDC", relief="flat", readonlybackground="#E7DCDC")
+        
+        # Add placeholder for date field
+        self.date_placeholder = "YY/MM/DD"
+        self.entries["lnE_DateOfBirth"].insert(0, self.date_placeholder)
+        self.entries["lnE_DateOfBirth"].config(fg="grey")  # Set placeholder text color to grey
+        
+        # Bind focus events for date field
+        self.entries["lnE_DateOfBirth"].bind("<FocusIn>", self.on_date_field_focus_in)
+        self.entries["lnE_DateOfBirth"].bind("<FocusOut>", self.on_date_field_focus_out)
+
+        # Bind name field to generate username and email on Enter key press
+        self.entries["lnE_Name"].bind("<Return>", self.generate_user_info)
+        self.entries["lnE_Name"].bind("<FocusOut>", self.generate_user_info)
+
         # Create submit button
         self.create_button("btn_Confirm", (421.0, 486.0, 313.0, 48.0))
+
+        # self.setup_date_field_placeholders()
+        self.setup_field_events()
+    
+    def setup_field_events(self):
+        """Set up focus and key events for form fields"""
+        # Set up date field placeholders
+        date_field = self.entries["lnE_DateOfBirth"]
+        date_field.bind("<FocusIn>", self.on_date_field_focus_in)
+        date_field.bind("<FocusOut>", self.on_date_field_focus_out)
+        
+        # Bind name field to generate username and email on Enter key press
+        name_field = self.entries["lnE_Name"]
+        name_field.bind("<Return>", self.generate_user_info)
+        name_field.bind("<FocusOut>", self.generate_user_info)
+
+    def on_date_field_focus_in(self, event):
+        """Clear placeholder when date field gets focus"""
+        if self.entries["lnE_DateOfBirth"].get() == self.date_placeholder:
+            self.entries["lnE_DateOfBirth"].delete(0, "end")
+            self.entries["lnE_DateOfBirth"].config(fg="#000716")  # Change to normal text color
+
+    def on_date_field_focus_out(self, event):
+        """Restore placeholder when date field loses focus if empty"""
+        if not self.entries["lnE_DateOfBirth"].get():
+            self.entries["lnE_DateOfBirth"].insert(0, self.date_placeholder)
+            self.entries["lnE_DateOfBirth"].config(fg="grey")  # Change back to placeholder color
+
+    def generate_user_info(self, event):
+        """Generate username, email, and set default password"""
+        name = self.entries["lnE_Name"].get().strip()
+        if name:
+            # Get next user ID 
+            user_id = add_account.get_next_user_id()
+            
+            # Generate username and email
+            username, email = add_account.generate_username_and_email(name, user_id)
+            
+            if username and email:
+                # Set username and email
+                self.entries["lnE_User"].delete(0, "end")
+                self.entries["lnE_Email"].delete(0, "end")
+                
+                self.entries["lnE_User"].insert(0, username)
+                self.entries["lnE_Email"].insert(0, email)
+                
+                # Set default password
+                self.entries["lnE_Password"].delete(0, "end")
+                self.entries["lnE_Password"].insert(0, "123456789")
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -163,6 +254,36 @@ class UserAddAccountApp:
 
         self.entries[entry_name] = entry
         self.load_image(icon_name, icon_position)
+    
+    def validate_and_create_user(self):
+        """Validate the form and create a new user"""
+        name = self.entries["lnE_Name"].get().strip()
+        username = self.entries["lnE_User"].get().strip()
+        email = self.entries["lnE_Email"].get().strip()
+        password = self.entries["lnE_Password"].get().strip()
+        date_of_birth = self.entries["lnE_DateOfBirth"].get().strip()
+        
+        # Validate all fields
+        valid, error_msg = add_account.validate_all_fields(name, username, email, date_of_birth)
+        
+        if not valid:
+            messagebox.showerror("Validation Error", error_msg)
+            return False
+            
+        # Check if password is empty
+        if not password:
+            messagebox.showerror("Validation Error", "Password cannot be empty.")
+            return False
+            
+        # Create user
+        success, message = add_account.create_user(name, username, email, password, date_of_birth)
+        
+        if success:
+            messagebox.showinfo("Success", message)
+            return True
+        else:
+            messagebox.showerror("Error", message)
+            return False
 
     def button_click(self, button_name):
         """Handle button click events"""

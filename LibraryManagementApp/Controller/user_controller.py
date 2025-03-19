@@ -35,6 +35,12 @@ from Model.user_model import User
 from tkinter import messagebox
 from View.noti_tab_view_1 import Message_1
 
+import re
+import datetime
+import unidecode
+import os
+import sys
+
 class Search_users:
     def __init__(self):
         pass
@@ -314,3 +320,149 @@ class Search_users:
             print(f"Error filtering users: {e}")
             # Reload all users if filtering fails
             load_user_func()
+
+class add_account:
+    @staticmethod
+    def generate_username_and_email(name, user_id):
+        """Generate username and email based on full name and user ID"""
+        if not name or len(name.split()) < 2:
+            return None, None
+        
+        name_parts = name.split()
+        last_name = name_parts[-1]
+        first_letters = "".join([unidecode.unidecode(part[0]).lower() for part in name_parts[:-1]])
+        
+        # Generate username and email
+        user_id_str = str(user_id)
+        username = unidecode.unidecode(last_name).lower() + first_letters + user_id_str
+        email = f"{unidecode.unidecode(last_name).lower()}{first_letters}{user_id_str}@user.libma"
+        
+        return username, email
+    
+    @staticmethod
+    def validate_name(name):
+        """Validate that name contains only letters and spaces"""
+        if not name:
+            return False, "Name cannot be empty."
+        
+        # Check for numbers or special characters
+        if re.search(r'[^a-zA-ZÀ-ỹ\s]', name):
+            return False, "Name should contain only letters and spaces."
+        
+        return True, ""
+    
+    @staticmethod
+    def validate_date_format(date_text):
+        """Validate date format (yy/mm/dd)"""
+        if date_text == "yy/mm/dd" or not date_text:
+            return False, "Please enter a valid date."
+        
+        # Allow only numbers and / character
+        if re.search(r'[^0-9/]', date_text):
+            return False, "Date should contain only numbers and / character."
+        
+        try:
+            # Check format
+            if not re.match(r'^(\d{2})/(\d{2})/(\d{2})$', date_text):
+                return False, "Invalid date format. Use yy/mm/dd."
+            
+            # Parse date
+            year, month, day = date_text.split('/')
+            
+            # Add century prefix to year
+            if len(year) == 2:
+                year = "20" + year  # Assuming 21st century
+            
+            # Convert to integers
+            year_int = int(year)
+            month_int = int(month)
+            day_int = int(day)
+            
+            # Basic validation
+            if not (1 <= month_int <= 12 and 1 <= day_int <= 31):
+                return False, "Invalid month or day."
+                
+            # Create date object for additional validation
+            date_obj = datetime.datetime(year_int, month_int, day_int)
+            
+            # Check if date is in the future
+            if date_obj.date() > datetime.datetime.now().date():
+                return False, "Date of birth cannot be in the future."
+                
+            return True, ""
+            
+        except ValueError:
+            return False, "Invalid date. Please use yy/mm/dd format."
+    
+    @staticmethod
+    def format_date_for_database(date_text):
+        """Convert date from yy/mm/dd to yyyy-mm-dd for database"""
+        if not date_text or date_text == "yy/mm/dd":
+            return None
+            
+        try:
+            date_parts = date_text.split('/')
+            if len(date_parts) == 3:
+                year, month, day = date_parts
+                # Add century to year if needed
+                if len(year) == 2:
+                    current_year = datetime.datetime.now().year
+                    century = str(current_year)[:2]
+                    year = century + year
+                return f"{year}-{month}-{day}"
+            return None
+        except Exception:
+            return None
+    
+    @staticmethod
+    def get_next_user_id():
+        """Get the next available user ID from the database"""
+        try:
+            users = User.get_all_user()
+            if users:
+                # Find the highest user_id
+                max_id = max([int(user[0]) for user in users])
+                return max_id + 1
+            return 1  # Default if no users
+        except Exception as e:
+            print(f"Error getting next user ID: {str(e)}")
+            return 167  # Default fallback value
+    
+    @staticmethod
+    def create_user(name, username, email, password, date_of_birth):
+        """Create a new user after validation"""
+        try:
+            # Format date for database
+            formatted_date = add_account.format_date_for_database(date_of_birth)
+            if not formatted_date:
+                return False, "Invalid date format"
+                
+            # Create user object
+            user = User(name=name, username=username, email=email, 
+                        password=password, date_of_birth=formatted_date)
+            
+            # Save user to database
+            user.save_user()
+            return True, "User account created successfully!"
+            
+        except Exception as e:
+            return False, f"Error creating user: {str(e)}"
+    
+    @staticmethod
+    def validate_all_fields(name, username, email, date_of_birth):
+        """Validate all fields before form submission"""
+        # Validate name
+        name_valid, name_msg = add_account.validate_name(name)
+        if not name_valid:
+            return False, name_msg
+        
+        # Check if username and email were generated
+        if not username or not email:
+            return False, "Username and email were not properly generated. Please check the name field."
+        
+        # Validate date of birth
+        date_valid, date_msg = add_account.validate_date_format(date_of_birth)
+        if not date_valid:
+            return False, date_msg
+        
+        return True, ""

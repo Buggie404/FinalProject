@@ -27,14 +27,14 @@ class Database:
                 try:
                     self.conn = sqlite3.connect(path)
                     self.cursor = self.conn.cursor()
-                    print(f"✅ Kết nối database thành công: {path}")
+                    # print(f"✅ Kết nối database thành công: {path}")
                     break
                 except sqlite3.Error as e:
                     print(f"⚠️ Đường dẫn hợp lệ nhưng có lỗi kết nối: {path} - {e}")
         
         # Nếu không tìm thấy database ở bất kỳ đường dẫn nào
         if self.conn is None:
-            print("❌ Không tìm thấy database ở các đường dẫn thông thường")
+            # print("❌ Không tìm thấy database ở các đường dẫn thông thường")
             # Cho phép người dùng chỉ định đường dẫn
             custom_path = input("Vui lòng nhập đường dẫn đến file database: ")
             if os.path.exists(custom_path):
