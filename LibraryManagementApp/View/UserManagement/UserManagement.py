@@ -180,11 +180,11 @@ class UserManagementApp:
                 for User in Users:
                     self.tbl_User.insert('', 'end', values=(
                         User[0],  # User_id
-                        User[1],  # title
-                        User[2],  # author
-                        User[3],  # published_year
-                        User[5],  # category
-                        User[6]  # quantity
+                        User[1],  # name
+                        User[2],  # username
+                        User[3],  # email
+                        User[5],  # date_of_birth
+                        User[6]  # role
                     ))
                 return True
             return False
@@ -267,6 +267,7 @@ class UserManagementApp:
             print(f"Error while filtering users: {e}")
             # Reload all users if filtering fails
             self.load_user()
+    
     def filter_by_user_id(self):
         """Filter the user table by user_id or username"""
         search_term = self.entries["lnE_Search"].get()
@@ -279,7 +280,8 @@ class UserManagementApp:
             Search_users.filter_users(
                 self.tbl_User,  # The Treeview widget
                 search_term,    # The search term
-                self.load_user  # The function to reload all users
+                self.load_user,  # The function to reload all users
+                self.root       # Pass the root window for noti tab
             )
         except Exception as e:
             print(f"Error while filtering users: {e}")
