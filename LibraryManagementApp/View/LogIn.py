@@ -115,8 +115,43 @@ class LogInApp:
             46.0
         )
     
-    def create_entry(self, image_name, img_x, img_y, entry_x, entry_y, width, height):
-        """Helper method to create an entry field with background image"""
+    # def create_entry(self, image_name, img_x, img_y, entry_x, entry_y, width, height):
+    #     """Helper method to create an entry field with background image"""
+    #     if image_name in self.images:
+    #         self.canvas.create_image(
+    #             img_x,
+    #             img_y,
+    #             image=self.images[image_name]
+    #         )
+        
+    #     is_password = "Password" in image_name
+        
+    #     entry = Entry(
+    #         bd=0,
+    #         bg="#E7DCDC",
+    #         fg="#000716",
+    #         highlightthickness=0,
+    #         show="•" if is_password else ""
+    #     )
+        
+    #     entry.place(
+    #         x=entry_x,
+    #         y=entry_y,
+    #         width=width,
+    #         height=height
+    #     )
+        
+    #     # Store reference to entry fields for later access
+    #     if image_name == "lnE_Email.png":
+    #         self.lnE_Email = entry
+    #     elif image_name == "lnE_Password.png":
+    #         self.lnE_Password = entry
+            
+    #     return entry
+
+    def create_entry(self, image_name, img_x, img_y, entry_x, entry_y, width, height, placeholder=None):
+        """Helper method to create an entry field with background image and placeholder text"""
+        # Display the background image
         if image_name in self.images:
             self.canvas.create_image(
                 img_x,
@@ -124,16 +159,25 @@ class LogInApp:
                 image=self.images[image_name]
             )
         
+        # Determine if this is a password field and set appropriate placeholder
         is_password = "Password" in image_name
-        
+        if placeholder is None:
+            if "Email" in image_name:
+                placeholder = "Email"
+            elif "Password" in image_name:
+                placeholder = "Password"
+            else:
+                placeholder = ""
+    
+        # Create the entry widget
         entry = Entry(
             bd=0,
-            bg="#E7DCDC",
-            fg="#000716",
-            highlightthickness=0,
-            show="•" if is_password else ""
+            bg="#E8DCDC",
+            fg="grey",  # Start with grey text for placeholder
+            highlightthickness=0
         )
         
+        # Position the entry
         entry.place(
             x=entry_x,
             y=entry_y,
@@ -141,13 +185,61 @@ class LogInApp:
             height=height
         )
         
+        # Set initial placeholder text
+        entry.insert(0, placeholder)
+        
+        # Store the entry's properties in the widget itself for easy access in callbacks
+        entry.is_password = is_password
+        entry.placeholder = placeholder
+        entry.has_content = False
+        
+        # Setup focus events to handle placeholder behavior
+        entry.bind("<FocusIn>", self._on_entry_focus_in)
+        entry.bind("<FocusOut>", self._on_entry_focus_out)
+        
+        # For password field, we need to track when the content changes
+        if is_password:
+            entry.bind("<KeyRelease>", self._on_entry_key_event)
+        
         # Store reference to entry fields for later access
         if image_name == "lnE_Email.png":
             self.lnE_Email = entry
         elif image_name == "lnE_Password.png":
             self.lnE_Password = entry
-            
+                
         return entry
+
+    def _on_entry_focus_in(self, event):
+        """Remove placeholder text when entry gets focus"""
+        entry = event.widget
+        if entry.get() == entry.placeholder:
+            entry.delete(0, "end")
+            entry.config(fg="#000716")  # Change to normal text color
+            # Set show attribute for password fields
+            if entry.is_password:
+                entry.config(show="•")
+
+    def _on_entry_focus_out(self, event):
+        """Add placeholder text if entry is empty and loses focus"""
+        entry = event.widget
+        if entry.get() == "":
+            entry.insert(0, entry.placeholder)
+            entry.config(fg="grey", show="")  # Grey text, no bullets for placeholder
+            entry.has_content = False
+        else:
+            entry.has_content = True
+
+    def _on_entry_key_event(self, event):
+        """Track when password field has content and apply bullet mask"""
+        entry = event.widget
+        if entry.is_password:
+            # If we have any content and it's not just the placeholder, show bullets
+            if entry.get() != "" and entry.get() != entry.placeholder:
+                entry.config(show="•")
+                entry.has_content = True
+            # If field is empty but still has focus, keep show="•" but mark as empty
+            elif entry.get() == "":
+                entry.has_content = False
     
     def create_login_button(self):
         """Create the login button"""

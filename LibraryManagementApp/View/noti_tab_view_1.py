@@ -132,7 +132,7 @@ class Invalid():  # To notify Invalid input
 
         # Ok button
         Button(self.invalid, width=13, text="OK", highlightbackground='white', highlightthickness=1,
-               command=lambda: self.invalid.destroy).pack(pady=10)
+               command=lambda: self.invalid.destroy()).pack(pady=10)
 
 
 class Drop_Off():
