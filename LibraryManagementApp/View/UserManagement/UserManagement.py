@@ -227,10 +227,6 @@ class UserManagementApp:
         )
 
         self.buttons[button_name] = button
-        
-        # Initially disable the delete button until a user is selected
-        if button_name == "btn_DeleteAccount":
-            button.config(state='disabled')
 
     def create_entry(self, entry_name, bg_position, entry_dimensions, bg_color, placeholder="Search"):
         """Create an entry field with a placeholder"""
@@ -286,8 +282,7 @@ class UserManagementApp:
                 selected_item = selected_items[0]
                 print(f"Deleting user: {self.tbl_User.item(selected_item, 'values')}")
                 self.tbl_User.delete(selected_item)
-                # Disable the delete button after deletion
-                self.buttons['btn_DeleteAccount'].config(state='disabled')
+
         elif button_name == "btn_AddAccount":
             self.root.destroy()
             from UserAddAccount import UserAddAccountApp
