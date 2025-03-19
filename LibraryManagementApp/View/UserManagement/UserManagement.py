@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, StringVar
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, StringVar, messagebox
 from tkinter import ttk
 import tkinter as tk
 import os
@@ -193,43 +193,62 @@ class UserManagementApp:
             print(f"Error loading user data: {e}")
             return False
 
+    # def filter_by_user_id(self):
+    #     """Filter the user table by user_id"""
+    #     search_term = self.entries["lnE_Search"].get()
+        
+    #     # Skip filtering if the search term is the placeholder or empty
+    #     if search_term == "Search" or search_term.strip() == "":
+    #         # Reload all users
+    #         self.load_user()
+    #         return
+        
+    #     print(f"Filtering by user_id: {search_term}")
+        
+    #     try:
+    #         # Clear the current view and reload all data
+    #         self.load_user()
+            
+    #         # Get all items after reloading
+    #         all_items = self.tbl_User.get_children()
+            
+    #         # First, hide all rows
+    #         for item in all_items:
+    #             self.tbl_User.detach(item)
+            
+    #         # Then, show only the matching rows
+    #         for item in all_items:
+    #             values = self.tbl_User.item(item, 'values')
+    #             user_id = str(values[0])  # The first column is user_id
+                
+    #             if search_term.lower() in user_id.lower():
+    #                 # Reattach the item to show it
+    #                 self.tbl_User.reattach(item, '', 'end')
+            
+    #     except Exception as e:
+    #         print(f"Error filtering users: {e}")
+    #         # Reload all users if filtering fails
+    #         self.load_user()
+
     def filter_by_user_id(self):
         """Filter the user table by user_id"""
         search_term = self.entries["lnE_Search"].get()
         
-        # Skip filtering if the search term is the placeholder or empty
-        if search_term == "Search" or search_term.strip() == "":
-            # Reload all users
-            self.load_user()
-            return
-        
-        print(f"Filtering by user_id: {search_term}")
-        
         try:
-            # Clear the current view and reload all data
-            self.load_user()
+            # Import the controller
+            from Controller.user_controller import Search_users
             
-            # Get all items after reloading
-            all_items = self.tbl_User.get_children()
-            
-            # First, hide all rows
-            for item in all_items:
-                self.tbl_User.detach(item)
-            
-            # Then, show only the matching rows
-            for item in all_items:
-                values = self.tbl_User.item(item, 'values')
-                user_id = str(values[0])  # The first column is user_id
-                
-                if search_term.lower() in user_id.lower():
-                    # Reattach the item to show it
-                    self.tbl_User.reattach(item, '', 'end')
-            
+            # Call the controller's filter_by_user_id method, passing the necessary arguments
+            Search_users.filter_by_user_id(
+                self.tbl_User,  # The Treeview widget
+                search_term,    # The search term
+                self.load_user  # The function to reload all users
+            )
         except Exception as e:
-            print(f"Error filtering users: {e}")
+            print(f"Error while filtering users: {e}")
             # Reload all users if filtering fails
             self.load_user()
-
+    
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
         self.images[image_name] = PhotoImage(

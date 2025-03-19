@@ -58,6 +58,8 @@ class Message_1():  # To notify message (Type 1: When clicked 'OK' button -> mes
         self.message_1.resizable(False, False)
         self.message_1.config(bg='white')
 
+        self.delete_type = delete_type
+
         # Dynamic Message
         message_1_map = {'book': "Book Deleted!",
                          'account': "Account Deleted!",
@@ -107,7 +109,7 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
         # parent_window.destroy() (ngoài vòng)
 
 
-class Invalid():  # To notify Invalid input
+class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id format
     def __init__(self, root, invalid_type):
         # Setup tab
         self.root = root
