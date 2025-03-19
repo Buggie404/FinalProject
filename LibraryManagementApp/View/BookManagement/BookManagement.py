@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, ttk, Frame
 
 
 class BookManagementApp:
@@ -40,6 +40,9 @@ class BookManagementApp:
         self.create_sidebar()
         self.create_main_panel()
 
+        # Create book table
+        self.create_book_table()
+
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
         return self.assets_path / Path(path)
@@ -52,11 +55,11 @@ class BookManagementApp:
             fill="#0A66C2", outline=""
         )
 
-        # Main content panel
-        self.tbl_Book = self.canvas.create_rectangle(
-            285.0, 156.0, 871.0, 542.0,
-            fill="#D9D9D9", outline=""
-        )
+        # # Main content panel
+        # self.tbl_Book = self.canvas.create_rectangle(
+        #     285.0, 156.0, 871.0, 542.0,
+        #     fill="#D9D9D9", outline=""
+        # )
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -166,6 +169,133 @@ class BookManagementApp:
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()
+    
+    def create_book_table(self):
+       """Create the user table using ttk.Treeview"""
+       # Configure the ttk style
+       style = ttk.Style()
+      
+       # Configure the Treeview style
+       style.configure(
+           "Treeview",
+           background="#E6E6E6",
+           foreground="black",
+           fieldbackground="#E6E6E6",
+           font=("Montserrat", 10, "bold")
+       )
+      
+       # Configure the Treeview.Heading style
+       style.configure(
+           "Treeview.Heading",
+           background="#D3D3D3",
+           foreground="black",
+           font=("Montserrat", 10, "bold")
+       )
+      
+       # Style when a row is selected
+       style.map('Treeview',
+           background=[('selected', '#0A66C2')],
+           foreground=[('selected', 'white')]
+       )
+      
+       # Create a frame to hold the treeview and scrollbar
+       table_frame = Frame(self.root) 
+       table_frame.place(x=285.0, y=156.0, width=586.0, height=386.0)
+      
+       # Create the scrollbar
+       vsb = ttk.Scrollbar(table_frame, orient="vertical")
+       vsb.pack(side='right', fill='y')
+      
+       # Create the treeview
+       self.tbl_Book = ttk.Treeview(
+           table_frame,
+           yscrollcommand=vsb.set,
+           selectmode="browse",
+           columns=("book_id", "title", "author", "published_year", "category", "quantity"),
+           show="headings"
+       )
+      
+       # Configure the scrollbar
+       vsb.config(command=self.tbl_Book.yview)
+      
+       # Define column headings and widths
+       columns = {
+           "book_id": ("ISBN", 60),
+           "title": ("Title", 110),
+           "author": ("Author", 110),
+           "published_year": ("Published Year", 70),
+           "category": ("Category", 50),
+           "quantity": ("Quantity", 50)
+       }
+      
+       # Configure each column
+       for col_id, (col_name, col_width) in columns.items():
+           self.tbl_Book.heading(col_id, text=col_name, anchor="w")
+           self.tbl_Book.column(col_id, width=col_width, anchor="w")
+      
+       # Pack the treeview
+       self.tbl_Book.pack(side="left", fill="both", expand=1)
+      
+       # Bind the selection event
+    #    self.tbl_Book.bind("<<TreeviewSelect>>", self.on_user_select)
+      
+       # Bind a click on column header for sorting
+    #    for col in columns:
+            # self.tbl_Book.heading(col, command=lambda _col=col: self.sort_treeview_column(_col))
+
+
+    # def sort_treeview_column(self, col):
+    #     """Sort the treeview content when a column header is clicked"""
+    #     if col in ["book_id", "price", "quantity", "year"]:
+    #         # Numeric columns should be sorted as numbers
+    #         data = []
+    #         for iid in self.tbl_Book.get_children(''):
+    #             value = self.tbl_Book.set(iid, col)
+    #             try:
+    #                 # Convert to float for numeric sorting
+    #                 numeric_value = float(value)
+    #                 data.append((numeric_value, iid))
+    #             except ValueError:
+    #                 # If conversion fails, place at the beginning with value 0
+    #                 data.append((0, iid))
+    #         data.sort()
+    #     elif col == "category":
+    #         # For category column, sort with predefined category order
+    #         category_order = {
+    #             "fantasy": 0, 
+    #             "fiction": 1, 
+    #             "romance": 2, 
+    #             "technology": 3, 
+    #             "biography": 4
+    #         }
+            
+    #         data = []
+    #         for iid in self.tbl_Book.get_children(''):
+    #             category = self.tbl_Book.set(iid, col).lower()
+    #             # Get category priority, default to high number for unknown categories
+    #             sort_key = category_order.get(category, 99)
+    #             data.append((sort_key, iid))
+    #         data.sort()
+    #     else:
+    #         # For other columns (title, author), sort alphabetically
+    #         data = [(self.tbl_Book.set(iid, col), iid) for iid in self.tbl_Book.get_children('')]
+    #         data.sort()
+        
+    #     # Rearrange items in sorted positions
+    #     for idx, (_, iid) in enumerate(data):
+    #         self.tbl_Book.move(iid, '', idx)
+        
+    #     # Set the sort direction for the next click
+    #     if hasattr(self, 'sort_direction') and self.sort_direction.get(col) == 'asc':
+    #         self.tbl_Book.delete(*self.tbl_Book.get_children())
+    #         data.reverse()
+    #         for _, iid in data:
+    #             self.tbl_Book.move(iid, '', 'end')
+    #         self.sort_direction[col] = 'desc'
+    #     else:
+    #         if not hasattr(self, 'sort_direction'):
+    #             self.sort_direction = {}
+    #         self.sort_direction[col] = 'asc'
 
 
 if __name__ == "__main__":

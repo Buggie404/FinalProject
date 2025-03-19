@@ -114,40 +114,6 @@ class LogInApp:
             273.0, 
             46.0
         )
-    
-    # def create_entry(self, image_name, img_x, img_y, entry_x, entry_y, width, height):
-    #     """Helper method to create an entry field with background image"""
-    #     if image_name in self.images:
-    #         self.canvas.create_image(
-    #             img_x,
-    #             img_y,
-    #             image=self.images[image_name]
-    #         )
-        
-    #     is_password = "Password" in image_name
-        
-    #     entry = Entry(
-    #         bd=0,
-    #         bg="#E7DCDC",
-    #         fg="#000716",
-    #         highlightthickness=0,
-    #         show="•" if is_password else ""
-    #     )
-        
-    #     entry.place(
-    #         x=entry_x,
-    #         y=entry_y,
-    #         width=width,
-    #         height=height
-    #     )
-        
-    #     # Store reference to entry fields for later access
-    #     if image_name == "lnE_Email.png":
-    #         self.lnE_Email = entry
-    #     elif image_name == "lnE_Password.png":
-    #         self.lnE_Password = entry
-            
-    #     return entry
 
     def create_entry(self, image_name, img_x, img_y, entry_x, entry_y, width, height, placeholder=None):
         """Helper method to create an entry field with background image and placeholder text"""
