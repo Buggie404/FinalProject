@@ -193,6 +193,39 @@ class UserManagementApp:
             print(f"Error loading user data: {e}")
             return False
         
+    def filter_by_user_id(self):
+        """Filter the user table by user_id"""
+        search_term = self.entries["lnE_Search"].get()
+        
+        # Skip filtering if the search term is the placeholder or empty
+        if search_term == "Search" or search_term.strip() == "":
+            # Reload all users
+            self.load_user()
+            return
+        
+        print(f"Filtering by user_id: {search_term}")
+        
+        try:
+            # Get all items currently in the table
+            all_items = self.tbl_User.get_children()
+            
+            # First, hide all rows
+            for item in all_items:
+                self.tbl_User.detach(item)
+            
+            # Then, show only the matching rows
+            for item in all_items:
+                values = self.tbl_User.item(item, 'values')
+                user_id = str(values[0])  # The first column is user_id
+                
+                if search_term.lower() in user_id.lower():
+                    # Reattach the item to show it
+                    self.tbl_User.reattach(item, '', 'end')
+            
+        except Exception as e:
+            print(f"Error filtering users: {e}")
+            # Reload all users if filtering fails
+            self.load_user()
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -259,6 +292,10 @@ class UserManagementApp:
             if entry.get() == "":
                 entry.insert(0, placeholder)
                 entry.config(fg="grey")
+
+        # Add Enter key binding for search entry
+        if entry_name == "lnE_Search":
+            entry.bind("<Return>", lambda event: self.filter_by_user_id())
 
         entry.bind("<FocusIn>", on_focus_in)
         entry.bind("<FocusOut>", on_focus_out)
