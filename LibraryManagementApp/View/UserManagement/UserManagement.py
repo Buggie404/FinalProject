@@ -192,7 +192,7 @@ class UserManagementApp:
         except Exception as e:
             print(f"Error loading user data: {e}")
             return False
-        
+
     def filter_by_user_id(self):
         """Filter the user table by user_id"""
         search_term = self.entries["lnE_Search"].get()
@@ -206,7 +206,10 @@ class UserManagementApp:
         print(f"Filtering by user_id: {search_term}")
         
         try:
-            # Get all items currently in the table
+            # Clear the current view and reload all data
+            self.load_user()
+            
+            # Get all items after reloading
             all_items = self.tbl_User.get_children()
             
             # First, hide all rows
