@@ -93,7 +93,7 @@ class UserManagementApp:
             background="#E6E6E6",
             foreground="black",
             fieldbackground="#E6E6E6",
-            font=("Montserrat", 10, "bold")
+            font=("Montserrat", 10, "normal")
         )
         
         # Configure the Treeview.Heading style

@@ -133,6 +133,33 @@ class UserAddAccount1App:
         """Handle button click events"""
         print(f"{button_name} clicked")
 
+        if button_name == "btn_DeleteAccount":
+            selected_items = self.tbl_User.selection()
+            if selected_items:
+                selected_item = selected_items[0]
+                print(f"Deleting user: {self.tbl_User.item(selected_item, 'values')}")
+                self.tbl_User.delete(selected_item)
+                # Disable the delete button after deletion
+                self.buttons['btn_DeleteAccount'].config(state='disabled')
+        elif button_name == "btn_AddAccount":
+            self.root.destroy()
+            from UserAddAccount import UserAddAccountApp
+            add_user_root = Tk()
+            add_user = UserAddAccountApp(add_user_root)
+            add_user_root.mainloop()
+        elif button_name == 'btn_EditAccountPassword':
+            self.root.destroy()
+            from UserEditAccount import UserEditAccountApp
+            edit_pass_root = Tk()
+            edit_pass = UserEditAccountApp(edit_pass_root)
+            edit_pass_root.mainloop()
+        else:
+            self.root.destroy()
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
+
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()

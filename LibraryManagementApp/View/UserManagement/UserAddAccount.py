@@ -1,6 +1,11 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+import sys
+import os
 
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(base_dir, "View"))
+sys.path.append(base_dir)
 
 class UserAddAccountApp:
     def __init__(self, root, assets_path=None):
@@ -162,6 +167,31 @@ class UserAddAccountApp:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+
+        if button_name == "btn_AddAccount":
+            self.root.destroy()
+            from UserManagement import UserManagementApp
+            add_user_root = Tk()
+            add_user = UserManagementApp(add_user_root)
+            add_user_root.mainloop()
+        elif button_name == 'btn_EditAccountPassword':
+            self.root.destroy()
+            from UserEditAccount import UserEditAccountApp
+            edit_pass_root = Tk()
+            edit_pass = UserEditAccountApp(edit_pass_root)
+            edit_pass_root.mainloop()
+        elif button_name == "btn_Confirm":
+            self.root.destroy()
+            from UserAddAccount1 import UserAddAccount1App
+            add_user_1_root = Tk()
+            add_user_1 = UserAddAccount1App(add_user_1_root)
+            add_user_1_root.mainloop()
+        else:
+            self.root.destroy()
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
 
     def run(self):
         """Start the application main loop"""
