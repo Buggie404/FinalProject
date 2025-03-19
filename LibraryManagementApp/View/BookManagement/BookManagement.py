@@ -79,7 +79,7 @@ class BookManagementApp:
         self.create_button("btn_Romance", (521.0, 88.0, 103.0, 43.0))
         self.create_button("btn_Technology", (639.0, 88.0, 103.0, 43.0))
         self.create_button("btn_Biography", (757.0, 88.0, 103.0, 43.0))
-        self.create_button("btn_DeleteAccount", (719.0, 552.0, 115.0, 43.0))
+        self.create_button("btn_DeleteBook", (719.0, 552.0, 115.0, 43.0))
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -158,34 +158,6 @@ class BookManagementApp:
         )
 
         self.entries[entry_name] = entry
-
-    # def create_entry(self, entry_name, image_position, dimensions, bg_color):
-    #     """Create an entry field with the given parameters"""
-    #     self.images[entry_name] = PhotoImage(
-    #         file=self.relative_to_assets(f"{entry_name}.png")
-    #     )
-    #
-    #     entry_bg = self.canvas.create_image(
-    #         image_position[0],
-    #         image_position[1],
-    #         image=self.images[entry_name]
-    #     )
-    #
-    #     entry = Entry(
-    #         bd=0,
-    #         bg=bg_color,
-    #         fg="#000716",
-    #         highlightthickness=0
-    #     )
-    #
-    #     entry.place(
-    #         x=dimensions[0],
-    #         y=dimensions[1],
-    #         width=dimensions[2],
-    #         height=dimensions[3]
-    #     )
-    #
-    #     self.entries[entry_name] = entry
 
     def button_click(self, button_name):
         """Handle button click events"""
