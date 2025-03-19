@@ -2,6 +2,8 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, StringVar
 from tkinter import ttk
 import tkinter as tk
+import os
+import sys
 
 class UserManagementApp:
     def __init__(self, root, assets_path=None):
@@ -40,7 +42,8 @@ class UserManagementApp:
         self.create_background()
         self.create_sidebar()
         self.create_main_panel()
-        self.create_user_table()  # Add the table creation
+        self.create_tbl_User()  # Add the table creation
+        self.load_user()
 
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
@@ -78,7 +81,7 @@ class UserManagementApp:
         # Create action button
         self.create_button("btn_DeleteAccount", (719.0, 533.0, 115.0, 43.0))
 
-    def create_user_table(self):
+    def create_tbl_User(self):
         """Create the user table using ttk.Treeview"""
         # Configure the ttk style
         style = ttk.Style()
@@ -90,7 +93,7 @@ class UserManagementApp:
             background="#E6E6E6",
             foreground="black",
             fieldbackground="#E6E6E6",
-            font=("Montserrat", 12, "bold")
+            font=("Montserrat", 10, "bold")
         )
         
         # Configure the Treeview.Heading style
@@ -98,7 +101,7 @@ class UserManagementApp:
             "Treeview.Heading",
             background="#E6E6E6",
             foreground="black",
-            font=("Montserrat", 12, "bold")
+            font=("Montserrat", 10, "bold")
         )
         
         # Style when a row is selected
@@ -111,96 +114,85 @@ class UserManagementApp:
         table_frame = Frame(self.root)
         table_frame.place(x=285.0, y=121.0, width=586.0, height=386.0)
         
+        # Create the scrollbar
+        vsb = ttk.Scrollbar(table_frame, orient='vertical')
+        vsb.pack(side='right', fill='y')
+
         # Create the treeview
-        self.user_table = ttk.Treeview(
+        self.tbl_User = ttk.Treeview(
             table_frame,
+            yscrollcommand=vsb.set,
             selectmode="browse",
             columns=("user_id", "name", "username", "email", "date_of_birth", "role"),
             show="headings"
         )
 
-        # Create the scrollbar
-        scroll_y = ttk.Scrollbar(table_frame, orient="vertical")
-        self.user_table.configure(yscrollcommand=scroll_y.set)
-        scroll_y.place(x=586, y=0, width=15, height=386)
+        # Config scrollbar
+        vsb.config(command=self.tbl_User.yview)
         
         # Define column headings and widths
         columns = {
-            "user_id": ("User ID", 50),
+            "user_id": ("User ID", 60),
             "name": ("Name", 100),
-            "username": ("Username", 100),
+            "username": ("Username", 110),
             "email": ("Email", 120),
-            "date_of_birth": ("Date of Birth", 100),
+            "date_of_birth": ("Date of Birth", 90),
             "role": ("Role", 70)
         }
         
         # Configure each column
         for col_id, (col_name, col_width) in columns.items():
-            self.user_table.heading(col_id, text=col_name, anchor="w")
-            self.user_table.column(col_id, width=col_width, anchor="w")
+            self.tbl_User.heading(col_id, text=col_name, anchor="c")
+            self.tbl_User.column(col_id, width=col_width, anchor="w")
         
         # Pack the treeview
-        self.user_table.pack(side="left", fill="both", expand=1)
+        self.tbl_User.pack(side="left", fill="both", expand=1)
         
-        # Bind the selection event
-        self.user_table.bind("<<TreeviewSelect>>", self.on_user_select)
+    def load_user(self):
+        """ Try to load data if possible"""
+        try:
+            # Try to find correct path to Model file
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            parent_dir = os.path.dirname(current_dir)
+            grandparent_dir = os.path.dirname(parent_dir)
+
+            # Add possible path
+            possible_paths = [
+                grandparent_dir,
+                os.path.join(grandparent_dir, "LibraryManagementApp"),
+                parent_dir,
+                current_dir
+            ]
+
+            for path in possible_paths:
+                if path not in sys.path:
+                    sys.path.append(path)
+
+            from Model.user_model import User
+
+             # Clear existing data
+            for item in self.tbl_User.get_children():
+                self.tbl_User.delete(item)
+                
+            # Load user data from database
+            Users = User.get_all_user()
+            if Users:
+                for User in Users:
+                    self.tbl_User.insert('', 'end', values=(
+                        User[0],  # User_id
+                        User[1],  # title
+                        User[2],  # author
+                        User[3],  # published_year
+                        User[5],  # category
+                        User[6]  # quantity
+                    ))
+                return True
+            return False
+
+        except Exception as e:
+            print(f"Error loading user data: {e}")
+            return False
         
-        # Bind a click on column header for sorting
-        for col in columns:
-            self.user_table.heading(col, command=lambda _col=col: self.sort_treeview_column(_col))
-
-        
-
-    def sort_treeview_column(self, col):
-        """Sort the treeview content when a column header is clicked"""
-        if col != "role":
-            # For other columns, sort normally
-            data = [(self.user_table.set(iid, col), iid) for iid in self.user_table.get_children('')]
-            data.sort()
-        else:
-            # For the role column, sort with admin first, then user
-            data = []
-            for iid in self.user_table.get_children(''):
-                role = self.user_table.set(iid, col)
-                # Sort key: 0 for admin, 1 for user, 2 for anything else
-                sort_key = 0 if role.lower() == "admin" else (1 if role.lower() == "user" else 2)
-                data.append((sort_key, iid))
-            data.sort()
-            
-        # Rearrange items in sorted positions
-        for idx, (_, iid) in enumerate(data):
-            self.user_table.move(iid, '', idx)
-            
-        # Set the sort direction for the next click
-        if hasattr(self, 'sort_direction') and self.sort_direction.get(col) == 'asc':
-            self.user_table.delete(*self.user_table.get_children())
-            data.reverse()
-            for _, iid in data:
-                self.user_table.move(iid, '', 'end')
-            self.sort_direction[col] = 'desc'
-        else:
-            if not hasattr(self, 'sort_direction'):
-                self.sort_direction = {}
-            self.sort_direction[col] = 'asc'
-
-    def on_user_select(self, event):
-        """Handle user selection event"""
-        selected_items = self.user_table.selection()
-        if selected_items:
-            selected_item = selected_items[0]
-            user_data = {
-                'user_id': self.user_table.item(selected_item, 'values')[0],
-                'name': self.user_table.item(selected_item, 'values')[1],
-                'username': self.user_table.item(selected_item, 'values')[2],
-                'email': self.user_table.item(selected_item, 'values')[3],
-                'date_of_birth': self.user_table.item(selected_item, 'values')[4],
-                'role': self.user_table.item(selected_item, 'values')[5]
-            }
-            print(f"Selected user: {user_data}")
-            
-            # You can enable the delete button here
-            if 'btn_DeleteAccount' in self.buttons:
-                self.buttons['btn_DeleteAccount'].config(state='normal')
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -289,13 +281,31 @@ class UserManagementApp:
         print(f"{button_name} clicked")
         
         if button_name == "btn_DeleteAccount":
-            selected_items = self.user_table.selection()
+            selected_items = self.tbl_User.selection()
             if selected_items:
                 selected_item = selected_items[0]
-                print(f"Deleting user: {self.user_table.item(selected_item, 'values')}")
-                self.user_table.delete(selected_item)
+                print(f"Deleting user: {self.tbl_User.item(selected_item, 'values')}")
+                self.tbl_User.delete(selected_item)
                 # Disable the delete button after deletion
                 self.buttons['btn_DeleteAccount'].config(state='disabled')
+        elif button_name == "btn_AddAccount":
+            self.root.destroy()
+            from UserAddAccount import UserAddAccountApp
+            add_user_root = Tk()
+            add_user = UserAddAccountApp(add_user_root)
+            add_user_root.mainloop()
+        elif button_name == 'btn_EditAccountPassword':
+            self.root.destroy()
+            from UserEditAccount import UserEditAccountApp
+            edit_pass_root = Tk()
+            edit_pass = UserEditAccountApp(edit_pass_root)
+            edit_pass_root.mainloop()
+        else:
+            self.root.destroy()
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
 
     def run(self):
         """Start the application main loop"""
