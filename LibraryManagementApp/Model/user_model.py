@@ -43,7 +43,7 @@ class User:
     @staticmethod
     def get_username(username): # Search user by username
         db = Database()
-        db.cursor.execute("SELECT * FROM Users WHERE username = ?", (username,))
+        db.cursor.execute("SELECT * FROM Users WHERE username LIKE ?", (username,))
         return db.cursor.fetchone()
     
     @staticmethod
