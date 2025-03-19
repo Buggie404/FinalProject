@@ -282,6 +282,8 @@ class UserManagementApp:
                 selected_item = selected_items[0]
                 print(f"Deleting user: {self.tbl_User.item(selected_item, 'values')}")
                 self.tbl_User.delete(selected_item)
+                # QD chèn thêm cái dụ xoá user trên database nha, chứ nó mới xoá trên bảng thoai, bật lên nó hiện lại
+                # Mà xoá thì xoá demo user nha ba
 
         elif button_name == "btn_AddAccount":
             self.root.destroy()
