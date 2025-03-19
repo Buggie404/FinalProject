@@ -278,7 +278,7 @@ class Search_users: # Handel search function
                 ))
             else:
                 from View.noti_tab_view_1 import Message_1
-                Message_1(root, "edit_pass_id")
+                Message_1(root, "search_account")
                 load_user_func()
                 
         except Exception as e:

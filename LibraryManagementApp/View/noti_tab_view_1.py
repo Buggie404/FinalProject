@@ -65,7 +65,8 @@ class Message_1():  # To notify message (Type 1: When clicked 'OK' button -> mes
                          'account': "Account Deleted!",
                          'edit_pass_id': 'No match ID!',
                          'edit_book_id': "No match ISBN!",
-                         'receipt': "No match receipt ID!"}
+                         'receipt': "No match receipt ID!",
+                         'search_account': 'No match User!'}
 
         # Tile Label
         Label(self.message_1, text=message_1_map[delete_type], font=("Montserrat", 18, 'bold'), bg='white',
