@@ -196,17 +196,17 @@ class BookManagementAddBookApp:
     def add_book(self):
         """Handle the add book functionality"""
         # Get values from entry fields
-        book_name = self.entries["lnE_ISBN"].get()
-        author = self.entries["lnE_Title"].get()
-        isbn = self.entries["lnE_Author"].get()
-        pub_year = self.entries["lnE_PublishedYear"].get()
+        isbn = self.entries["lnE_ISBN"].get()
+        title = self.entries["lnE_Title"].get()
+        author = self.entries["lnE_Author"].get()
+        published_year = self.entries["lnE_PublishedYear"].get()
         category = self.entries["lnE_Category"].get()
-        price = self.entries["lnE_Quantity"].get()
+        quantity = self.entries["lnE_Quantity"].get()
 
         # Print the collected data (placeholder for actual functionality)
-        print(f"Adding book: {book_name} by {author}")
-        print(f"ISBN: {isbn}, Year: {pub_year}")
-        print(f"Category: {category}, Price: {price}")
+        print(f"Adding book: {isbn} by {author}")
+        print(f"ISBN: {title}, Year: {published_year}")
+        print(f"Category: {category}, quantity: {quantity}")
 
     #     # Here you would add code to save the book to a database or file
 
