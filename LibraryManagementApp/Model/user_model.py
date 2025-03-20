@@ -1,6 +1,15 @@
 from Database.db_lma import Database
 
 class User:
+    # Create a class-level database connection
+    _db = None
+    
+    @classmethod
+    def get_db(cls):
+        if cls._db is None:
+            cls._db = Database()
+        return cls._db
+    
     def __init__(self, user_id=None, name=None, username=None, email=None, password=None, date_of_birth=None, role="user"):
         self.user_id = user_id #Primary key
         self.name = name
@@ -9,13 +18,25 @@ class User:
         self.password = password
         self.date_of_birth = date_of_birth
         self.role = role
-        self.db = Database() # Connect to databse
+        self.db = self.get_db() # Connect to databse
     
-    def save_user(self): #To save new user to database
-        self.db.cursor.execute("INSERT INTO Users (name, username, email, password, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?)", 
-                               (self.name, self.username, self.email, self.password, self.date_of_birth, self.role))
-        self.db.conn.commit()
-        self.user_id = self.db.cursor.lastrowid # Get the last inserted id
+    # def save_user(self): #To save new user to database
+    #     self.db.cursor.execute("INSERT INTO Users (name, username, email, password, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?)", 
+    #                            (self.name, self.username, self.email, self.password, self.date_of_birth, self.role))
+    #     self.db.conn.commit()
+    #     self.user_id = self.db.cursor.lastrowid # Get the last inserted id
+
+    def save_user(self):
+        try:
+            self.db.cursor.execute("INSERT INTO Users (name, username, email, password, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?)", 
+                            (self.name, self.username, self.email, self.password, self.date_of_birth, self.role))
+            self.db.conn.commit()
+            self.user_id = self.db.cursor.lastrowid
+            return True
+        except Exception as e:
+            self.db.conn.rollback()  # Rollback on error
+            print(f"Error saving user: {e}")
+            return False
     
     @staticmethod
     def login(email, password): # Authenticate user login 

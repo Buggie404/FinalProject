@@ -123,6 +123,10 @@ class UserAddAccountApp:
 
         # Setup field events for placeholders
         self.setup_field_events()
+        
+        # Initialize warning flags
+        for field in ["lnE_Name", "lnE_Role", "lnE_DateOfBirth"]:
+            self.entries[field]._shown_warning = False
     
     def setup_field_events(self):
         """Set up focus and key events for form fields"""
@@ -142,33 +146,102 @@ class UserAddAccountApp:
         """Clear placeholder text when field receives focus"""
         widget = event.widget
         
-        if widget == self.entries["lnE_DateOfBirth"] and widget.get() == self.date_placeholder:
-            widget.delete(0, "end")
-            widget.config(fg="#000716")  # Change to normal text color
+        if widget == self.entries["lnE_DateOfBirth"]:
+            if widget.get() == self.date_placeholder:
+                widget.delete(0, "end")
+                widget.config(fg="#000716")  # Change to normal text color
+            # Reset warning flag when user starts editing
+            widget._shown_warning = False
         
-        elif widget == self.entries["lnE_Role"] and widget.get() == self.role_placeholder:
-            widget.delete(0, "end")
-            widget.config(fg="#000716")  # Change to normal text color
+        elif widget == self.entries["lnE_Role"]:
+            if widget.get() == self.role_placeholder:
+                widget.delete(0, "end")
+                widget.config(fg="#000716")  # Change to normal text color
+            # Reset warning flag when user starts editing
+            widget._shown_warning = False
         
-        elif widget == self.entries["lnE_Name"] and widget.get() == self.name_placeholder:
-            widget.delete(0, "end")
-            widget.config(fg="#000716")  # Change to normal text color
+        elif widget == self.entries["lnE_Name"]:
+            if widget.get() == self.name_placeholder:
+                widget.delete(0, "end")
+                widget.config(fg="#000716")  # Change to normal text color
+            # Reset warning flag when user starts editing
+            widget._shown_warning = False
+
+    # def on_input_field_focus_out(self, event):
+    #     """Restore placeholder text if field is empty and validate field content."""
+    #     widget = event.widget
+
+    #     # Define mapping of fields to their attributes
+    #     field_mapping = {
+    #         "lnE_Name": (self.name_placeholder, add_account.validate_name_on_event),
+    #         "lnE_Role": (self.role_placeholder, add_account.validate_role_on_event),
+    #         "lnE_DateOfBirth": (self.date_placeholder, add_account.validate_date_on_event)
+    #     }
+
+    #     # Identify which field triggered the event
+    #     for field_name, (placeholder, validation_func) in field_mapping.items():
+    #         if widget == self.entries[field_name]:
+    #             field_value = widget.get()
+
+    #             # Restore placeholder if empty
+    #             if not field_value:
+    #                 widget.insert(0, placeholder)
+    #                 widget.config(fg="grey")
+    #                 widget._shown_warning = False  # Reset warning flag when placeholder is restored
+    #                 return
+
+    #             # Validate field only if flag is not set
+    #             valid, message = validation_func(field_value)
+
+    #             if not valid:
+    #                 # Show warning only if not already shown
+    #                 if not widget._shown_warning:
+    #                     messagebox.showwarning(f"Invalid {field_name.split('_')[-1]}", message)
+    #                     widget._shown_warning = True  # Set flag to prevent duplicate warnings
+    #                 widget.focus_set()  # Keep focus on the widget
+    #             else:
+    #                 widget._shown_warning = False  # Reset flag if validation passes
+    #             break  # Exit loop after handling the matched field
 
     def on_input_field_focus_out(self, event):
-        """Restore placeholder text if field is empty when it loses focus"""
+        """Restore placeholder text if field is empty and validate field content."""
         widget = event.widget
-        
-        if widget == self.entries["lnE_DateOfBirth"] and not widget.get():
-            widget.insert(0, self.date_placeholder)
-            widget.config(fg="grey")  # Change back to placeholder color
 
-        elif widget == self.entries["lnE_Role"] and not widget.get():
-            widget.insert(0, self.role_placeholder)
-            widget.config(fg="grey")  # Change back to placeholder color
-        
-        elif widget == self.entries["lnE_Name"] and not widget.get():
-            widget.insert(0, self.name_placeholder)
-            widget.config(fg="grey")  # Change back to placeholder color
+        # Define mapping of fields to their attributes
+        field_mapping = {
+            "lnE_Name": (self.name_placeholder, add_account.validate_name_on_event),
+            "lnE_Role": (self.role_placeholder, add_account.validate_role_on_event),
+            "lnE_DateOfBirth": (self.date_placeholder, add_account.validate_date_on_event)
+        }
+
+        # Identify which field triggered the event
+        for field_name, (placeholder, validation_func) in field_mapping.items():
+            if widget == self.entries[field_name]:
+                field_value = widget.get()
+
+                # Restore placeholder if empty
+                if not field_value:
+                    widget.insert(0, placeholder)
+                    widget.config(fg="grey")
+                    widget._shown_warning = False  # Reset warning flag when placeholder is restored
+                    return
+
+                # Validate field only if flag is not set
+                valid, message = validation_func(field_value)
+
+                if not valid:
+                    # Show warning only if not already shown
+                    if not widget._shown_warning:
+                        messagebox.showwarning(f"Invalid {field_name.split('_')[-1]}", message)
+                        widget._shown_warning = True  # Set flag to prevent duplicate warnings
+                        # Schedule focus to happen after the messagebox is closed
+                        self.root.after(100, lambda w=widget: w.focus_set())
+                    else:
+                        # Even if we've shown the warning before, still keep focus on this field
+                        widget.focus_set()
+                else:
+                    widget._shown_warning = False  # Reset flag if validation passes
+                break  # Exit loop after handling the matched field
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -238,52 +311,60 @@ class UserAddAccountApp:
         """Handle button click events"""
         print(f"{button_name} clicked")
 
-        if button_name == "btn_AddAccount":
+        if button_name == "btn_Confirm":
+            # Temporarily disable FocusOut validation to avoid duplicate triggers
+            for field_name in ["lnE_Name", "lnE_Role", "lnE_DateOfBirth"]:
+                self.entries[field_name].unbind("<FocusOut>")
+            
+            # Allow safe focus change without triggering validation
+            self.root.focus_set()
+            
+            # Retrieve values from entry fields
+            name = self.entries["lnE_Name"].get()
+            role = self.entries["lnE_Role"].get()
+            date_of_birth = self.entries["lnE_DateOfBirth"].get()
+            
+            # Skip if placeholders are detected
+            if name == self.name_placeholder:
+                self.root.after(100, lambda: self.entries["lnE_Name"].focus_set())
+            elif role == self.role_placeholder:
+                self.root.after(100, lambda: self.entries["lnE_Role"].focus_set())
+            elif date_of_birth == self.date_placeholder:
+                self.root.after(100, lambda: self.entries["lnE_DateOfBirth"].focus_set())
+                
+            # Process the form if all validations pass
+            success, message, user_data = add_account.process_user_form(name, role, date_of_birth)
+
+            if success:
+                self.root.destroy()
+                from UserAddAccount1 import UserAddAccount1App
+                user_management_root = Tk()
+                user_management = UserAddAccount1App(user_management_root)
+                user_management_root.mainloop()
+            else:
+                messagebox.showerror("Error", message)
+                # Determine which field to focus based on the error message
+                if "name" in message.lower():
+                    self.root.after(100, lambda: self.entries["lnE_Name"].focus_set())
+                elif "role" in message.lower():
+                    self.root.after(100, lambda: self.entries["lnE_Role"].focus_set())
+                elif "date" in message.lower() or "birth" in message.lower():
+                    self.root.after(100, lambda: self.entries["lnE_DateOfBirth"].focus_set())
+        
+        elif button_name == "btn_AddAccount":
             self.root.destroy()
             from UserManagement import UserManagementApp
             add_user_root = Tk()
             add_user = UserManagementApp(add_user_root)
             add_user_root.mainloop()
+        
         elif button_name == 'btn_EditAccountPassword':
             self.root.destroy()
             from UserEditAccount import UserEditAccountApp
             edit_pass_root = Tk()
             edit_pass = UserEditAccountApp(edit_pass_root)
             edit_pass_root.mainloop()
-        elif button_name == "btn_Confirm":
-            # Get values from form fields
-            name = self.entries["lnE_Name"].get()
-            role = self.entries["lnE_Role"].get()
-            date_of_birth = self.entries["lnE_DateOfBirth"].get()
-            
-            # Remove placeholder values if they're still there
-            if name == self.name_placeholder:
-                name = ""
-            if role == self.role_placeholder:
-                role = ""
-            if date_of_birth == self.date_placeholder:
-                date_of_birth = ""
-            
-            # Initialize controller
-            controller = add_account()
-            
-            # Process the form data using the controller
-            success, message, user_data = controller.process_user_form(name, role, date_of_birth)
-            
-            if success:
-                # Show success message with user information
-                message_text = f"{message}\n\nUsername: {user_data.get('username')}\nEmail: {user_data.get('email')}\nPassword: {user_data.get('password')}"
-                messagebox.showinfo("Account Created", message_text)
-                
-                # Navigate to next screen
-                self.root.destroy()
-                from UserManagement import UserManagementApp
-                user_management_root = Tk()
-                user_management = UserManagementApp(user_management_root)
-                user_management_root.mainloop()
-            else:
-                # Show error message
-                messagebox.showerror("Error", message)
+        
         else:  # btn_BackToHomepage
             self.root.destroy()
             parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -292,7 +373,7 @@ class UserAddAccountApp:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root)
             homepage_root.mainloop()
-    
+
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()

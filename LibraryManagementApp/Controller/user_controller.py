@@ -325,6 +325,13 @@ class add_account:
     # Class attribute instead of instance attribute
     default_password = "123456789"
     
+    # Flag to track validation errors for each field
+    field_validation_errors = {
+        'name': False,
+        'role': False,
+        'date_of_birth': False
+    }
+    
     @staticmethod
     def process_user_form(name, role, date_of_birth):
         """
@@ -338,24 +345,51 @@ class add_account:
         Returns:
             tuple: (success_flag, message, user_data)
         """
-        # Validate all input fields
+        # Reset validation errors for a fresh form submission
+        field_errors = {
+            'name': False,
+            'role': False,
+            'date_of_birth': False
+        }
+        
+        # Validate all fields at once and collect errors
         valid_name, name_msg = add_account.validate_name(name)
         if not valid_name:
-            return False, name_msg, {}
+            field_errors['name'] = True
             
         valid_role, role_msg, formatted_role = add_account.validate_role(role)
         if not valid_role:
-            return False, role_msg, {}
+            field_errors['role'] = True
             
         valid_date, date_msg = add_account.validate_date_format(date_of_birth)
         if not valid_date:
-            return False, date_msg, {}
+            field_errors['date_of_birth'] = True
+        
+        # If any field has an error, return without showing additional messages
+        if any(field_errors.values()):
+            # Update the class-level validation errors
+            add_account.field_validation_errors = field_errors
+            
+            # Return only the first error message to avoid multiple warnings
+            if not valid_name:
+                return False, name_msg, {}
+            elif not valid_role:
+                return False, role_msg, {}
+            elif not valid_date:
+                return False, date_msg, {}
+            
+            return False, "Please correct the invalid fields and try again.", {}
         
         # Get next user ID
         user_id = add_account.get_next_user_id()
         
         # Generate username and email
-        username, email = add_account.generate_username_and_email(name, user_id)
+        try:
+            username, email = add_account.generate_username_and_email(name, user_id)
+            if not username or not email:
+                return False, "Could not generate username and email. Please check the name format.", {}
+        except Exception as e:
+            return False, f"Error generating username and email: {str(e)}", {}
         
         # Format date for database
         formatted_date = add_account.format_date_for_database(date_of_birth)
@@ -387,11 +421,66 @@ class add_account:
             user.generated = True  # Flag to indicate auto-generated username/email
             
             # Save user with extended account properties
-            user.save_user()
+            success = user.save_user()
             
+            # Reset validation errors after successful save
+            add_account.field_validation_errors = {
+                'name': False,
+                'role': False,
+                'date_of_birth': False
+            }
+            
+            if not success:
+                return False, "Failed to save user to database. The database might be locked.", {}
+                
             return True, "User account created successfully!", user_data
         except Exception as e:
             return False, f"Error creating user: {str(e)}", {}
+    
+    @staticmethod
+    def validate_name_on_event(name):
+        """
+        Validate name field when focus leaves the field
+        
+        Args:
+            name (str): Name to validate
+            
+        Returns:
+            tuple: (is_valid, error_message)
+        """
+        valid, message = add_account.validate_name(name)
+        add_account.field_validation_errors['name'] = not valid
+        return valid, message
+    
+    @staticmethod
+    def validate_role_on_event(role):
+        """
+        Validate role field when focus leaves the field
+        
+        Args:
+            role (str): Role to validate
+            
+        Returns:
+            tuple: (is_valid, error_message)
+        """
+        valid, message, _ = add_account.validate_role(role)
+        add_account.field_validation_errors['role'] = not valid
+        return valid, message
+    
+    @staticmethod
+    def validate_date_on_event(date_text):
+        """
+        Validate date field when focus leaves the field
+        
+        Args:
+            date_text (str): Date to validate
+            
+        Returns:
+            tuple: (is_valid, error_message)
+        """
+        valid, message = add_account.validate_date_format(date_text)
+        add_account.field_validation_errors['date_of_birth'] = not valid
+        return valid, message
     
     @staticmethod
     def validate_name(name):
@@ -416,7 +505,7 @@ class add_account:
     @staticmethod
     def validate_role(role):
         """
-        Validate that role is either 'User' or 'Admin' (case-insensitive)
+        Validate that role is either 'User' or 'Admin' (case-sensitive)
         
         Args:
             role (str): Role to validate
@@ -427,20 +516,18 @@ class add_account:
         if not role or role.strip() == "":
             return False, "Role cannot be empty.", ""
         
-        # Convert to lowercase for case-insensitive comparison
-        role_lower = role.lower()
-        
-        if role_lower == "user":
+        # Case-sensitive comparison (no longer using lowercase)
+        if role == "User":
             return True, "", "User"
-        elif role_lower == "admin":
+        elif role == "Admin":
             return True, "", "Admin"
         else:
-            return False, "Role must be either 'User' or 'Admin'.", ""
+            return False, "Role must be exactly 'User' or 'Admin'.", ""
     
     @staticmethod
     def validate_date_format(date_text):
         """
-        Validate date format (YY/MM/DD)
+        Validate date format (YYYY/MM/DD)
         
         Args:
             date_text (str): Date text to validate
@@ -458,14 +545,10 @@ class add_account:
         try:
             # Check format
             if not re.match(r'^(\d{4})/(\d{2})/(\d{2})$', date_text):
-                return False, "Invalid date format. Use YY/MM/DD."
+                return False, "Invalid date format. Use YYYY/MM/DD."
             
             # Parse date
             year, month, day = date_text.split('/')
-            
-            # Add century prefix to year
-            if len(year) == 2:
-                year = "20" + year  # Assuming 21st century
             
             # Convert to integers
             year_int = int(year)
@@ -486,8 +569,9 @@ class add_account:
             return True, ""
             
         except ValueError:
-            return False, "Invalid date. Please use YY/MM/DD format."
+            return False, "Invalid date. Please use YYYY/MM/DD format."
     
+    # Rest of the existing methods remain unchanged
     @staticmethod
     def format_date_for_database(date_text):
         """
@@ -560,8 +644,8 @@ class add_account:
         email = f"{unidecode.unidecode(last_name).lower()}{first_letters}{user_id_str}@user.libma"
         
         return username, email
-        
-    # Account model methods integrated into the controller
+    
+    # Account model methods remain unchanged
     @staticmethod
     def to_dict(user):
         """
