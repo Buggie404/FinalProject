@@ -189,11 +189,11 @@ class BookManagementApp:
         """Handle button click events"""
         print(f"{button_name} clicked")
         if button_name == "btn_DeleteBook":
-            BookManagementController.delete_book_clicked(self)
-        elif button_name == "btn_BackToHomepage":
-            # Implement navigation to homepage
-            pass
-        # Other button handlers...
+            selected_items = self.tbl_Book.selection()
+            if selected_items:
+                selected_item = selected_items[0]
+                print(f"Deleting book: {self.tbl_Book.item(selected_item, 'values')}")
+                self.tbl_Book.delete(selected_item)
 
     def run(self):
         """Start the application main loop"""

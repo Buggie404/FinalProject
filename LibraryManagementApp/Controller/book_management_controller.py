@@ -1,20 +1,15 @@
+import sys
+import os
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
 from Model.book_model import Book
 from Model.admin_model import Admin
 from View.noti_tab_view_1 import Delete, Message_1
 
 class BookManagementController:
-    from Model.book_model import Book
-from Model.admin_model import Admin
-from View.noti_tab_view_1 import Delete, Message_1
-
-class BookManagementController:
     def __init__(self, view):
-        """
-        Initialize the Book Management Controller.
-        
-        Args:
-            view: The BookManagementApp view instance
-        """
+
         self.view = view
         self.admin = None
         self.selected_book_id = None
@@ -36,6 +31,7 @@ class BookManagementController:
         self.view.buttons["btn_Romance"].config(command=lambda: self.filter_by_category("Romance"))
         self.view.buttons["btn_Technology"].config(command=lambda: self.filter_by_category("Technology"))
         self.view.buttons["btn_Biography"].config(command=lambda: self.filter_by_category("Biography"))
+        
         
         # Bind search entry
         self.view.entries["lnE_SearchBook"].bind("<Return>", self.search_books)
@@ -60,42 +56,50 @@ class BookManagementController:
             self.selected_book_id = None
     
     def delete_selected_book(self):
-        """Delete the selected book after confirmation"""
         if not self.selected_book_id:
-            # No book selected
+            print("❌ No book selected.")
             return
-        
-        # Show delete confirmation dialog
+
+        print(f"🗑️ Attempting to delete book ID: {self.selected_book_id}")
+
         delete_dialog = Delete(self.view.root, "book")
-        # Connect the confirmation callback
+
+        # Gán callback cho nút Yes
+        delete_dialog.set_yes_callback(lambda: self.confirm_delete_book('yes'))
+
+        # Nếu đóng dialog mà không chọn, coi như No
         delete_dialog.delete_noti.protocol(
             "WM_DELETE_WINDOW",
             lambda: self.confirm_delete_book('no')
         )
-        # Set up yes button to call confirm_delete_book with 'yes'
-        # You'd need to modify your Delete class to accept a callback function
     
     def confirm_delete_book(self, option):
-        """Callback function for the Delete dialog"""
         if option == 'yes':
-            # Check if admin instance exists
             if not self.admin:
-                print("Error: Admin not set")
+                print("❌ Admin not set")
                 return
             
-            # Delete the book from the database
+            # Xoá sách từ database
             success = self.admin.delete_book(self.selected_book_id)
-            
+
             if success:
-                # Remove the book from the treeview
+                print(f"✅ Successfully deleted book ID: {self.selected_book_id}")
+                
+                # Xoá trên giao diện
                 selected_items = self.view.tbl_Book.selection()
                 if selected_items:
                     self.view.tbl_Book.delete(selected_items[0])
-                
-                # Show success message
+
+                # Hiển thị thông báo xoá thành công
                 Message_1(self.view.root, "book")
+
+                # Reset lại book_id
                 self.selected_book_id = None
-    
+            else:
+                print("❌ Failed to delete book from database")
+        else:
+            print("❌ Deletion canceled")
+
     def filter_by_category(self, category):
         """Filter books by category"""
         # Clear current table
