@@ -9,7 +9,12 @@ from View.noti_tab_view_1 import Delete, Message_1
 
 class BookManagementController:
     def __init__(self, view):
-
+        """
+        Initialize the Book Management Controller.
+        
+        Args:
+            view: The BookManagementApp view instance
+        """
         self.view = view
         self.admin = None
         self.selected_book_id = None

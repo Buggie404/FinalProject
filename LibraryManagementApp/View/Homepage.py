@@ -118,11 +118,11 @@ class HomepageApp:
     
     def on_book_management_clicked(self):
         print("btn_BookManagement clicked")
-        # self.root.destroy()
-        # from BookManagement.BookManagement import BookManagementApp
-        # bookmgmt_root = Tk()
-        # bookmgmt = BookManagementApp(bookmgmt_root)
-        # bookmgmt_root.mainloop()
+        self.root.destroy()
+        from BookManagement.BookManagement import BookManagementApp
+        bookmgmt_root = Tk()
+        bookmgmt = BookManagementApp(bookmgmt_root)
+        bookmgmt_root.mainloop()
 
 if __name__ == "__main__":
     window = Tk()

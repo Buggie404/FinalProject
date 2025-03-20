@@ -11,6 +11,13 @@ import unidecode
 import os
 import sys
 
+# Add parent directory to path to import from Model
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
+from Model.user_model import User
+
 class Search_users: # Handel search function
     def __init__(self):
         pass
@@ -180,57 +187,6 @@ class Search_users: # Handel search function
         else:
             return False, "no_match_username"
         
-    # @staticmethod
-    # def filter_by_username(tbl_User, search_term, load_user_func):
-    #     """
-    #     Filter the user table by username
-        
-    #     Args:
-    #         tbl_User: The Treeview widget containing user data
-    #         search_term (str): The search term to filter by
-    #         load_user_func: Function to reload all users
-            
-    #     Returns:
-    #         None
-    #     """
-    #     # Skip filtering if the search term is the placeholder or empty
-    #     if search_term == "Search" or search_term.strip() == "":
-    #         # Reload all users
-    #         load_user_func()
-    #         return
-        
-    #     print(f"Filtering by username: {search_term}")
-        
-    #     try:
-    #         # Use the filter_users_by_username method
-    #         success, result = Search_users.filter_users_by_username(search_term)
-            
-    #         if success:
-    #             # Clear existing data
-    #             for item in tbl_User.get_children():
-    #                 tbl_User.delete(item)
-                
-    #             # Display the single user found
-    #             user = result
-    #             tbl_User.insert('', 'end', values=(
-    #                 user[0],  # User_id
-    #                 user[1],  # name
-    #                 user[2],  # username
-    #                 user[3],  # email
-    #                 user[5],  # date_of_birth
-    #                 user[6]   # role
-    #             ))
-    #         else:
-    #             # Show error message
-    #             messagebox.showinfo("Search Result", result)
-    #             # Reload all users if no match found
-    #             load_user_func()
-                
-    #     except Exception as e:
-    #         print(f"Error filtering users: {e}")
-    #         # Reload all users if filtering fails
-    #         load_user_func()
-
     @staticmethod
     def filter_by_username(tbl_User, search_term, load_user_func):
         """
@@ -272,91 +228,15 @@ class Search_users: # Handel search function
                     user[6]   # role
                 ))
             else:
-                # Try partial match instead
-                success, result = Search_users.filter_users_by_partial_username(search_term)
-                
-                if success:
-                    # Clear existing data
-                    for item in tbl_User.get_children():
-                        tbl_User.delete(item)
-                    
-                    # Display all matching users
-                    for user in result:
-                        tbl_User.insert('', 'end', values=(
-                            user[0],  # User_id
-                            user[1],  # name
-                            user[2],  # username
-                            user[3],  # email
-                            user[5],  # date_of_birth
-                            user[6]   # role
-                        ))
-                else:
-                    # Show error message
-                    messagebox.showinfo("Search Result", "No matching usernames found!")
-                    # Reload all users if no match found
-                    load_user_func()
+                # Show error message
+                messagebox.showinfo("Search Result", result)
+                # Reload all users if no match found
+                load_user_func()
                 
         except Exception as e:
             print(f"Error filtering users: {e}")
             # Reload all users if filtering fails
             load_user_func()
-
-
-    # @staticmethod
-    # def filter_users(tbl_User, search_term, load_user_func, root = None):
-    #     """
-    #     Filter users by either user_id or username depending on the search term
-        
-    #     Args:
-    #         tbl_User: The Treeview widget containing user data
-    #         search_term (str): The search term to filter by
-    #         load_user_func: Function to reload all users
-    #         root: The root for creating notification
-            
-    #     Returns:
-    #         None
-    #     """
-    #     # Skip filtering if the search term is the placeholder or empty
-    #     if search_term == "Search" or search_term.strip() == "":
-    #         # Reload all users
-    #         load_user_func()
-    #         return
-        
-    #     try:
-    #         # Check if the search term is a number (likely an ID)
-    #         is_id = search_term.isdigit()
-            
-    #         if is_id:
-    #             print(f"Filtering by user_id: {search_term}")
-    #             success, result = Search_users.filter_users_by_id(search_term)
-    #         else:
-    #             print(f"Filtering by username: {search_term}")
-    #             success, result = Search_users.filter_users_by_username(search_term)
-            
-    #         if success:
-    #             # Clear existing data
-    #             for item in tbl_User.get_children():
-    #                 tbl_User.delete(item)
-                
-    #             # Display the single user found
-    #             user = result
-    #             tbl_User.insert('', 'end', values=(
-    #                 user[0],  # User_id
-    #                 user[1],  # name
-    #                 user[2],  # username
-    #                 user[3],  # email
-    #                 user[5],  # date_of_birth
-    #                 user[6]   # role
-    #             ))
-    #         else:
-    #             from View.noti_tab_view_1 import Message_1
-    #             Message_1(root, "search_account")
-    #             load_user_func()
-                
-    #     except Exception as e:
-    #         print(f"Error filtering users: {e}")
-    #         # Reload all users if filtering fails
-    #         load_user_func()
 
     @staticmethod
     def filter_users(tbl_User, search_term, load_user_func, root = None):
@@ -385,69 +265,29 @@ class Search_users: # Handel search function
             if is_id:
                 print(f"Filtering by user_id: {search_term}")
                 success, result = Search_users.filter_users_by_id(search_term)
-                
-                if success:
-                    # Clear existing data
-                    for item in tbl_User.get_children():
-                        tbl_User.delete(item)
-                    
-                    # Display the single user found
-                    user = result
-                    tbl_User.insert('', 'end', values=(
-                        user[0],  # User_id
-                        user[1],  # name
-                        user[2],  # username
-                        user[3],  # email
-                        user[5],  # date_of_birth
-                        user[6]   # role
-                    ))
-                else:
-                    from View.noti_tab_view_1 import Message_1
-                    Message_1(root, "search_account")
-                    load_user_func()
             else:
                 print(f"Filtering by username: {search_term}")
-                # Try exact match first
                 success, result = Search_users.filter_users_by_username(search_term)
+            
+            if success:
+                # Clear existing data
+                for item in tbl_User.get_children():
+                    tbl_User.delete(item)
                 
-                if success:
-                    # Clear existing data
-                    for item in tbl_User.get_children():
-                        tbl_User.delete(item)
-                    
-                    # Display the single user found
-                    user = result
-                    tbl_User.insert('', 'end', values=(
-                        user[0],  # User_id
-                        user[1],  # name
-                        user[2],  # username
-                        user[3],  # email
-                        user[5],  # date_of_birth
-                        user[6]   # role
-                    ))
-                else:
-                    # Try partial match
-                    success, result = Search_users.filter_users_by_partial_username(search_term)
-                    
-                    if success:
-                        # Clear existing data
-                        for item in tbl_User.get_children():
-                            tbl_User.delete(item)
-                        
-                        # Display all matching users
-                        for user in result:
-                            tbl_User.insert('', 'end', values=(
-                                user[0],  # User_id
-                                user[1],  # name
-                                user[2],  # username
-                                user[3],  # email
-                                user[5],  # date_of_birth
-                                user[6]   # role
-                            ))
-                    else:
-                        from View.noti_tab_view_1 import Message_1
-                        Message_1(root, "search_account")
-                        load_user_func()
+                # Display the single user found
+                user = result
+                tbl_User.insert('', 'end', values=(
+                    user[0],  # User_id
+                    user[1],  # name
+                    user[2],  # username
+                    user[3],  # email
+                    user[5],  # date_of_birth
+                    user[6]   # role
+                ))
+            else:
+                from View.noti_tab_view_1 import Message_1
+                Message_1(root, "search_account")
+                load_user_func()
                 
         except Exception as e:
             print(f"Error filtering users: {e}")
@@ -478,28 +318,93 @@ class Search_users: # Handel search function
             return True, users
         else:
             return False, "no_match_username"
+
 class add_account:
+    """Controller for handling user account creation operations"""
+    
+    # Class attribute instead of instance attribute
+    default_password = "123456789"
+    
     @staticmethod
-    def generate_username_and_email(name, user_id):
-        """Generate username and email based on full name and user ID"""
-        if not name or len(name.split()) < 2:
-            return None, None
+    def process_user_form(name, role, date_of_birth):
+        """
+        Process user form data, validate it, and create a new user account
         
-        name_parts = name.split()
-        last_name = name_parts[-1]
-        first_letters = "".join([unidecode.unidecode(part[0]).lower() for part in name_parts[:-1]])
+        Args:
+            name (str): Full name of the user
+            role (str): User role (either 'User' or 'Admin')
+            date_of_birth (str): Date of birth in format YY/MM/DD
+            
+        Returns:
+            tuple: (success_flag, message, user_data)
+        """
+        # Validate all input fields
+        valid_name, name_msg = add_account.validate_name(name)
+        if not valid_name:
+            return False, name_msg, {}
+            
+        valid_role, role_msg, formatted_role = add_account.validate_role(role)
+        if not valid_role:
+            return False, role_msg, {}
+            
+        valid_date, date_msg = add_account.validate_date_format(date_of_birth)
+        if not valid_date:
+            return False, date_msg, {}
+        
+        # Get next user ID
+        user_id = add_account.get_next_user_id()
         
         # Generate username and email
-        user_id_str = str(user_id)
-        username = unidecode.unidecode(last_name).lower() + first_letters + user_id_str
-        email = f"{unidecode.unidecode(last_name).lower()}{first_letters}{user_id_str}@user.libma"
+        username, email = add_account.generate_username_and_email(name, user_id)
         
-        return username, email
+        # Format date for database
+        formatted_date = add_account.format_date_for_database(date_of_birth)
+        
+        # Create user data dictionary
+        user_data = {
+            'user_id': user_id,
+            'name': name,
+            'username': username,
+            'email': email,
+            'password': add_account.default_password,
+            'date_of_birth': formatted_date,
+            'role': formatted_role
+        }
+        
+        # Create and save user directly without separate UserAccount class
+        try:
+            user = User(
+                user_id=user_id, 
+                name=name, 
+                username=username, 
+                email=email, 
+                password=add_account.default_password, 
+                date_of_birth=formatted_date, 
+                role=formatted_role
+            )
+            
+            # Add account attributes directly to the user object
+            user.generated = True  # Flag to indicate auto-generated username/email
+            
+            # Save user with extended account properties
+            user.save_user()
+            
+            return True, "User account created successfully!", user_data
+        except Exception as e:
+            return False, f"Error creating user: {str(e)}", {}
     
     @staticmethod
     def validate_name(name):
-        """Validate that name contains only letters and spaces"""
-        if not name:
+        """
+        Validate that name contains only letters and spaces and is not empty
+        
+        Args:
+            name (str): Name to validate
+            
+        Returns:
+            tuple: (is_valid, error_message)
+        """
+        if not name or name.strip() == "":
             return False, "Name cannot be empty."
         
         # Check for numbers or special characters
@@ -509,10 +414,42 @@ class add_account:
         return True, ""
     
     @staticmethod
+    def validate_role(role):
+        """
+        Validate that role is either 'User' or 'Admin' (case-insensitive)
+        
+        Args:
+            role (str): Role to validate
+            
+        Returns:
+            tuple: (is_valid, error_message, formatted_role)
+        """
+        if not role or role.strip() == "":
+            return False, "Role cannot be empty.", ""
+        
+        # Convert to lowercase for case-insensitive comparison
+        role_lower = role.lower()
+        
+        if role_lower == "user":
+            return True, "", "User"
+        elif role_lower == "admin":
+            return True, "", "Admin"
+        else:
+            return False, "Role must be either 'User' or 'Admin'.", ""
+    
+    @staticmethod
     def validate_date_format(date_text):
-        """Validate date format (yy/mm/dd)"""
-        if date_text == "yy/mm/dd" or not date_text:
-            return False, "Please enter a valid date."
+        """
+        Validate date format (YY/MM/DD)
+        
+        Args:
+            date_text (str): Date text to validate
+            
+        Returns:
+            tuple: (is_valid, error_message)
+        """
+        if not date_text or date_text.strip() == "":
+            return False, "Date of birth cannot be empty."
         
         # Allow only numbers and / character
         if re.search(r'[^0-9/]', date_text):
@@ -520,8 +457,8 @@ class add_account:
         
         try:
             # Check format
-            if not re.match(r'^(\d{2})/(\d{2})/(\d{2})$', date_text):
-                return False, "Invalid date format. Use yy/mm/dd."
+            if not re.match(r'^(\d{4})/(\d{2})/(\d{2})$', date_text):
+                return False, "Invalid date format. Use YY/MM/DD."
             
             # Parse date
             year, month, day = date_text.split('/')
@@ -549,12 +486,20 @@ class add_account:
             return True, ""
             
         except ValueError:
-            return False, "Invalid date. Please use yy/mm/dd format."
+            return False, "Invalid date. Please use YY/MM/DD format."
     
     @staticmethod
     def format_date_for_database(date_text):
-        """Convert date from yy/mm/dd to yyyy-mm-dd for database"""
-        if not date_text or date_text == "yy/mm/dd":
+        """
+        Convert date from YY/MM/DD to YYYY-MM-DD for database
+        
+        Args:
+            date_text (str): Date in YY/MM/DD format
+            
+        Returns:
+            str: Date in YYYY-MM-DD format
+        """
+        if not date_text or date_text.strip() == "":
             return None
             
         try:
@@ -573,7 +518,12 @@ class add_account:
     
     @staticmethod
     def get_next_user_id():
-        """Get the next available user ID from the database"""
+        """
+        Get the next available user ID from the database
+        
+        Returns:
+            int: Next available user ID
+        """
         try:
             users = User.get_all_user()
             if users:
@@ -586,43 +536,100 @@ class add_account:
             return 167  # Default fallback value
     
     @staticmethod
-    def create_user(name, username, email, password, date_of_birth):
-        """Create a new user after validation"""
-        try:
-            # Format date for database
-            formatted_date = add_account.format_date_for_database(date_of_birth)
-            if not formatted_date:
-                return False, "Invalid date format"
-                
-            # Create user object
-            user = User(name=name, username=username, email=email, 
-                        password=password, date_of_birth=formatted_date)
+    def generate_username_and_email(name, user_id):
+        """
+        Generate username and email based on full name and user ID
+        
+        Args:
+            name (str): Full name of the user
+            user_id (int): User ID
             
-            # Save user to database
-            user.save_user()
-            return True, "User account created successfully!"
+        Returns:
+            tuple: (username, email)
+        """
+        if not name or len(name.split()) < 2:
+            return None, None
+        
+        name_parts = name.split()
+        last_name = name_parts[-1]
+        first_letters = "".join([unidecode.unidecode(part[0]).lower() for part in name_parts[:-1]])
+        
+        # Generate username and email
+        user_id_str = str(user_id)
+        username = unidecode.unidecode(last_name).lower() + first_letters + user_id_str
+        email = f"{unidecode.unidecode(last_name).lower()}{first_letters}{user_id_str}@user.libma"
+        
+        return username, email
+        
+    # Account model methods integrated into the controller
+    @staticmethod
+    def to_dict(user):
+        """
+        Convert user object to dictionary with account properties
+        
+        Args:
+            user (User): User object
             
-        except Exception as e:
-            return False, f"Error creating user: {str(e)}"
+        Returns:
+            dict: User data as dictionary with account properties
+        """
+        return {
+            'user_id': user.user_id,
+            'name': user.name,
+            'username': user.username,
+            'email': user.email,
+            'password': user.password,
+            'date_of_birth': user.date_of_birth,
+            'role': user.role,
+            'generated': getattr(user, 'generated', False)
+        }
     
     @staticmethod
-    def validate_all_fields(name, username, email, date_of_birth):
-        """Validate all fields before form submission"""
-        # Validate name
-        name_valid, name_msg = add_account.validate_name(name)
-        if not name_valid:
-            return False, name_msg
+    def get_account_by_id(user_id):
+        """
+        Get user account by ID
         
-        # Check if username and email were generated
-        if not username or not email:
-            return False, "Username and email were not properly generated. Please check the name field."
+        Args:
+            user_id (int): User ID
+            
+        Returns:
+            dict: User account data or None if not found
+        """
+        try:
+            user = User.get_user_by_id(user_id)
+            if user:
+                # Add account properties
+                user.generated = add_account._was_generated(user.username, user.name, user.user_id)
+                return add_account.to_dict(user)
+            return None
+        except Exception as e:
+            print(f"Error getting user account: {str(e)}")
+            return None
+    
+    @staticmethod
+    def _was_generated(username, name, user_id):
+        """
+        Check if username was auto-generated
         
-        # Validate date of birth
-        date_valid, date_msg = add_account.validate_date_format(date_of_birth)
-        if not date_valid:
-            return False, date_msg
+        Args:
+            username (str): Username to check
+            name (str): User's full name
+            user_id (int): User ID
+            
+        Returns:
+            bool: True if username appears to be auto-generated
+        """
+        if not name or len(name.split()) < 2:
+            return False
         
-        return True, ""
+        name_parts = name.split()
+        last_name = name_parts[-1]
+        first_letters = "".join([unidecode.unidecode(part[0]).lower() for part in name_parts[:-1]])
+        
+        expected = unidecode.unidecode(last_name).lower() + first_letters + str(user_id)
+        return username == expected
+
+    
 class Delete_Users:
     def __init__(self, root=None):
         """Initialize the UserController"""
@@ -649,7 +656,6 @@ class Delete_Users:
        
         return False
 
-
     def confirm_delete_user(self):
         """Confirm and execute user deletion"""
         if not self.selected_user or not self.selected_user.get('user_id'):
@@ -664,37 +670,30 @@ class Delete_Users:
             return True
         return False
 
-    def delete_user_from_db(self, user_id):
-        """Xóa người dùng khỏi database"""
-        try:
-            conn = sqlite3.connect("Library.db")  # Đảm bảo đúng đường dẫn file database
-            cursor = conn.cursor()
-
-
-            # Kiểm tra xem user có tồn tại hay không
-            cursor.execute("SELECT * FROM users WHERE user_id = ?", (int(user_id),))
-            user_exists = cursor.fetchone()
-
-
-            if not user_exists:
-                print(f"User ID {user_id} not found in database.")
-                conn.close()
-                return False
-
-
-            # Thực hiện xóa user
-            cursor.execute("DELETE FROM users WHERE user_id = ?", (int(user_id),))
-            conn.commit()
-            conn.close()
-            print(f"Successfully deleted user ID {user_id}")
-            return True
-
-
-        except sqlite3.Error as e:
-            print(f"Database error: {e}")
-            return False
-        except Exception as e:
-            print(f"Exception in delete_user_from_db: {e}")
-            return False 
+@staticmethod
+def delete_user_from_db(user_id):
+    """Delete a user from the database"""
+    try:
+        # Try to cast user_id to integer since it might be coming as a string
+        user_id = int(user_id)
         
-    
+        result = Admin.delete_user(Admin, user_id)
+        
+        # If the result is None or False, consider it as failed
+        if result is None or result is False:
+            print(f"No user found with ID {user_id}")
+            return False
+        
+        print(f"User {user_id} deleted successfully")
+        return True
+        
+    except ValueError:
+        print(f"Invalid user ID format: {user_id}")
+        return False
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return False
+    except Exception as e:
+        print(f"Exception in delete_user_from_db: {e}")
+        return False
+
