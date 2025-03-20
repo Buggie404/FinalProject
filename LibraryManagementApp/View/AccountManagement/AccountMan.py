@@ -234,15 +234,16 @@ class AccountManagement:
         print(f"{button_name} clicked")
         if button_name == "btn_ChangePassword":
             self.root.destroy()
-            from AccountChangePassword import AccountChangePwApp
+            from AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
             changepass = AccountChangePwApp(changepass_root)
             changepass_root.mainloop()
         elif button_name == "btn_EditAccountInformation":
             self.root.destroy()
-            from AccountEditInfo import AccountEditInfoApp
+            from AccountManagement.AccountEditInfo import AccountEditInfoApp
+            user_id = self.user_data[0]
             editinfo_root = Tk()
-            editinfo = AccountEditInfoApp(editinfo_root)
+            editinfo = AccountEditInfoApp(editinfo_root, user_id = user_id)
             editinfo_root.mainloop()
         elif button_name == "btn_SignOut":
             from noti_tab_view_1 import Sign_Out

@@ -4,18 +4,18 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 import os
 import sys
 
-# Import base file path
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(base_dir, "View"))
-sys.path.append(base_dir)
-
 class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (lấy input của lnE) -> thêm để bên Controller xử lý tiếp phần này nha
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_id = None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_id = user_id
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
+        # import controller that hndel Edit Account Information
+        from Controller.test_accountmmnt1 import AccountEditInfoController 
+        self.controller = AccountEditInfoController(user_id)
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -135,6 +135,17 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
 
         self.buttons[button_name] = button
 
+    def prefill_user_data(self):
+        """Prefill user data in the form entries with current data"""
+        if self.controller.current_user:
+            if self.controller.current_user.username:
+                self.entries["lnE_NewUsername"].delete(0, 'end')
+                self.entries["lnE_NewUsername"].insert(0, self.controller.current_user.username)
+
+            if self.controller.current_user.date_of_birth:
+                self.entries["lnE_NewDateOfBirth"].delete(0, 'end')
+                self.entries["lnE_NewDateOfBirth"].insert(0, self.controller.current_user.date_of_birth)
+
     def create_entry_with_icon(self, entry_name, icon_name, entry_dimensions, bg_position, icon_position):
         """Create an entry field with background and icon"""
         # Create entry background
@@ -169,28 +180,39 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
         print(f"{button_name} clicked")
         if button_name == "btn_EditAccountInformation": # switch back to Account Mainwindow
             self.root.destroy()
-            from AccountMan import AccountManagement
+            from View.AccountManagement.AccountMan import AccountManagement
             account_root = Tk()
             account = AccountManagement(account_root)
             account.root.mainloop()
         elif button_name == "btn_ChangePassword": # switch to Change Password window
             self.root.destroy()
-            from AccountChangePassword import AccountChangePwApp
+            from View.AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
             changepass = AccountChangePwApp(changepass_root)
             changepass.root.mainloop()
         elif button_name == "btn_BackToHomepage": # switch back to Homepage
             self.root.destroy()
-            from Homepage import HomepageApp
+            from View.Homepage import HomepageApp
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root)
             homepage.root.mainloop()
-        # else: # For btn_Apply
-        #     """have a function to check the input in lnE in Controller"""
-        #     # make sure all lnE are filled
-        #     # check if the username is already in used or not
-        #     # check if the input date in valid: in date format, the input date have to be less than the current month and year
-        #     # if valid -> AccountEditInfo1, else -> AccountEditInfo2
+        else: # For btn_Apply
+            new_username = self.entries["lnE_NewUserName"].get()
+            new_date_of_brith = self.entries["lnE_NewDateOfBirth"].get()
+
+            result = self.controller.process_edit_request(new_username, new_date_of_brith)
+
+            self.root.destroy()
+            if result:
+                from View.AccountManagement.AccountEditInfo1 import AccountEditInfo1
+                success_root = Tk()
+                success = AccountEditInfo1(success_root)
+                success.root.mainloop()
+            else:
+                from View.AccountManagement.AccountEditInfo2 import AccountEditInfo2
+                failed_root = Tk()
+                failed = AccountEditInfo2(failed_root)
+                failed.root.mainloop()
 
     def run(self): # ?!?!
         """Start the application main loop"""
