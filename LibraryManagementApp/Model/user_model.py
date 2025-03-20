@@ -47,6 +47,12 @@ class User:
         return db.cursor.fetchone()
     
     @staticmethod
+    def search_username_partial(partial_username): # Search users by partial username match
+        db = Database()
+        db.cursor.execute("SELECT * FROM Users WHERE username LIKE ?", (f"%{partial_username}%",))
+        return db.cursor.fetchall()
+    
+    @staticmethod
     def get_name(name): # Search user by name
         db = Database()
         db.cursor.execute("SELECT * FROM Users WHERE name = ?", (name,))

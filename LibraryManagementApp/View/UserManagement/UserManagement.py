@@ -213,6 +213,26 @@ class UserManagementApp:
     #         self.load_user()
     # Do trong fiter_users() da cho 2 mode lọc là theo id và username r, thì có cần có thêm filter_by_username() ko?
     
+    # def filter_by_user_id(self):
+    #     """Filter the user table by user_id or username"""
+    #     search_term = self.entries["lnE_Search"].get()
+        
+    #     try:
+    #         # Import the controller
+    #         from Controller.user_controller import Search_users
+            
+    #         # Call the controller's filter_users method that handles both ID and username
+    #         Search_users.filter_users(
+    #             self.tbl_User,  # The Treeview widget
+    #             search_term,    # The search term
+    #             self.load_user,  # The function to reload all users
+    #             self.root       # Pass the root window for noti tab
+    #         )
+    #     except Exception as e:
+    #         print(f"Error while filtering users: {e}")
+    #         # Reload all users if filtering fails
+    #         self.load_user()
+
     def filter_by_user_id(self):
         """Filter the user table by user_id or username"""
         search_term = self.entries["lnE_Search"].get()
@@ -232,6 +252,7 @@ class UserManagementApp:
             print(f"Error while filtering users: {e}")
             # Reload all users if filtering fails
             self.load_user()
+
         
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
