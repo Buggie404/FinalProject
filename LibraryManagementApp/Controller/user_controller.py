@@ -228,10 +228,29 @@ class Search_users: # Handel search function
                     user[6]   # role
                 ))
             else:
-                # Show error message
-                messagebox.showinfo("Search Result", result)
-                # Reload all users if no match found
-                load_user_func()
+                # Try partial match instead
+                success, result = Search_users.filter_users_by_partial_username(search_term)
+                
+                if success:
+                    # Clear existing data
+                    for item in tbl_User.get_children():
+                        tbl_User.delete(item)
+                    
+                    # Display all matching users
+                    for user in result:
+                        tbl_User.insert('', 'end', values=(
+                            user[0],  # User_id
+                            user[1],  # name
+                            user[2],  # username
+                            user[3],  # email
+                            user[5],  # date_of_birth
+                            user[6]   # role
+                        ))
+                else:
+                    # Show error message
+                    messagebox.showinfo("Search Result", "No matching usernames found!")
+                    # Reload all users if no match found
+                    load_user_func()
                 
         except Exception as e:
             print(f"Error filtering users: {e}")
@@ -265,29 +284,69 @@ class Search_users: # Handel search function
             if is_id:
                 print(f"Filtering by user_id: {search_term}")
                 success, result = Search_users.filter_users_by_id(search_term)
+                
+                if success:
+                    # Clear existing data
+                    for item in tbl_User.get_children():
+                        tbl_User.delete(item)
+                    
+                    # Display the single user found
+                    user = result
+                    tbl_User.insert('', 'end', values=(
+                        user[0],  # User_id
+                        user[1],  # name
+                        user[2],  # username
+                        user[3],  # email
+                        user[5],  # date_of_birth
+                        user[6]   # role
+                    ))
+                else:
+                    from View.noti_tab_view_1 import Message_1
+                    Message_1(root, "search_account")
+                    load_user_func()
             else:
                 print(f"Filtering by username: {search_term}")
+                # Try exact match first
                 success, result = Search_users.filter_users_by_username(search_term)
-            
-            if success:
-                # Clear existing data
-                for item in tbl_User.get_children():
-                    tbl_User.delete(item)
                 
-                # Display the single user found
-                user = result
-                tbl_User.insert('', 'end', values=(
-                    user[0],  # User_id
-                    user[1],  # name
-                    user[2],  # username
-                    user[3],  # email
-                    user[5],  # date_of_birth
-                    user[6]   # role
-                ))
-            else:
-                from View.noti_tab_view_1 import Message_1
-                Message_1(root, "search_account")
-                load_user_func()
+                if success:
+                    # Clear existing data
+                    for item in tbl_User.get_children():
+                        tbl_User.delete(item)
+                    
+                    # Display the single user found
+                    user = result
+                    tbl_User.insert('', 'end', values=(
+                        user[0],  # User_id
+                        user[1],  # name
+                        user[2],  # username
+                        user[3],  # email
+                        user[5],  # date_of_birth
+                        user[6]   # role
+                    ))
+                else:
+                    # Try partial match
+                    success, result = Search_users.filter_users_by_partial_username(search_term)
+                    
+                    if success:
+                        # Clear existing data
+                        for item in tbl_User.get_children():
+                            tbl_User.delete(item)
+                        
+                        # Display all matching users
+                        for user in result:
+                            tbl_User.insert('', 'end', values=(
+                                user[0],  # User_id
+                                user[1],  # name
+                                user[2],  # username
+                                user[3],  # email
+                                user[5],  # date_of_birth
+                                user[6]   # role
+                            ))
+                    else:
+                        from View.noti_tab_view_1 import Message_1
+                        Message_1(root, "search_account")
+                        load_user_func()
                 
         except Exception as e:
             print(f"Error filtering users: {e}")
