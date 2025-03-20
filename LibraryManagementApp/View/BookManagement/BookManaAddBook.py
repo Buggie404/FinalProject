@@ -1,6 +1,6 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-
+import datetime
 
 class BookManagementAddBookApp:
     def __init__(self, root, assets_path=None):
@@ -29,11 +29,17 @@ class BookManagementAddBookApp:
             relief="ridge"
         )
         self.canvas.place(x=0, y=0)
+    
+        # Valid categories (mới thêm)
+        self.valid_categories = ["Fiction", "Non-Fiction", "Mystery", "Science", 
+                                "Fantasy", "History", "Romance", "Biography", 
+                                "Thriller", "Technology"]
 
         # Store images and UI elements as instance variables
         self.images = {}
         self.buttons = {}
         self.entries = {}
+        self.stringvars = {}  # To store StringVars for validation #mới THÊM
 
         # Build UI components
         self.create_background()
@@ -41,6 +47,9 @@ class BookManagementAddBookApp:
         self.create_main_panel()
         self.create_form_elements()
         self.create_action_buttons()
+
+        # Add validation mới thêm
+        self.setup_validation()
 
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
@@ -121,6 +130,8 @@ class BookManagementAddBookApp:
         """Create action buttons"""
         # Add Book button
         self.create_button("btn_Confirm", (425.0, 508.0, 313.0, 48.0))
+        self.buttons["btn_Confirm"].config(command=self.handle_confirm) #mới thêm
+
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -188,27 +199,163 @@ class BookManagementAddBookApp:
 
         self.entries[entry_name] = entry
         return entry
+    
+    def setup_validation(self):
+        """Setup validation for entry fields"""
+        # Register validation commands
+        
+        # ISBN validation - only integers allowed
+        self.entries["lnE_ISBN"].config(validate="key")
+        self.entries["lnE_ISBN"].config(validatecommand=(self.root.register(self.validate_isbn), '%P'))
+        
+        # Published Year validation - only integers from 1440 to current year
+        self.entries["lnE_PublishedYear"].config(validate="key")
+        self.entries["lnE_PublishedYear"].config(validatecommand=(self.root.register(self.validate_published_year), '%P'))
+        
+        # Quantity validation - only integers allowed
+        self.entries["lnE_Quantity"].config(validate="key")
+        self.entries["lnE_Quantity"].config(validatecommand=(self.root.register(self.validate_quantity), '%P'))
+        
+        # Category validation - only valid categories allowed
+        self.entries["lnE_Category"].config(validate="focusout")
+        self.entries["lnE_Category"].config(validatecommand=(self.root.register(self.validate_category), '%P'))
+
+    def validate_isbn(self, value):
+        """Validate ISBN - only integers allowed"""
+        if value == "":
+            return True
+        if value.isdigit():
+            return True
+        return False
+
+    def validate_published_year(self, value):
+        """Validate Published Year - only integers from 1440 to current year"""
+        if value == "":
+            return True
+        
+        current_year = datetime.datetime.now().year
+        
+        if value.isdigit():
+            year = int(value)
+            if len(value) <= 4 and (value == "0" or (1440 <= int(value) <= current_year)):
+                return True
+        return False
+
+    def validate_quantity(self, value):
+        """Validate Quantity - only integers allowed"""
+        if value == "":
+            return True
+        if value.isdigit():
+            return True
+        return False
+
+    def validate_category(self, value):
+        """Validate Category - must be one of the valid categories"""
+        if value in self.valid_categories:
+            return True
+        
+        # If not valid, show a message and reset
+        if value != "":
+            from View.noti_tab_view_1 import Invalid 
+            Invalid.showerror("root", 'Input')
+            self.stringvars["lnE_Category"].set("")
+        return False
+
+    def validate_all_fields(self):
+        """Validate all fields before submission"""
+        # Check if all fields are filled
+        for entry_name, entry in self.entries.items():
+            if not entry.get().strip():
+                from View.noti_tab_view_1 import Invalid 
+                Invalid.showerror("root", 'Input')
+                return False
+                
+        # ISBN validation
+        isbn = self.entries["lnE_ISBN"].get()
+        if not isbn.isdigit():
+            from View.noti_tab_view_1 import Invalid 
+            Invalid.showerror("root", 'Input')
+            return False
+            
+        # Published Year validation
+        published_year = self.entries["lnE_PublishedYear"].get()
+        current_year = datetime.datetime.now().year
+        if not published_year.isdigit() or not (1440 <= int(published_year) <= current_year):
+            from View.noti_tab_view_1 import Invalid 
+            Invalid.showerror("root", 'Input')
+            return False
+            
+        # Category validation
+        category = self.entries["lnE_Category"].get()
+        if category not in self.valid_categories:
+            from View.noti_tab_view_1 import Invalid 
+            Invalid.showerror("root", 'Input')
+            return False
+            
+        # Quantity validation
+        quantity = self.entries["lnE_Quantity"].get()
+        if not quantity.isdigit() or int(quantity) <= 0:
+            from View.noti_tab_view_1 import Invalid 
+            Invalid.showerror("root", 'Input')
+            return False
+            
+        return True
 
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+        if button_name == "btn_AddBook" and self.controller:
+            # Already on Add Book screen, do nothing
+            pass
 
-    def add_book(self):
-        """Handle the add book functionality"""
-        # Get values from entry fields
-        isbn = self.entries["lnE_ISBN"].get()
-        title = self.entries["lnE_Title"].get()
-        author = self.entries["lnE_Author"].get()
-        published_year = self.entries["lnE_PublishedYear"].get()
-        category = self.entries["lnE_Category"].get()
-        quantity = self.entries["lnE_Quantity"].get()
+    def handle_confirm(self):
+        """Handle the confirm button click"""
+        # Validate all fields
+        if not self.validate_all_fields():
+            return
+            
+        # Collect book data
+        book_data = {
+            'book_id': self.entries["lnE_ISBN"].get(),
+            'title': self.entries["lnE_Title"].get(),
+            'author': self.entries["lnE_Author"].get(),
+            'published_year': self.entries["lnE_PublishedYear"].get(),
+            'category': self.entries["lnE_Category"].get(),
+            'quantity': self.entries["lnE_Quantity"].get()
+        }
+        
+        # Save the book via controller
+        if self.controller:
+            success = self.controller.add_book(book_data)
+            if success:
+                # Navigate to BookManaAddBook1 to display the book details
+                self.controller.navigate_to_add_book_confirmation(book_data)
+            else:
+                from View.noti_tab_view_1 import Invalid 
+                Invalid.showerror("root", 'Input')
+        else:
+            print("Controller not set")
 
-        # Print the collected data (placeholder for actual functionality)
-        print(f"Adding book: {isbn} by {author}")
-        print(f"ISBN: {title}, Year: {published_year}")
-        print(f"Category: {category}, quantity: {quantity}")
+    # def button_click(self, button_name):
+    #     """Handle button click events"""
+    #     print(f"{button_name} clicked")
 
-    #     # Here you would add code to save the book to a database or file
+    # def add_book(self):
+    #     """Handle the add book functionality"""
+    #     # Get values from entry fields
+    #     isbn = self.entries["lnE_ISBN"].get()
+    #     title = self.entries["lnE_Title"].get()
+    #     author = self.entries["lnE_Author"].get()
+    #     published_year = self.entries["lnE_PublishedYear"].get()
+    #     category = self.entries["lnE_Category"].get()
+    #     quantity = self.entries["lnE_Quantity"].get()
+
+    #     # Print the collected data (placeholder for actual functionality)
+    #     print(f"Adding book: {isbn} by {author}")
+    #     print(f"ISBN: {title}, Year: {published_year}")
+    #     print(f"Category: {category}, quantity: {quantity}")
+
+    # #     # Here you would add code to save the book to a database or file
 
     def run(self):
         """Start the application main loop"""

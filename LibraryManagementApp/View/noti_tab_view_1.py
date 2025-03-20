@@ -124,7 +124,8 @@ class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id forma
         # Dynamic Title and Message
         invalid_map = {'account': ("Invalid Account", "Please double-check your email and password!"),
                        'quantity': ('Invalid Quantities',
-                                    "No. of books borrow need to be larger than zero and lower or equal to Availible quantities")}
+                                    "No. of books borrow need to be larger than zero and lower or equal to Availible quantities"), 
+                                    'Input':("Invalid input", "Please double-check your input")}
 
         # Title Label
         Label(self.invalid, text=invalid_map[invalid_type][0], font=("Montserrat", 18, 'bold'), bg='white',
