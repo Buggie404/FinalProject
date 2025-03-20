@@ -10,8 +10,7 @@ class BookManaAddBook1App:
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
-        self.controller = controller
-        self.book_data = book_data or {}
+    
 
         # Set up asset paths
         self.output_path = Path(__file__).parent

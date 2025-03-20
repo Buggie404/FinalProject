@@ -5,7 +5,10 @@ sys.path.append(parent_dir)
 
 from Model.book_model import Book
 from Model.admin_model import Admin
-from View.noti_tab_view_1 import Delete, Message_1
+from View.noti_tab_view_1 import Delete, Message_1, Invalid
+
+# from View.BookManaAddBook import BookManagementAddBookApp
+# from View.BookManaAddBook1 import BookManaAddBook1App
 
 class BookManagementController:
     def __init__(self, view):
@@ -187,3 +190,6 @@ class BookManagementController:
         """Navigate back to homepage"""
         print("Navigating to Homepage")
         # Implementation would depend on your app's navigation structure
+
+# add_book:
+
