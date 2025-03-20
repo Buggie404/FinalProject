@@ -88,23 +88,14 @@ class BookManagementApp:
         )
 
     def update_ui_based_on_role(self):
-        """Hide and show buttons based on user role"""
-        if self.role == "admin":
-            # Show admin buttons
-            if "btn_AddBook" in self.buttons:
-                self.buttons["btn_AddBook"].place(x=0.0, y=181.0, width=262.0, height=25.0)
-            if "btn_EditBookInformation" in self.buttons:
-                self.buttons["btn_EditBookInformation"].place(x=0.0, y=219.0, width=262.0, height=25.0)
-            if "btn_DeleteBook" in self.buttons:
-                self.buttons["btn_DeleteBook"].place(x=719.0, y=552.0, width=115.0, height=43.0)
-        else:
-            # Hide admin buttons for regular users
-            if "btn_AddBook" in self.buttons:
-                self.buttons["btn_AddBook"].place_forget()
-            if "btn_EditBookInformation" in self.buttons:
-                self.buttons["btn_EditBookInformation"].place_forget()
-            if "btn_DeleteBook" in self.buttons:
-                self.buttons["btn_DeleteBook"].place_forget()
+        """Show or hide buttons based on user role"""
+        admin_buttons = ["btn_AddBook", "btn_EditBookInformation", "btn_DeleteBook"]
+        
+        if self.role != "admin":
+            # Nếu không phải admin, ẩn các nút admin
+            for button_name in admin_buttons:
+                if button_name in self.buttons:
+                    self.buttons[button_name].place_forget()
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -340,5 +331,5 @@ if __name__ == "__main__":
     sys.path.append(parent_dir)
     from Model.admin_model import Admin
     admin_user = Admin()
-    app = BookManagementApp(root, admin_user=admin_user, role="user")
+    app = BookManagementApp(root, admin_user=admin_user, role="admin")
     app.run()

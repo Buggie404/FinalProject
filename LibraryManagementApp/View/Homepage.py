@@ -121,7 +121,8 @@ class HomepageApp:
         self.root.destroy()
         from BookManagement.BookManagement import BookManagementApp
         bookmgmt_root = Tk()
-        bookmgmt = BookManagementApp(bookmgmt_root)
+        #Truyền role vào BookManagement
+        bookmgmt = BookManagementApp(bookmgmt_root, role=self.role)
         bookmgmt_root.mainloop()
 
 if __name__ == "__main__":
