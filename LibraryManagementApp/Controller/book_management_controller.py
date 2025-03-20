@@ -78,13 +78,20 @@ class BookManagementController:
         delete_dialog.set_yes_callback(self.confirm_delete_book)
     
     def confirm_delete_book(self):
-        """Delete the selected book from database and UI"""
+    #Delete the selected book from database and UI
         if not self.admin:
             print("❌ Admin not set")
             return
-        
         # Store the selected book ID locally in case selection changes
         book_id_to_delete = self.selected_book_id
+        
+        # Get the selected item from the treeview BEFORE deleting from database
+        selected_items = self.view.tbl_Book.selection()
+        selected_item = selected_items[0] if selected_items else None
+        
+        if not selected_item:
+            print("❌ No item selected in the table")
+            return
         
         # Delete book from database
         success = self.admin.delete_book(book_id_to_delete)
@@ -92,12 +99,8 @@ class BookManagementController:
         if success:
             print(f"✅ Successfully deleted book ID: {book_id_to_delete}")
             
-            # Remove book from UI table
-            for item in self.view.tbl_Book.get_children():
-                values = self.view.tbl_Book.item(item, "values")
-                if values and values[0] == book_id_to_delete:
-                    self.view.tbl_Book.delete(item)
-                    break
+            # Remove book directly from UI table using the selected item
+            self.view.tbl_Book.delete(selected_item)
             
             # Show success message
             Message_1(self.view.root, "book")
