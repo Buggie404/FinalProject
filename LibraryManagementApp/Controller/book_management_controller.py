@@ -14,7 +14,7 @@ class BookManagementController:
         
         Args:
             view: The BookManagementApp view instance
-        """
+        """ 
         self.view = view
         self.admin = None
         self.selected_book_id = None
