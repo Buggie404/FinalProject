@@ -43,7 +43,6 @@ class Delete_Users:
             return True
         return False
 
-
     def delete_user_from_db(self, user_id):
         """Xóa người dùng khỏi database"""
         try:
