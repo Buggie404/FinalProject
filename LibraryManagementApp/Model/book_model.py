@@ -32,7 +32,7 @@ class Book:
     @staticmethod
     def get_book_by_id(book_id): # Search book by ID
         db = Database()
-        db.cursor.execute("SELECT * FROM Books WHERE id = ?", (book_id,))
+        db.cursor.execute("SELECT * FROM Books WHERE book_id = ?", (book_id,))
         return db.cursor.fetchone()
     
     @staticmethod
@@ -62,7 +62,7 @@ class Book:
     @staticmethod
     def get_quantity(book_id):
         db = Database()
-        db.cursor.execute("SELECT quantity FROM Books WHERE id = ?", (book_id,))
+        db.cursor.execute("SELECT quantity FROM Books WHERE book_id = ?", (book_id,))
         result = db.cursor.fetchone()  # Fetch one row
         
         if result:  # Check if result is not None
