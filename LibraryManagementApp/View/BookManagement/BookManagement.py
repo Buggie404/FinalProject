@@ -17,7 +17,7 @@ project_root = os.path.dirname(parent_dir)
 sys.path.append(project_root)
 
 # Now import using the package path
-from Controller.book_management_controller import BookManagementController
+from Controller.book_management_controller import DeleteBook
 
 class BookManagementApp:
     def __init__(self, root, assets_path=None, admin_user=None, role=None):
@@ -69,7 +69,7 @@ class BookManagementApp:
         self.update_ui_based_on_role()
 
         # Initialize controller AFTER all UI elements are created
-        self.controller = BookManagementController(self)
+        self.controller = DeleteBook(self)
         
         # Set admin user in the controller
         if self.admin_user:

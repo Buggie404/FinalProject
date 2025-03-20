@@ -10,7 +10,7 @@ from View.noti_tab_view_1 import Delete, Message_1, Invalid
 # from View.BookManaAddBook import BookManagementAddBookApp
 # from View.BookManaAddBook1 import BookManaAddBook1App
 
-class BookManagementController:
+class DeleteBook:
     def __init__(self, view):
         """
         Initialize the Book Management Controller.
