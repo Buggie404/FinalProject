@@ -1,8 +1,19 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+import os
+import sys
+
+# Get the current directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Go up one level to the View directory
+parent_dir = os.path.dirname(current_dir)
+# Go up one more level to the project root directory
+project_root = os.path.dirname(parent_dir)
+# Add project root to sys.path
+sys.path.append(project_root)
 
 
-class UserManagementApp:
+class UserAddAccountApp:
     def __init__(self, root, assets_path=None):
         # Initialize the main window
         self.root = root
@@ -72,20 +83,6 @@ class UserManagementApp:
         # Hình chữ nhật lớn nằm ngang (bo góc)
         self.create_rounded_rectangle(285.0, 59.0, 871.0, 547.0, radius=10, color="#F1F1F1")
 
-    # def create_background(self):
-    #     """Create the main background elements"""
-    #     # Sidebar background
-    #     self.canvas.create_rectangle(
-    #         0.0, 0.0, 262.0, 605.0,
-    #         fill="#0A66C2", outline=""
-    #     )
-    #
-    #     # Main panel background
-    #     self.canvas.create_rectangle(
-    #         285.0, 59.0, 871.0, 547.0,
-    #         fill="#F0F0F0", outline=""
-    #     )
-
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
         # Load and place logo
@@ -102,12 +99,97 @@ class UserManagementApp:
         self.load_image("image_2", (577.0, 102.0))
 
         # Create form fields with their respective icons
-        self.create_entry_with_icon("lbl_Name", "image_3", (542.0, 164.0, 273.0, 46.0), (678.5, 188.0), (409.0, 188.0))
-        self.create_entry_with_icon("lbl_Role", "image_4", (542.0, 267.0, 273.0, 46.0), (678.5, 291.0), (409.0, 291.0))
-        self.create_entry_with_icon("lbl_DateOfBirth", "image_5", (542.0, 370.0, 273.0, 46.0), (678.5, 394.0), (409.0, 394.0))
+        self.create_entry_with_icon("lnE_Name", "image_3", (542.0, 164.0, 273.0, 46.0), (678.5, 188.0), (409.0, 188.0))
+        self.create_entry_with_icon("lnE_Role", "image_4", (542.0, 267.0, 273.0, 46.0), (678.5, 291.0), (409.0, 291.0))
+        self.create_entry_with_icon("lnE_DateOfBirth", "image_5", (542.0, 370.0, 273.0, 46.0), (678.5, 394.0), (409.0, 394.0))
+        
+        # Add placeholder for date field
+        self.date_placeholder = "YY/MM/DD"
+        self.entries["lnE_DateOfBirth"].insert(0, self.date_placeholder)
+        self.entries["lnE_DateOfBirth"].config(fg="grey")  # Set placeholder text color to grey
+
+        # Bind focus events for date field
+        self.entries["lnE_DateOfBirth"].bind("<FocusIn>", self.on_input_field_focus_in)
+        self.entries["lnE_DateOfBirth"].bind("<FocusOut>", self.on_input_field_focus_out)
+
+        # Add placeholder for role field
+        self.name_placeholder = "Full Name"
+        self.entries["lnE_Name"].insert(0, self.name_placeholder)
+        self.entries["lnE_Name"].config(fg="grey") # Set placeholder text color to grey
+
+        # Bind focus events for date field
+        self.entries["lnE_Name"].bind("<FocusIn>", self.on_input_field_focus_in)
+        self.entries["lnE_Name"].bind("<FocusOut>", self.on_input_field_focus_out)
+
+        self.role_placeholder = "User/Admin"
+        self.entries["lnE_Role"].insert(0, self.role_placeholder)
+        self.entries["lnE_Role"].config(fg="grey") # Set placeholder text color to grey
+
+        # Bind focus events for date field
+        self.entries["lnE_Role"].bind("<FocusIn>", self.on_input_field_focus_in)
+        self.entries["lnE_Role"].bind("<FocusOut>", self.on_input_field_focus_out)
 
         # Create submit button
         self.create_button("btn_Confirm", (421.0, 473.0, 313.0, 48.0))
+
+        # self.setup_date_field_placeholders()
+        self.setup_field_events()
+    
+    def setup_field_events(self):
+        """Set up focus and key events for form fields"""
+        # Set up date field placeholders
+        date_field = self.entries["lnE_DateOfBirth"]
+        if date_field:
+            date_field.bind("<FocusIn>", self.on_input_field_focus_in)
+            date_field.bind("<FocusOut>", self.on_input_field_focus_out)
+
+        # Set up role field placeholders
+        role_field = self.entries["lnE_Role"]
+        if role_field:
+            role_field.bind("<FocusIn>", self.on_input_field_focus_in)
+            role_field.bind("<FocusOut>", self.on_input_field_focus_out)
+
+        # Set up name field placeholders
+        name_field = self.entries["lnE_Name"]
+        if name_field:
+            name_field.bind("<FocusIn>", self.on_input_field_focus_in)
+            name_field.bind("<FocusOut>", self.on_input_field_focus_out)
+    
+    def on_input_field_focus_in(self, event):
+        """Clear placeholder only for the specific input field that gets focus"""
+        # Get the widget that triggered the event
+        widget = event.widget
+        
+        # Check which field was focused and clear only that field's placeholder
+        if widget == self.entries["lnE_DateOfBirth"] and widget.get() == self.date_placeholder:
+            widget.delete(0, "end")
+            widget.config(fg="#000716")  # Change to normal text color
+        
+        elif widget == self.entries["lnE_Role"] and widget.get() == self.role_placeholder:
+            widget.delete(0, "end")
+            widget.config(fg="#000716")  # Change to normal text color
+        
+        elif widget == self.entries["lnE_Name"] and widget.get() == self.name_placeholder:
+            widget.delete(0, "end")
+            widget.config(fg="#000716")  # Change to normal text color
+
+    def on_input_field_focus_out(self, event):
+        """Restore placeholder only for the specific input field that loses focus if empty"""
+        # Get the widget that triggered the event
+        widget = event.widget
+        
+        # Check which field lost focus and restore only that field's placeholder if empty
+        if widget == self.entries["lnE_DateOfBirth"] and not widget.get():
+            widget.insert(0, self.date_placeholder)
+            widget.config(fg="grey")  # Change back to placeholder color
+
+        elif widget == self.entries["lnE_Role"] and not widget.get():
+            widget.insert(0, self.role_placeholder)
+            widget.config(fg="grey")  # Change back to placeholder color
+        
+        elif widget == self.entries["lnE_Name"] and not widget.get():
+            widget.insert(0, self.name_placeholder)  # Fixed: was using date_placeholder
+            widget.config(fg="grey")  # Change back to placeholder color
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -177,6 +259,33 @@ class UserManagementApp:
         """Handle button click events"""
         print(f"{button_name} clicked")
 
+        if button_name == "btn_AddAccount":
+            self.root.destroy()
+            from UserManagement import UserManagementApp
+            add_user_root = Tk()
+            add_user = UserManagementApp(add_user_root)
+            add_user_root.mainloop()
+        elif button_name == 'btn_EditAccountPassword':
+            self.root.destroy()
+            from UserEditAccount import UserEditAccountApp
+            edit_pass_root = Tk()
+            edit_pass = UserEditAccountApp(edit_pass_root)
+            edit_pass_root.mainloop()
+        elif button_name == "btn_Confirm":
+            self.root.destroy()
+            from UserAddAccount1 import UserAddAccount1App
+            add_user_1_root = Tk()
+            add_user_1 = UserAddAccount1App(add_user_1_root)
+            add_user_1_root.mainloop()
+        else:
+            self.root.destroy()
+            parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            sys.path.append(parent_dir)
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
+    
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()
@@ -184,5 +293,5 @@ class UserManagementApp:
 
 if __name__ == "__main__":
     root = Tk()
-    app = UserManagementApp(root)
+    app = UserAddAccountApp(root)
     app.run()

@@ -478,6 +478,7 @@ class Search_users: # Handel search function
             return True, users
         else:
             return False, "no_match_username"
+
 class add_account:
     @staticmethod
     def generate_username_and_email(name, user_id):
@@ -623,6 +624,7 @@ class add_account:
             return False, date_msg
         
         return True, ""
+    
 class Delete_Users:
     def __init__(self, root=None):
         """Initialize the UserController"""
