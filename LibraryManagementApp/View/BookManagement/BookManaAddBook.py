@@ -193,20 +193,20 @@ class BookManagementAddBookApp:
         """Handle button click events"""
         print(f"{button_name} clicked")
 
-    # def add_book(self):
-    #     """Handle the add book functionality"""
-    #     # Get values from entry fields
-    #     book_name = self.entries["entry_1"].get()
-    #     author = self.entries["entry_2"].get()
-    #     isbn = self.entries["entry_3"].get()
-    #     pub_year = self.entries["entry_5"].get()
-    #     category = self.entries["entry_6"].get()
-    #     price = self.entries["entry_4"].get()
+    def add_book(self):
+        """Handle the add book functionality"""
+        # Get values from entry fields
+        book_name = self.entries["lnE_ISBN"].get()
+        author = self.entries["lnE_Title"].get()
+        isbn = self.entries["lnE_Author"].get()
+        pub_year = self.entries["lnE_PublishedYear"].get()
+        category = self.entries["lnE_Category"].get()
+        price = self.entries["lnE_Quantity"].get()
 
-    #     # Print the collected data (placeholder for actual functionality)
-    #     print(f"Adding book: {book_name} by {author}")
-    #     print(f"ISBN: {isbn}, Year: {pub_year}")
-    #     print(f"Category: {category}, Price: {price}")
+        # Print the collected data (placeholder for actual functionality)
+        print(f"Adding book: {book_name} by {author}")
+        print(f"ISBN: {isbn}, Year: {pub_year}")
+        print(f"Category: {category}, Price: {price}")
 
     #     # Here you would add code to save the book to a database or file
 
