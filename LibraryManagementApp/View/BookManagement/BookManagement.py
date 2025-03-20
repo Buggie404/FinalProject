@@ -331,5 +331,5 @@ if __name__ == "__main__":
     sys.path.append(parent_dir)
     from Model.admin_model import Admin
     admin_user = Admin()
-    app = BookManagementApp(root, admin_user=admin_user, role="user")
+    app = BookManagementApp(root, admin_user=admin_user, role="admin")
     app.run()
