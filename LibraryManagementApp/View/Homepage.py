@@ -10,10 +10,11 @@ sys.path.append(os.path.join(base_dir, "View"))
 sys.path.append(base_dir)
 
 class HomepageApp:
-    def __init__(self, root, role=None, assets_path=None):
+    def __init__(self, root, role=None, assets_path=None, user_data=None):
         self.root = root
         # self.role = "user"  # Default role
         self.role = role
+        self.user_data = user_data
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
@@ -97,7 +98,7 @@ class HomepageApp:
         self.root.destroy()
         from AccountManagement.AccountMan import AccountManagement 
         accountmnt_root = Tk()
-        accountmnt = AccountManagement(accountmnt_root)
+        accountmnt = AccountManagement(accountmnt_root, user_data=self.user_data)
         accountmnt_root.mainloop()
     
     def on_user_management_clicked(self):
@@ -121,7 +122,8 @@ class HomepageApp:
         self.root.destroy()
         from BookManagement.BookManagement import BookManagementApp
         bookmgmt_root = Tk()
-        bookmgmt = BookManagementApp(bookmgmt_root)
+        #Truyền role vào BookManagement
+        bookmgmt = BookManagementApp(bookmgmt_root, role=self.role)
         bookmgmt_root.mainloop()
 
 if __name__ == "__main__":

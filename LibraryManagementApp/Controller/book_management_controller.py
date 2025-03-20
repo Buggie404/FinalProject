@@ -5,9 +5,12 @@ sys.path.append(parent_dir)
 
 from Model.book_model import Book
 from Model.admin_model import Admin
-from View.noti_tab_view_1 import Delete, Message_1
+from View.noti_tab_view_1 import Delete, Message_1, Invalid
 
-class BookManagementController:
+# from View.BookManaAddBook import BookManagementAddBookApp
+# from View.BookManaAddBook1 import BookManaAddBook1App
+
+class DeleteBook:
     def __init__(self, view):
         """
         Initialize the Book Management Controller.
@@ -37,7 +40,6 @@ class BookManagementController:
         self.view.buttons["btn_Technology"].config(command=lambda: self.filter_by_category("Technology"))
         self.view.buttons["btn_Biography"].config(command=lambda: self.filter_by_category("Biography"))
         
-        
         # Bind search entry
         self.view.entries["lnE_SearchBook"].bind("<Return>", self.search_books)
         
@@ -57,54 +59,57 @@ class BookManagementController:
             # Get the book ID from the selected row
             item = self.view.tbl_Book.item(selected_items[0])
             self.selected_book_id = item["values"][0]  # First column is book_id
+            print(f"Selected book ID: {self.selected_book_id}")
         else:
             self.selected_book_id = None
     
     def delete_selected_book(self):
+        """Show delete confirmation dialog and handle deletion"""
         if not self.selected_book_id:
             print("❌ No book selected.")
             return
 
         print(f"🗑️ Attempting to delete book ID: {self.selected_book_id}")
-
+        
+        # Create delete confirmation dialog
         delete_dialog = Delete(self.view.root, "book")
-
-        # Gán callback cho nút Yes
-        delete_dialog.set_yes_callback(lambda: self.confirm_delete_book('yes'))
-
-        # Nếu đóng dialog mà không chọn, coi như No
-        delete_dialog.delete_noti.protocol(
-            "WM_DELETE_WINDOW",
-            lambda: self.confirm_delete_book('no')
-        )
+        
+        # Set callback for Yes button
+        delete_dialog.set_yes_callback(self.confirm_delete_book)
     
-    def confirm_delete_book(self, option):
-        if option == 'yes':
-            if not self.admin:
-                print("❌ Admin not set")
-                return
+    def confirm_delete_book(self):
+    #Delete the selected book from database and UI
+        if not self.admin:
+            print("❌ Admin not set")
+            return
+        # Store the selected book ID locally in case selection changes
+        book_id_to_delete = self.selected_book_id
+        
+        # Get the selected item from the treeview BEFORE deleting from database
+        selected_items = self.view.tbl_Book.selection()
+        selected_item = selected_items[0] if selected_items else None
+        
+        if not selected_item:
+            print("❌ No item selected in the table")
+            return
+        
+        # Delete book from database
+        success = self.admin.delete_book(book_id_to_delete)
+        
+        if success:
+            print(f"✅ Successfully deleted book ID: {book_id_to_delete}")
             
-            # Xoá sách từ database
-            success = self.admin.delete_book(self.selected_book_id)
-
-            if success:
-                print(f"✅ Successfully deleted book ID: {self.selected_book_id}")
-                
-                # Xoá trên giao diện
-                selected_items = self.view.tbl_Book.selection()
-                if selected_items:
-                    self.view.tbl_Book.delete(selected_items[0])
-
-                # Hiển thị thông báo xoá thành công
-                Message_1(self.view.root, "book")
-
-                # Reset lại book_id
-                self.selected_book_id = None
-            else:
-                print("❌ Failed to delete book from database")
+            # Remove book directly from UI table using the selected item
+            self.view.tbl_Book.delete(selected_item)
+            
+            # Show success message
+            Message_1(self.view.root, "book")
+            
+            # Reset selected book ID
+            self.selected_book_id = None
         else:
-            print("❌ Deletion canceled")
-
+            print("❌ Failed to delete book from database")
+    
     def filter_by_category(self, category):
         """Filter books by category"""
         # Clear current table
@@ -173,7 +178,7 @@ class BookManagementController:
                     book[5]   # quantity
                 ))
     
-    # Navigation methods (placeholders - would connect to actual navigation in a real app)
+    # Navigation methods
     def navigate_to_add_book(self):
         """Navigate to Add Book screen"""
         print("Navigating to Add Book screen")
@@ -188,14 +193,6 @@ class BookManagementController:
         """Navigate back to homepage"""
         print("Navigating to Homepage")
         # Implementation would depend on your app's navigation structure
-        
-    # Static methods for handling button clicks from the view
-    @staticmethod
-    def delete_book_clicked(view_instance):
-        """Static method to handle delete book button click from the view"""
-        # Find the controller instance
-        if hasattr(view_instance, 'controller'):
-            controller = view_instance.controller
-            controller.delete_selected_book()
-        else:
-            print("Error: Controller not found")
+
+# add_book:
+

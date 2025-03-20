@@ -10,9 +10,10 @@ sys.path.append(os.path.join(base_dir, "View"))
 sys.path.append(base_dir)
 
 class AccountManagement:
-    def __init__(self, root,assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
@@ -175,6 +176,26 @@ class AccountManagement:
             fill="#0A66C2",
             font=("Montserrat Medium", 18 * -1)
         )
+
+        if self.user_data:
+            self.update_profile_info()
+        
+    def update_profile_info(self):
+        """Update profile information with actual user data"""
+        if self.user_data:
+            # Update labels with user data using itemconfig
+            # assuming user_data is a tuple from database with values in specific order
+            # user_id(0), name(1), username(2), email(3), password(4), date_of_birth(5), role(6)
+            
+            # Update user profile info
+            self.canvas.itemconfig(self.lbl_Name, text=self.user_data[1])  # name
+            self.canvas.itemconfig(self.lbl_ID, text=self.user_data[0])  # user_id
+            self.canvas.itemconfig(self.lbl_Role, text=self.user_data[6])  # role
+            
+            # Update user details
+            self.canvas.itemconfig(self.lbl_Username, text=self.user_data[2])  # username
+            self.canvas.itemconfig(self.lbl_EmailAddress, text=self.user_data[3])  # email
+            self.canvas.itemconfig(self.lbl_DateOfBirth, text=self.user_data[5])  # date_of_birth
 
     # def load_image(self, image_name, position):
     #     """Load an image and place it on the canvas"""

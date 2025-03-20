@@ -7,13 +7,15 @@ from tkinter import *
 # from current-sub-win import current-sub class
 
 class Delete():  # To confirm delection
-    def __init__(self, root, delete_type):
-        """delete_type: 'book' or 'account"""
+    def __init__(self, root, delete_type,yes_callback=None):
+        """delete_type: 'book' or 'account'
+        yes_callback: function to call when 'Yes' is clicked"""
 
         # Config Notification tab
         self.root = root
         self.delete_type = delete_type
         self.delete_noti = Toplevel(root)
+        self.yes_callback = yes_callback
 
         # Dynamic Title and Messages
         delete_map = {'book': ('Delete Book', "Are you sure you wnat to delete this book?"),
@@ -38,13 +40,19 @@ class Delete():  # To confirm delection
         # No Button
         Button(self.delete_noti, width=13, text="No", highlightbackground='white', highlightthickness=1,
                command=lambda: self.choice('no')).pack(pady=10)
-
+    def set_yes_callback(self, callback):
+        """Set the callback function for the 'Yes' button"""
+        self.yes_callback = callback
     # Choice function
     def choice(self, option):
         if option == 'yes':  # When clicked 'Yes' button -> switch to notify mess
             # Cho chức năng xoá sách từ Controller vào
-            Message_1(self.root, self.delete_type)
-        else:
+            if self.yes_callback:
+                self.yes_callback()
+            else:
+                # Default behavior if no callback is provided
+                Message_1(self.root, self.delete_type)
+        else:        
             print('Action canceled')
         self.delete_noti.destroy()
 
@@ -124,7 +132,8 @@ class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id forma
         # Dynamic Title and Message
         invalid_map = {'account': ("Invalid Account", "Please double-check your email and password!"),
                        'quantity': ('Invalid Quantities',
-                                    "No. of books borrow need to be larger than zero and lower or equal to Availible quantities")}
+                                    "No. of books borrow need to be larger than zero and lower or equal to Availible quantities"), 
+                                    'Input':("Invalid input", "Please double-check your input")}
 
         # Title Label
         Label(self.invalid, text=invalid_map[invalid_type][0], font=("Montserrat", 18, 'bold'), bg='white',
