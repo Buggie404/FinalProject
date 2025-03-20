@@ -20,14 +20,15 @@ sys.path.append(project_root)
 from Controller.book_management_controller import BookManagementController
 
 class BookManagementApp:
-    def __init__(self, root, assets_path=None, admin_user=None):
+    def __init__(self, root, assets_path=None, admin_user=None, role=None):
         # Initialize the main window
         self.root = root
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.admin_user = admin_user
-        
+        self.role = role
+
         # Set up asset paths
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -64,6 +65,9 @@ class BookManagementApp:
         # Load book data into the table
         self.load_book()
 
+        # Update UI based on user role
+        self.update_ui_based_on_role()
+
         # Initialize controller AFTER all UI elements are created
         self.controller = BookManagementController(self)
         
@@ -82,6 +86,25 @@ class BookManagementApp:
             0.0, 0.0, 262.0, 605.0,
             fill="#0A66C2", outline=""
         )
+
+    def update_ui_based_on_role(self):
+        """Hide and show buttons based on user role"""
+        if self.role == "admin":
+            # Show admin buttons
+            if "btn_AddBook" in self.buttons:
+                self.buttons["btn_AddBook"].place(x=0.0, y=181.0, width=262.0, height=25.0)
+            if "btn_EditBookInformation" in self.buttons:
+                self.buttons["btn_EditBookInformation"].place(x=0.0, y=219.0, width=262.0, height=25.0)
+            if "btn_DeleteBook" in self.buttons:
+                self.buttons["btn_DeleteBook"].place(x=719.0, y=552.0, width=115.0, height=43.0)
+        else:
+            # Hide admin buttons for regular users
+            if "btn_AddBook" in self.buttons:
+                self.buttons["btn_AddBook"].place_forget()
+            if "btn_EditBookInformation" in self.buttons:
+                self.buttons["btn_EditBookInformation"].place_forget()
+            if "btn_DeleteBook" in self.buttons:
+                self.buttons["btn_DeleteBook"].place_forget()
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -317,5 +340,5 @@ if __name__ == "__main__":
     sys.path.append(parent_dir)
     from Model.admin_model import Admin
     admin_user = Admin()
-    app = BookManagementApp(root, admin_user=admin_user)
+    app = BookManagementApp(root, admin_user=admin_user, role="user")
     app.run()
