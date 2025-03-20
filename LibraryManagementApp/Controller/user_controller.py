@@ -3,6 +3,7 @@
 from Model.admin_model import Admin
 from Model.user_model import User
 from tkinter import messagebox
+from View.noti_tab_view_1 import Delete, Message_1
 import sqlite3
 import re
 import datetime
