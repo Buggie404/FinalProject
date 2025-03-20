@@ -4,34 +4,34 @@ import sys
 import os
 
 # Bỏ cái path resolution này dô là ko có cho chuyển tab đc
-# # Path resolution to find modules
-# try:
-#     # Try to find correct path to Controller and Model files
-#     current_dir = os.path.dirname(os.path.abspath(__file__))
-#     parent_dir = os.path.dirname(current_dir)
-#     grandparent_dir = os.path.dirname(parent_dir)
+# Path resolution to find modules
+try:
+    # Try to find correct path to Controller and Model files
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    grandparent_dir = os.path.dirname(parent_dir)
 
-#     # Add possible paths
-#     possible_paths = [
-#         grandparent_dir,
-#         os.path.join(grandparent_dir, "LibraryManagementApp"),
-#         parent_dir,
-#         current_dir
-#     ]
+    # Add possible paths
+    possible_paths = [
+        grandparent_dir,
+        os.path.join(grandparent_dir, "LibraryManagementApp"),
+        parent_dir,
+        current_dir
+    ]
 
-#     for path in possible_paths:
-#         if path not in sys.path:
-#             sys.path.append(path)
+    for path in possible_paths:
+        if path not in sys.path:
+            sys.path.append(path)
 
-#     # Import Controller
-#     from Controller.user_controller import add_account
-# except ModuleNotFoundError:
-#     try:
-#         # Try alternative import path
-#         from Controller.user_controller import add_account
-#     except ModuleNotFoundError:
-#         messagebox.showerror("Import Error", "Failed to import controller module. Please check your project structure.")
-#         sys.exit(1)
+    # Import Controller
+    from Controller.user_controller import add_account
+except ModuleNotFoundError:
+    try:
+        # Try alternative import path
+        from Controller.user_controller import add_account
+    except ModuleNotFoundError:
+        messagebox.showerror("Import Error", "Failed to import controller module. Please check your project structure.")
+        sys.exit(1)
 
 class UserAddAccountApp:
     def __init__(self, root, assets_path=None):

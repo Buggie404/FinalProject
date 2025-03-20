@@ -1,17 +1,33 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, ttk, Frame
-# from Model.book_model import Book
+
 import sys
 import os
 
+# Get the current directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Go up one level to the View directory
+parent_dir = os.path.dirname(current_dir)
+
+# Go up one more level to the project root directory
+project_root = os.path.dirname(parent_dir)
+
+# Add project root to sys.path
+sys.path.append(project_root)
+
+# Now import using the package path
+from Controller.book_management_controller import BookManagementController
+
 class BookManagementApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, assets_path=None, admin_user=None):
         # Initialize the main window
         self.root = root
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
-
+        self.admin_user = admin_user
+        
         # Set up asset paths
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -48,6 +64,13 @@ class BookManagementApp:
         # Load book data into the table
         self.load_book()
 
+        # Initialize controller AFTER all UI elements are created
+        self.controller = BookManagementController(self)
+        
+        # Set admin user in the controller
+        if self.admin_user:
+            self.controller.set_admin(self.admin_user)
+
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
         return self.assets_path / Path(path)
@@ -59,12 +82,6 @@ class BookManagementApp:
             0.0, 0.0, 262.0, 605.0,
             fill="#0A66C2", outline=""
         )
-
-        # # Main content panel
-        # self.tbl_Book = self.canvas.create_rectangle(
-        #     285.0, 156.0, 871.0, 542.0,
-        #     fill="#D9D9D9", outline=""
-        # )
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -167,9 +184,16 @@ class BookManagementApp:
 
         self.entries[entry_name] = entry
 
+    
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+        if button_name == "btn_DeleteBook":
+            BookManagementController.delete_book_clicked(self)
+        elif button_name == "btn_BackToHomepage":
+            # Implement navigation to homepage
+            pass
+        # Other button handlers...
 
     def run(self):
         """Start the application main loop"""
@@ -289,5 +313,9 @@ class BookManagementApp:
 
 if __name__ == "__main__":
     root = Tk()
-    app = BookManagementApp(root)
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    sys.path.append(parent_dir)
+    from Model.admin_model import Admin
+    admin_user = Admin()
+    app = BookManagementApp(root, admin_user=admin_user)
     app.run()

@@ -15,7 +15,7 @@ class Book:
         Save a new book into the database.
         This function inserts the book title, author, published year, category, and quantity into the Books table.
         """
-        self.db.cursor.execute("INSERT INTO Books (title, author, published_year, category, quantity) VALUES (?, ?, ?, ?, ?, ?)", 
+        self.db.cursor.execute("INSERT INTO Books (title, author, published_year, category, quantity) VALUES (?, ?, ?, ?, ?)", 
                                (self.book_id, self.title, self.author, self.pulished_year, self.category, self.quantity)) 
         self.db.conn.commit()
         self.book_id = self.db.cursor.lastrowid # Update book_id with the new id
