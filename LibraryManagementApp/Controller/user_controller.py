@@ -180,57 +180,6 @@ class Search_users: # Handel search function
         else:
             return False, "no_match_username"
         
-    # @staticmethod
-    # def filter_by_username(tbl_User, search_term, load_user_func):
-    #     """
-    #     Filter the user table by username
-        
-    #     Args:
-    #         tbl_User: The Treeview widget containing user data
-    #         search_term (str): The search term to filter by
-    #         load_user_func: Function to reload all users
-            
-    #     Returns:
-    #         None
-    #     """
-    #     # Skip filtering if the search term is the placeholder or empty
-    #     if search_term == "Search" or search_term.strip() == "":
-    #         # Reload all users
-    #         load_user_func()
-    #         return
-        
-    #     print(f"Filtering by username: {search_term}")
-        
-    #     try:
-    #         # Use the filter_users_by_username method
-    #         success, result = Search_users.filter_users_by_username(search_term)
-            
-    #         if success:
-    #             # Clear existing data
-    #             for item in tbl_User.get_children():
-    #                 tbl_User.delete(item)
-                
-    #             # Display the single user found
-    #             user = result
-    #             tbl_User.insert('', 'end', values=(
-    #                 user[0],  # User_id
-    #                 user[1],  # name
-    #                 user[2],  # username
-    #                 user[3],  # email
-    #                 user[5],  # date_of_birth
-    #                 user[6]   # role
-    #             ))
-    #         else:
-    #             # Show error message
-    #             messagebox.showinfo("Search Result", result)
-    #             # Reload all users if no match found
-    #             load_user_func()
-                
-    #     except Exception as e:
-    #         print(f"Error filtering users: {e}")
-    #         # Reload all users if filtering fails
-    #         load_user_func()
-
     @staticmethod
     def filter_by_username(tbl_User, search_term, load_user_func):
         """
@@ -272,91 +221,15 @@ class Search_users: # Handel search function
                     user[6]   # role
                 ))
             else:
-                # Try partial match instead
-                success, result = Search_users.filter_users_by_partial_username(search_term)
-                
-                if success:
-                    # Clear existing data
-                    for item in tbl_User.get_children():
-                        tbl_User.delete(item)
-                    
-                    # Display all matching users
-                    for user in result:
-                        tbl_User.insert('', 'end', values=(
-                            user[0],  # User_id
-                            user[1],  # name
-                            user[2],  # username
-                            user[3],  # email
-                            user[5],  # date_of_birth
-                            user[6]   # role
-                        ))
-                else:
-                    # Show error message
-                    messagebox.showinfo("Search Result", "No matching usernames found!")
-                    # Reload all users if no match found
-                    load_user_func()
+                # Show error message
+                messagebox.showinfo("Search Result", result)
+                # Reload all users if no match found
+                load_user_func()
                 
         except Exception as e:
             print(f"Error filtering users: {e}")
             # Reload all users if filtering fails
             load_user_func()
-
-
-    # @staticmethod
-    # def filter_users(tbl_User, search_term, load_user_func, root = None):
-    #     """
-    #     Filter users by either user_id or username depending on the search term
-        
-    #     Args:
-    #         tbl_User: The Treeview widget containing user data
-    #         search_term (str): The search term to filter by
-    #         load_user_func: Function to reload all users
-    #         root: The root for creating notification
-            
-    #     Returns:
-    #         None
-    #     """
-    #     # Skip filtering if the search term is the placeholder or empty
-    #     if search_term == "Search" or search_term.strip() == "":
-    #         # Reload all users
-    #         load_user_func()
-    #         return
-        
-    #     try:
-    #         # Check if the search term is a number (likely an ID)
-    #         is_id = search_term.isdigit()
-            
-    #         if is_id:
-    #             print(f"Filtering by user_id: {search_term}")
-    #             success, result = Search_users.filter_users_by_id(search_term)
-    #         else:
-    #             print(f"Filtering by username: {search_term}")
-    #             success, result = Search_users.filter_users_by_username(search_term)
-            
-    #         if success:
-    #             # Clear existing data
-    #             for item in tbl_User.get_children():
-    #                 tbl_User.delete(item)
-                
-    #             # Display the single user found
-    #             user = result
-    #             tbl_User.insert('', 'end', values=(
-    #                 user[0],  # User_id
-    #                 user[1],  # name
-    #                 user[2],  # username
-    #                 user[3],  # email
-    #                 user[5],  # date_of_birth
-    #                 user[6]   # role
-    #             ))
-    #         else:
-    #             from View.noti_tab_view_1 import Message_1
-    #             Message_1(root, "search_account")
-    #             load_user_func()
-                
-    #     except Exception as e:
-    #         print(f"Error filtering users: {e}")
-    #         # Reload all users if filtering fails
-    #         load_user_func()
 
     @staticmethod
     def filter_users(tbl_User, search_term, load_user_func, root = None):
@@ -385,99 +258,35 @@ class Search_users: # Handel search function
             if is_id:
                 print(f"Filtering by user_id: {search_term}")
                 success, result = Search_users.filter_users_by_id(search_term)
-                
-                if success:
-                    # Clear existing data
-                    for item in tbl_User.get_children():
-                        tbl_User.delete(item)
-                    
-                    # Display the single user found
-                    user = result
-                    tbl_User.insert('', 'end', values=(
-                        user[0],  # User_id
-                        user[1],  # name
-                        user[2],  # username
-                        user[3],  # email
-                        user[5],  # date_of_birth
-                        user[6]   # role
-                    ))
-                else:
-                    from View.noti_tab_view_1 import Message_1
-                    Message_1(root, "search_account")
-                    load_user_func()
             else:
                 print(f"Filtering by username: {search_term}")
-                # Try exact match first
                 success, result = Search_users.filter_users_by_username(search_term)
+            
+            if success:
+                # Clear existing data
+                for item in tbl_User.get_children():
+                    tbl_User.delete(item)
                 
-                if success:
-                    # Clear existing data
-                    for item in tbl_User.get_children():
-                        tbl_User.delete(item)
-                    
-                    # Display the single user found
-                    user = result
-                    tbl_User.insert('', 'end', values=(
-                        user[0],  # User_id
-                        user[1],  # name
-                        user[2],  # username
-                        user[3],  # email
-                        user[5],  # date_of_birth
-                        user[6]   # role
-                    ))
-                else:
-                    # Try partial match
-                    success, result = Search_users.filter_users_by_partial_username(search_term)
-                    
-                    if success:
-                        # Clear existing data
-                        for item in tbl_User.get_children():
-                            tbl_User.delete(item)
-                        
-                        # Display all matching users
-                        for user in result:
-                            tbl_User.insert('', 'end', values=(
-                                user[0],  # User_id
-                                user[1],  # name
-                                user[2],  # username
-                                user[3],  # email
-                                user[5],  # date_of_birth
-                                user[6]   # role
-                            ))
-                    else:
-                        from View.noti_tab_view_1 import Message_1
-                        Message_1(root, "search_account")
-                        load_user_func()
+                # Display the single user found
+                user = result
+                tbl_User.insert('', 'end', values=(
+                    user[0],  # User_id
+                    user[1],  # name
+                    user[2],  # username
+                    user[3],  # email
+                    user[5],  # date_of_birth
+                    user[6]   # role
+                ))
+            else:
+                from View.noti_tab_view_1 import Message_1
+                Message_1(root, "search_account")
+                load_user_func()
                 
         except Exception as e:
             print(f"Error filtering users: {e}")
             # Reload all users if filtering fails
             load_user_func()
-    
-    @staticmethod
-    def filter_users_by_partial_username(search_term):
-        """
-        Filter users by partial username match
-        
-        Args:
-            search_term (str): The partial username to search for
-            
-        Returns:
-            tuple: (success_flag, result)
-                - If successful and users found: (True, users_data)
-                - If successful but no users found: (False, "no_match_username")
-                - If search_term is empty: (False, "empty_search")
-        """
-        if not search_term or search_term.strip() == "" or search_term == "Search":
-            return False, "empty_search"
-            
-        # Search for partial matches
-        users = User.search_username_partial(search_term)
-        
-        if users and len(users) > 0:
-            return True, users
-        else:
-            return False, "no_match_username"
+
 class add_account:
     @staticmethod
     def generate_username_and_email(name, user_id):
@@ -649,7 +458,6 @@ class Delete_Users:
        
         return False
 
-
     def confirm_delete_user(self):
         """Confirm and execute user deletion"""
         if not self.selected_user or not self.selected_user.get('user_id'):
@@ -664,37 +472,30 @@ class Delete_Users:
             return True
         return False
 
-    def delete_user_from_db(self, user_id):
-        """Xóa người dùng khỏi database"""
-        try:
-            conn = sqlite3.connect("Library.db")  # Đảm bảo đúng đường dẫn file database
-            cursor = conn.cursor()
-
-
-            # Kiểm tra xem user có tồn tại hay không
-            cursor.execute("SELECT * FROM users WHERE user_id = ?", (int(user_id),))
-            user_exists = cursor.fetchone()
-
-
-            if not user_exists:
-                print(f"User ID {user_id} not found in database.")
-                conn.close()
-                return False
-
-
-            # Thực hiện xóa user
-            cursor.execute("DELETE FROM users WHERE user_id = ?", (int(user_id),))
-            conn.commit()
-            conn.close()
-            print(f"Successfully deleted user ID {user_id}")
-            return True
-
-
-        except sqlite3.Error as e:
-            print(f"Database error: {e}")
-            return False
-        except Exception as e:
-            print(f"Exception in delete_user_from_db: {e}")
-            return False 
+@staticmethod
+def delete_user_from_db(user_id):
+    """Delete a user from the database"""
+    try:
+        # Try to cast user_id to integer since it might be coming as a string
+        user_id = int(user_id)
         
-    
+        result = Admin.delete_user(Admin, user_id)
+        
+        # If the result is None or False, consider it as failed
+        if result is None or result is False:
+            print(f"No user found with ID {user_id}")
+            return False
+        
+        print(f"User {user_id} deleted successfully")
+        return True
+        
+    except ValueError:
+        print(f"Invalid user ID format: {user_id}")
+        return False
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return False
+    except Exception as e:
+        print(f"Exception in delete_user_from_db: {e}")
+        return False
+

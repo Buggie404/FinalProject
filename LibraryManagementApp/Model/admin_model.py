@@ -27,7 +27,7 @@ class Admin(User): # Include all the ADMIN ONLY function
             return False # User not found
         self.db.cursor.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
         self.db.conn.commit()
-        return True
+
     
     def add_book(self, book_id, title, author, category, published_year, quantity): # Add new book
         if Book.get_book_by_id(book_id):

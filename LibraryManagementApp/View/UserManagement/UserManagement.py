@@ -341,11 +341,38 @@ class UserManagementApp:
         print(f"{button_name} clicked")
         
         if button_name == "btn_DeleteAccount":
+            from Controller.user_controller import Delete_Users
             selected_items = self.tbl_User.selection()
-            if selected_items:
-                selected_item = selected_items[0]
-                print(f"Deleting user: {self.tbl_User.item(selected_item, 'values')}")
-                self.tbl_User.delete(selected_item)
+        if not selected_items:
+            messagebox.showinfo("Error", "Please select an account to delete.")
+            return
+            
+        selected_item = selected_items[0]
+        user_values = self.tbl_User.item(selected_item, 'values')
+        
+        if not user_values:
+            messagebox.showinfo("Error", "No user data found.")
+            return
+            
+        user_id = user_values[0]  # First column is user_id
+        
+        # Confirmation dialog
+        confirm = messagebox.askyesno(
+            "Delete Confirmation",
+            f"Are you sure you want to delete the account {user_id}?",
+            icon='warning'
+        )
+
+        if confirm:
+            # Call the function to delete from the database
+            delete_success = Delete_Users.delete_user_from_db(user_id)
+            
+            if delete_success:
+                self.tbl_User.delete(selected_item)  # Remove from UI
+                from View.noti_tab_view_1 import Message_1
+                Message_1(self.root, 'account')
+            else:
+                messagebox.showerror("Error", "Failed to delete account!")
                 # QD chèn thêm cái dụ xoá user trên database nha, chứ nó mới xoá trên bảng thoai, bật lên nó hiện lại
                 # Mà xoá thì xoá demo user nha ba
 
