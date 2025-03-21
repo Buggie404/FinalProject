@@ -23,10 +23,23 @@ class Admin(User): # Include all the ADMIN ONLY function
         """
         Removes a user from the users table based on the given user_id.
         """
-        if not User.get_id(user_id):
-            return False # User not found
-        self.db.cursor.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
-        self.db.conn.commit()
+        try:
+            # Ensure user_id is an integer
+            user_id = int(user_id)
+            if not User.get_id(user_id):
+                return False # User not found
+            self.db.cursor.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
+            self.db.conn.commit()
+            # Verify deletion
+            if self.db.cursor.rowcount > 0:
+                print(f"User with ID {user_id} successfully deleted")
+                return True
+            else:
+                print(f"No rows affected when deleting user {user_id}")
+                return False
+        except Exception as e:
+            print(f"Error deleting user: {e}")
+            return False
 
     
     def add_book(self, book_id, title, author, category, published_year, quantity): # Add new book
