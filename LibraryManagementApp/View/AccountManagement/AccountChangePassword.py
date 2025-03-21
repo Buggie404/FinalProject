@@ -1,22 +1,38 @@
 # Import Lib
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Button, PhotoImage, messagebox
 import os
 import sys
 
 # Import base file path
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(base_dir, "View"))
+sys.path.append(os.path.join(base_dir, "Model"))
+sys.path.append(os.path.join(base_dir, "Controller"))
+# sys.path.append(os.path.join(base_dir, "View"))
 sys.path.append(base_dir)
 
+# Import models and controllers
+from Model.user_model import User
+from Controller.password_change_controller import PasswordChangeController
 
 class AccountChangePwApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_data = user_data  # Store the user data from login
+        self.password_validation_errors = {
+            'current_password': False,
+            'new_password': False,
+            'confirm_password': False
+        }
+
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
+        # Initialize the controller first, before using it
+        from Controller.password_change_controller import PasswordChangeController
+        self.controller = PasswordChangeController(user_data)
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -47,6 +63,13 @@ class AccountChangePwApp:
         self.create_background()
         self.create_sidebar()
         self.create_main_panel()
+
+        # # Add validation error text placeholders
+        # self.error_messages = {
+        #     'current_password': None,
+        #     'new_password': None,
+        #     'confirm_password': None
+        # }
 
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
@@ -117,6 +140,42 @@ class AccountChangePwApp:
             image=self.images[image_name]
         )
 
+    def validate_current_password_event(self, event):
+        """Validate current password when focus leaves the field"""
+        current_password = self.entries["lnE_CurrentPassword"].get()
+        valid, message = self.controller.validate_current_password(current_password)
+        self.password_validation_errors['current_password'] = not valid
+        
+        # Update or create error message
+        if not valid:
+            messagebox.showerror("Password Error", message)
+        
+        return valid
+
+    def validate_new_password_event(self, event):
+        """Validate new password when focus leaves the field"""
+        new_password = self.entries["lnE_NewPassword"].get()
+        valid, message = self.controller.validate_new_password(new_password)
+        self.password_validation_errors['new_password'] = not valid
+        
+        if not valid:
+            messagebox.showerror("Password Error", message)
+        
+        return valid
+
+    def validate_confirm_password_event(self, event):
+        """Validate confirm password when focus leaves the field"""
+        new_password = self.entries["lnE_NewPassword"].get()
+        confirm_password = self.entries["lnE_ConfirmPassword"].get()
+        valid, message = self.controller.validate_confirm_password(new_password, confirm_password)
+        self.password_validation_errors['confirm_password'] = not valid
+        
+        if not valid:
+            messagebox.showerror("Password Error", message)
+        
+        return valid
+
+
     def create_button(self, button_name, dimensions):
         """Create a button with the given name and dimensions"""
         self.images[button_name] = PhotoImage(
@@ -166,37 +225,89 @@ class AccountChangePwApp:
             height=entry_dimensions[3]
         )
 
+        # Add validation bindings based on entry type
+        if entry_name == "lnE_CurrentPassword":
+            entry.bind("<FocusOut>", self.validate_current_password_event)
+        elif entry_name == "lnE_NewPassword":
+            entry.bind("<FocusOut>", self.validate_new_password_event)
+        elif entry_name == "lnE_ConfirmPassword":
+            entry.bind("<FocusOut>", self.validate_confirm_password_event)
+
         self.entries[entry_name] = entry
         self.load_image(icon_name, icon_position)
 
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
-        if button_name == "btn_ChangePassword": # When clicked Change Password on Change Password window -> go back to Account MainWindow
-            self.root.destroy()
-            from AccountMan import AccountManagement
-            accountman_root = Tk()
-            accountman = AccountManagement(accountman_root)
-            accountman_root.mainloop()
-        elif button_name == "btn_EditAccountInformation":
-            self.root.destroy()
-            from AccountEditInfo import AccountEditInfoApp
-            editinfo_root = Tk()
-            editinfo = AccountEditInfoApp(editinfo_root)
-            editinfo_root.mainloop()
-        elif button_name == "btn_BackToHomepage":
-            self.root.destroy()
-            from Homepage import HomepageApp
-            homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
-            homepage_root.mainloop()
-        # else: # For btn_ChangePasswordConfirm
-        """ changepass_success: check for new_password input, in Controller folder
-        if input of lnE_CurrentPassword ≠ user_password: -> Failed
-        if input of lnE_NewPassword ≠ input of lnE_ConfrimPassword: -> Failed"""
-        #     import Controller that handle the check for password validation
-        #     if changepass_success: # If password changed successfully -> switch to ChangePassword1 window -> update new_password in database through user_model
-        #     else: # Switch to AccountChangePassword2
+        if button_name == "btn_ChangePasswordConfirm":
+            # Get values from entry fields
+            current_password = self.entries["lnE_CurrentPassword"].get()
+            new_password = self.entries["lnE_NewPassword"].get()
+            confirm_password = self.entries["lnE_ConfirmPassword"].get()
+            
+            # Create event objects for validation
+            class DummyEvent:
+                pass
+            
+            event = DummyEvent()
+            
+            # Validate all fields
+            current_valid = self.validate_current_password_event(event)
+            new_valid = self.validate_new_password_event(event)
+            confirm_valid = self.validate_confirm_password_event(event)
+            
+            # Check if current password is correct and new password is valid
+            if current_valid and new_valid and confirm_valid:
+                # Update password in database
+                success = self.controller.change_password(new_password)
+                
+                if success:
+                    # Navigate to success screen
+                    self.root.destroy()
+                    from View.AccountManagement.AccountChangePassword1 import AccountChangePw1App
+                    success_root = Tk()
+                    success_app = AccountChangePw1App(success_root, user_data=self.controller.user_data)
+                    success_root.mainloop()
+                else:
+                    # Navigate to failure screen due to database error
+                    self.root.destroy()
+                    from View.AccountManagement.AccountChangePassword2 import AccountChangePw2App
+                    failure_root = Tk()
+                    failure_app = AccountChangePw2App(failure_root, user_data=self.controller.user_data)
+                    failure_root.mainloop()
+            else:
+                # Navigate to failure screen due to validation errors
+                self.root.destroy()
+                from View.AccountManagement.AccountChangePassword2 import AccountChangePw2App
+                failure_root = Tk()
+                failure_app = AccountChangePw2App(failure_root, user_data=self.controller.user_data)
+                failure_root.mainloop()
+
+        # if button_name == "btn_ChangePassword": # When clicked Change Password on Change Password window -> go back to Account MainWindow
+        #     self.root.destroy()
+        #     from AccountMan import AccountManagement
+        #     accountman_root = Tk()
+        #     accountman = AccountManagement(accountman_root)
+        #     accountman_root.mainloop()
+        # elif button_name == "btn_EditAccountInformation":
+        #     self.root.destroy()
+        #     from AccountEditInfo import AccountEditInfoApp
+        #     editinfo_root = Tk()
+        #     editinfo = AccountEditInfoApp(editinfo_root)
+        #     editinfo_root.mainloop()
+        # elif button_name == "btn_BackToHomepage":
+        #     self.root.destroy()
+        #     from Homepage import HomepageApp
+        #     homepage_root = Tk()
+        #     homepage = HomepageApp(homepage_root)
+        #     homepage_root.mainloop()
+        # # else: # For btn_ChangePasswordConfirm
+        # """ changepass_success: check for new_password input, in Controller folder
+        # if input of lnE_CurrentPassword ≠ user_password: -> Failed
+        # if input of lnE_NewPassword ≠ input of lnE_ConfrimPassword: -> Failed"""
+        # #     import Controller that handle the check for password validation
+        # #     if changepass_success: # If password changed successfully -> switch to ChangePassword1 window -> update new_password in database through user_model
+        # #     else: # Switch to AccountChangePassword2
 
     def run(self):
         """Start the application main loop"""

@@ -236,7 +236,7 @@ class AccountManagement:
             self.root.destroy()
             from AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
-            changepass = AccountChangePwApp(changepass_root)
+            changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass_root.mainloop()
         elif button_name == "btn_EditAccountInformation":
             self.root.destroy()

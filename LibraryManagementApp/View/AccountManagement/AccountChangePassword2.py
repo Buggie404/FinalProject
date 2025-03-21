@@ -10,9 +10,10 @@ sys.path.append(os.path.join(base_dir, "View"))
 sys.path.append(base_dir)
 
 class AccountChangePw2App:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
@@ -149,26 +150,26 @@ class AccountChangePw2App:
         print(f"{button_name} clicked")
         if button_name == "btn_ChangePassword" or button_name == "btn_Redo": # If clicked change pass in success/failed window -> go back to first AccountChangePass
             self.root.destroy()
-            from AccountChangePassword import AccountChangePwApp
+            from View.AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
-            changeoass = AccountChangePwApp(changepass_root)
+            changeoass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass_root.mainloop()
         elif button_name == "btn_Return": # Return to Account MainWindow
             self.root.destroy()
-            from AccountMan import AccountManagement
+            from View.AccountManagement.AccountMan import AccountManagement
             account_root = Tk()
-            account = AccountManagement(account_root)
+            account = AccountManagement(account_root, user_data=self.user_data)
             account_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
-            from Homepage import HomepageApp
+            from View.Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
+            homepage = HomepageApp(homepage_root, user_data=self.user_data)
             homepage_root.mainloop()
         else: # If clicked edit account information here, nothing happends
             pass
 
-    def run(self): # ?!?! Bỏ nha gái oi
+    def run(self): 
         """Start the application main loop"""
         self.root.mainloop()
 
