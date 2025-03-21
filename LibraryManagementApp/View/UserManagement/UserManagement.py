@@ -342,39 +342,53 @@ class UserManagementApp:
         
         if button_name == "btn_DeleteAccount":
             from Controller.user_controller import Delete_Users
+            from Model.admin_model import Admin
+            from noti_tab_view_1 import Delete, Message_1, Invalid
             selected_items = self.tbl_User.selection()
-        if not selected_items:
-            messagebox.showinfo("Error", "Please select an account to delete.")
-            return
+            if not selected_items:
+                messagebox.showinfo("Error", "Please select an account to delete.")
+                return
+                
+            selected_item = selected_items[0]
+            user_values = self.tbl_User.item(selected_item, 'values')
             
-        selected_item = selected_items[0]
-        user_values = self.tbl_User.item(selected_item, 'values')
-        
-        if not user_values:
-            messagebox.showinfo("Error", "No user data found.")
-            return
-            
-        user_id = user_values[0]  # First column is user_id
-        
-        # Confirmation dialog
-        confirm = messagebox.askyesno(
-            "Delete Confirmation",
-            f"Are you sure you want to delete the account {user_id}?",
-            icon='warning'
-        )
+    #         if not user_values:
+    #             messagebox.showinfo("Error", "No user data found.")
+    #             return
+                
+    #         user_id = user_values[0]  # First column is user_id
+    #         print(f"Attempting to delete user ID: {user_id}")
 
-        if confirm:
-            # Call the function to delete from the database
-            delete_success = Delete_Users.delete_user_from_db(user_id)
-            
-            if delete_success:
-                self.tbl_User.delete(selected_item)  # Remove from UI
-                from View.noti_tab_view_1 import Message_1
-                Message_1(self.root, 'account')
-            else:
-                messagebox.showerror("Error", "Failed to delete account!")
-                # QD chèn thêm cái dụ xoá user trên database nha, chứ nó mới xoá trên bảng thoai, bật lên nó hiện lại
-                # Mà xoá thì xoá demo user nha ba
+    #     # Define a direct callback function to handle deletion
+    # def confirm_delete_callback():
+    #     print(f"Executing delete callback for user ID: {user_id}")
+    #     try:
+    #         # Create admin and use its delete_user method
+    #         admin = Admin()
+    #         success = admin.delete_user(user_id)
+
+    #         if success:
+    #             print(f"Successfully deleted user ID: {user_id}")
+    #             # Remove from UI
+    #             self.tbl_User.delete(selected_item)
+    #             # Show success message
+    #             Message_1(self.root, "account")
+    #         else:
+    #             print(f"Failed to delete user ID: {user_id}")
+    #             messagebox.showerror("Error", "Failed to delete user")
+    #     except Exception as e:
+    #         print(f"Error during deletion: {e}")
+    #         messagebox.showerror("Error", f"Error: {str(e)}")
+    #     # Create delete confirmation dialog
+    #     delete_dialog = Delete(self.root, "account")
+    #     delete_dialog.set_yes_callback(confirm_delete_callback)
+    
+
+
+
+
+
+
 
         elif button_name == "btn_AddAccount":
             self.root.destroy()
@@ -395,9 +409,12 @@ class UserManagementApp:
             homepage = HomepageApp(homepage_root)
             homepage_root.mainloop()
 
+
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()
+
+
 
 
 if __name__ == "__main__":
