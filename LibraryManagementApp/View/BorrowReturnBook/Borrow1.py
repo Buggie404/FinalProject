@@ -1,12 +1,13 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Button, PhotoImage, messagebox
 
+
 class Borrow1App:
-    def __init__(self, root, user_data = None, receipt_id = None, assets_path=None):
+    def __init__(self, root, user_data=None, receipt_id=None, assets_path=None):
         self.root = root
         self.user_data = user_data
         if self.user_data:
-            self.user_id = self.user_data[0] # get user id from user data
+            self.user_id = self.user_data[0]  # get user id from user data
         else:
             self.user_id = None
         self.receipt_id = receipt_id
@@ -20,10 +21,10 @@ class Borrow1App:
             self.assets_path = Path(assets_path)
         else:
             self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameBorrow1")
-        
+
         # Store image references to prevent garbage collection
         self.images = {}
-        
+
         # Setup UI components
         self.canvas = Canvas(
             self.root,
@@ -38,38 +39,38 @@ class Borrow1App:
 
         # Load all images
         self.load_images()
-        
+
         # Create UI elements
         self.create_sidebar()
         self.create_main_content()
         self.create_buttons()
-    
+
     def relative_to_assets(self, path: str) -> Path:
         """Convert relative asset path to absolute path"""
         return self.assets_path / Path(path)
-    
+
     def load_images(self):
         """Load all required images"""
         image_files = [
-            "lnE_ID.png", 
-            "lnE_ISBN.png", 
-            "btn_BackToHomepage.png", 
-            "btn_ReturnBook.png", 
-            "btn_BorrowBook.png", 
-            "btn_Search.png", 
-            "image_1.png", 
-            "image_2.png", 
-            "image_3.png", 
+            "lnE_ID.png",
+            "lnE_ISBN.png",
+            "btn_BackToHomepage.png",
+            "btn_ReturnBook.png",
+            "btn_BorrowBook.png",
+            "btn_Search.png",
+            "image_1.png",
+            "image_2.png",
+            "image_3.png",
             "image_5.png"
         ]
-        
+
         for image_file in image_files:
             full_path = self.relative_to_assets(image_file)
             try:
                 self.images[image_file] = PhotoImage(file=full_path)
             except Exception as e:
                 print(f"Error loading image {full_path}: {e}")
-    
+
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Vẽ hình chữ nhật có bo góc."""
         # Bo góc trên bên trái
@@ -86,7 +87,7 @@ class Borrow1App:
         # Phần thân của hình chữ nhật
         self.canvas.create_rectangle(x1 + radius, y1, x2 - radius, y2, fill=color, outline=color)
         self.canvas.create_rectangle(x1, y1 + radius, x2, y2 - radius, fill=color, outline=color)
-    
+
     def create_sidebar(self):
         """Create the blue sidebar rectangle and its content"""
         self.canvas.create_rectangle(
@@ -97,7 +98,7 @@ class Borrow1App:
             fill="#0A66C2",
             outline=""
         )
-        
+
         # Add images to sidebar
         if "image_4.png" in self.images:
             self.canvas.create_image(
@@ -105,14 +106,14 @@ class Borrow1App:
                 74.0,
                 image=self.images["image_4.png"]
             )
-            
+
         if "image_5.png" in self.images:
             self.canvas.create_image(
                 130.0,
                 73.0,
                 image=self.images["image_5.png"]
             )
-            
+
     def create_main_content(self):
         """Create the main content area with entry fields and header images"""
         self.create_rounded_rectangle(
@@ -123,16 +124,16 @@ class Borrow1App:
             radius=10,
             color="#F1F1F1"
         )
-        
+
         # Create header images
         self.create_image("image_1.png", 578.0, 118.0)
         self.create_image("image_2.png", 400.0, 223.0)
         self.create_image("image_3.png", 400.0, 301.0)
-        
+
         # Create entry fields
         self.create_entry("lnE_ID.png", 684.5, 223.0, 554.0, 199.0, 261.0, 46.0)
         self.create_entry("lnE_ISBN.png", 684.5, 301.0, 554.0, 277.0, 261.0, 46.0)
-    
+
     def create_image(self, image_name, x, y):
         """Helper method to create an image"""
         if image_name in self.images:
@@ -141,7 +142,7 @@ class Borrow1App:
                 y,
                 image=self.images[image_name]
             )
-    
+
     def create_entry(self, image_name, img_x, img_y, entry_x, entry_y, width, height):
         """Helper method to create an entry field with background image"""
         if image_name in self.images:
@@ -150,36 +151,36 @@ class Borrow1App:
                 img_y,
                 image=self.images[image_name]
             )
-        
+
         entry = Entry(
             bd=0,
             bg="#E7DCDC",
             fg="#000716",
             highlightthickness=0
         )
-        
+
         entry.place(
             x=entry_x,
             y=entry_y,
             width=width,
             height=height
         )
-        
+
         # Store reference to entry fields for later access
         if image_name == "lnE_ID.png":
             self.lnE_ID = entry
         elif image_name == "lnE_ISBN.png":
             self.lnE_ISBN = entry
-            
+
         return entry
-    
+
     def create_buttons(self):
         """Create all buttons"""
         self.create_button("btn_BackToHomepage.png", 0.0, 563.0, 261.0, 25.0, self.on_back_to_homepage_clicked)
         self.create_button("btn_ReturnBook.png", 0.0, 219.0, 262.0, 25.0, self.on_return_book_clicked)
         self.create_button("btn_BorrowBook.png", 0.0, 181.0, 262.0, 25.0, self.on_borrow_book_clicked)
         self.create_button("btn_Search.png", 420.0, 401.0, 313.0, 48.0, self.on_search_clicked)
-    
+
     def create_button(self, image_name, x, y, width, height, command):
         """Helper method to create a button"""
         if image_name in self.images:
@@ -190,14 +191,14 @@ class Borrow1App:
                 command=command,
                 relief="flat"
             )
-            
+
             button.place(
                 x=x,
                 y=y,
                 width=width,
                 height=height
             )
-            
+
             # Store reference to buttons for later access
             if image_name == "btn_BackToHomepage.png":
                 self.btn_BackToHomepage = button
@@ -207,21 +208,21 @@ class Borrow1App:
                 self.btn_BorrowBook = button
             elif image_name == "btn_Search.png":
                 self.btn_Search = button
-                
+
         return button
-    
+
     def on_back_to_homepage_clicked(self):
         """Handle Back to Homepage button click event"""
         print("btn_BackToHomepage clicked")
-    
+
     def on_return_book_clicked(self):
         """Handle Return Book button click event"""
         print("btn_ReturnBook clicked")
-    
+
     def on_borrow_book_clicked(self):
         """Handle Borrow Book button click event"""
         print("btn_BorrowBook clicked")
-    
+
     def on_search_clicked(self):
         """Handle Search button click event"""
         print("btn_Search clicked")
@@ -232,7 +233,7 @@ class Borrow1App:
             user_id = self.user_id
         else:
             user_id = self.lnE_ID.get().strip()
-        
+
         book_id = self.lnE_ISBN.get().strip()
 
         # Import View and Controller
@@ -245,10 +246,10 @@ class Borrow1App:
         is_valid, user_data, book_data, error_messgae = BorrowController.validate_user_and_book(user_id, book_id)
 
         # Check if user has reached borrowing limit
-        can_borrow, remaining = BorrowController.check_borrowing_limit(user_id)
-        if not can_borrow:
-            messagebox.showwarning("Borrow Limit Reach", f"You have reached your maximum borrow limit. You can borrow {remaining} more books.")
-            return
+        # can_borrow, remaining = BorrowController.check_borrowing_limit(user_id)
+        # if not can_borrow:
+        #     messagebox.showwarning("Borrow Limit Reach", f"You have reached your maximum borrow limit. You can borrow {remaining} more books.")
+        #     return
 
         if not is_valid:
             # Display error message
@@ -257,22 +258,20 @@ class Borrow1App:
             else:
                 Message_1(self.root, 'edit_book_id')
             return
-        
+
         # If valid, switch to Borrow2 window
         self.root.destroy()
         borrowing_root = Tk()
-        borrowing = Borrow2App(borrowing_root)
+        borrowing = Borrow2App(borrowing_root, book_id)
 
         # Set values in Borrow2
-        borrowing.lbl_ID.config(text = user_id)
-        borrowing.lbl_ISBN.config(text = book_id)
+        borrowing.canvas.itemconfig(borrowing.lbl_ID, text=user_id)
+        borrowing.canvas.itemconfig(borrowing.lbl_ISBN, text=book_id)
 
         # Get and set available quantity
         available_quantity = Book.get_quantity(book_id)
-        borrowing.lbl_AvailableQuantities.config(text = str(available_quantity))
+        borrowing.canvas.itemconfig(borrowing.lbl_AvailableQuantities, text=available_quantity)
         borrowing_root.mainloop()
-        
-
 
 
 if __name__ == "__main__":

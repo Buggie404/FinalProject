@@ -227,127 +227,128 @@ class Sign_Out():  # To Sign out, when clicked "Yes" -> switch to Log_In window
 
 class Print_Receipt():
     """To manage the borrowing cart and finalize the transaction"""
+
     def __init__(self, root, book_data=None, quantity=None):
         # Setup tab
         self.root = root
         self.print_receipt = Toplevel(root)
         self.print_receipt.title(" ")
-        self.print_receipt.geometry("500x350")
+        self.print_receipt.geometry("400x300")
         self.print_receipt.resizable(False, False)
         self.print_receipt.config(bg='white')
-        
+
         # Import cart
         import sys
         import os
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(parent_dir)
-        
+
         from Controller.test_borrowbook_controller import BorrowingCart
         self.cart = BorrowingCart.get_instance()
-        
+
         # If we have book data, add it to cart
         if book_data and quantity:
             self.cart.add_item(book_data[0], book_data[1], quantity)
-        
+
         # Title Label
-        Label(self.print_receipt, text="Book Added to Cart!", 
+        Label(self.print_receipt, text="Book Added to Cart!",
               font=('Montserrat', 18, 'bold'), bg='white', fg='black').pack(pady=(20, 10))
-        
+
         # Show cart items
         self.create_cart_display()
-        
+
         # Add More Button
-        Button(self.print_receipt, width=15, text="Add More Books", 
-               highlightbackground='white', highlightthickness=1, 
+        Button(self.print_receipt, width=13, text="Add More Books",
+               highlightbackground='white', highlightthickness=1,
                command=self.add_more_books).pack(pady=10)
-        
+
         # Checkout Button
-        Button(self.print_receipt, width=15, text="Complete Borrowing", 
-               highlightbackground='white', highlightthickness=1, 
+        Button(self.print_receipt, width=13, text="Complete Borrowing",
+               highlightbackground='white', highlightthickness=1,
                command=self.complete_borrowing).pack(pady=10)
-        
+
         # Cancel Button
-        Button(self.print_receipt, width=15, text="Cancel", 
-               highlightbackground='white', highlightthickness=1, 
+        Button(self.print_receipt, width=13, text="Cancel",
+               highlightbackground='white', highlightthickness=1,
                command=self.cancel_borrowing).pack(pady=10)
-    
+
     def create_cart_display(self):
         """Create a display of cart items"""
         # Create frame for cart items
         from tkinter import Frame, Label, Scrollbar
-        
+
         cart_frame = Frame(self.print_receipt, bg='white')
         cart_frame.pack(fill='both', expand=True, padx=20, pady=10)
-        
+
         # Headers
         Label(cart_frame, text="Book ID", width=15, bg='white', font=('Montserrat', 10, 'bold')).grid(row=0, column=0)
         Label(cart_frame, text="Title", width=25, bg='white', font=('Montserrat', 10, 'bold')).grid(row=0, column=1)
         Label(cart_frame, text="Quantity", width=10, bg='white', font=('Montserrat', 10, 'bold')).grid(row=0, column=2)
-        
+
         # Item rows
         for i, item in enumerate(self.cart.items):
-            Label(cart_frame, text=item['book_id'], width=15, bg='white').grid(row=i+1, column=0)
-            
+            Label(cart_frame, text=item['book_id'], width=15, bg='white').grid(row=i + 1, column=0)
+
             # Truncate title if too long
             title = item['title']
             if len(title) > 20:
                 title = title[:17] + "..."
-            
-            Label(cart_frame, text=title, width=25, bg='white').grid(row=i+1, column=1)
-            Label(cart_frame, text=str(item['quantity']), width=10, bg='white').grid(row=i+1, column=2)
-    
+
+            Label(cart_frame, text=title, width=25, bg='white').grid(row=i + 1, column=1)
+            Label(cart_frame, text=str(item['quantity']), width=10, bg='white').grid(row=i + 1, column=2)
+
     def add_more_books(self):
         """Return to Borrow1 to add more books"""
         self.print_receipt.destroy()
-        
+
         # Import Borrow1App
         import sys
         import os
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(parent_dir)
-        
+
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         from tkinter import Tk
-        
+
         # Close current window
         self.root.destroy()
-        
+
         # Create new Borrow1 window
         new_window = Tk()
-        
+
         # Pass the user_id from the cart
         user_data = None
         if self.cart.user_id:
             user_data = (self.cart.user_id,)
-        
+
         app = Borrow1App(new_window, user_data=user_data)
         new_window.mainloop()
-    
+
     def complete_borrowing(self):
         """Complete the borrowing process and create receipts"""
         if self.cart.is_empty():
             from tkinter import messagebox
             messagebox.showinfo("Empty Cart", "Your borrowing cart is empty.")
             return
-        
+
         # Import required modules
         import sys
         import os
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(parent_dir)
-        
+
         from Model.receipt_model import Receipt
         from Model.book_model import Book
         from Controller.test_borrowbook_controller import BorrowController
-        
+
         # Check if borrowing limit would be exceeded
         can_borrow, remaining, total_borrowed = BorrowController.check_borrowing_limit(
             self.cart.user_id, self.cart.get_total_quantity()
         )
-        
+
         if not can_borrow:
             from tkinter import messagebox
             messagebox.showwarning(
@@ -358,15 +359,15 @@ class Print_Receipt():
                 f"You can borrow up to {remaining} more books."
             )
             return
-        
+
         # Create receipts
         from datetime import datetime, timedelta
-        
+
         # Calculate borrow date (today) and return date (20 days from today)
         today = datetime.now()
         today_str = today.strftime('%Y-%m-%d')
         return_date_str = (today + timedelta(days=20)).strftime('%Y-%m-%d')
-        
+
         # Create receipt object
         receipt = Receipt(
             user_id=self.cart.user_id,
@@ -374,21 +375,21 @@ class Print_Receipt():
             return_date=return_date_str,
             status="Borrowed"
         )
-        
+
         # Save multiple receipts (one for each book)
         success = receipt.save_multi_receipt(self.cart.items)
-        
+
         if not success:
             from tkinter import messagebox
             messagebox.showerror("Error", "Failed to create receipts. Please try again.")
             return
-        
+
         # Update book quantities
         for item in self.cart.items:
             book_data = Book.get_book_by_id(item['book_id'])
-            current_quantity = book_data[5]  
+            current_quantity = book_data[5]
             new_quantity = current_quantity - item['quantity']
-            
+
             book = Book(book_id=item['book_id'])
             book.update_book({
                 'title': book_data[1],
@@ -397,52 +398,36 @@ class Print_Receipt():
                 'published_year': book_data[3],
                 'quantity': new_quantity
             })
-        
+
         # Clear the cart
         self.cart.clear()
-        
+
         # Switch to receipt view
         self.print_receipt.destroy()
-        
+
         # Import BorrowReceiptApp
         from View.BorrowReturnBook.BorrowReceipt import BorrowReceiptApp
-        from tkinter import Tk
-        
         # Close current window
         self.root.destroy()
-        
+
         # Create new BorrowReceipt window with first receipt_id and borrow date
         new_window = Tk()
         app = BorrowReceiptApp(new_window, receipt_id=receipt.receipt_id, borrow_date=today_str)
         new_window.mainloop()
-    
+
     def cancel_borrowing(self):
         """Cancel the borrowing process"""
         # Clear the cart
         self.cart.clear()
-        
+
         # Close the window
         self.print_receipt.destroy()
-        
-        # Return to homepage
-        # Import Homepage
-        import sys
-        import os
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        parent_dir = os.path.dirname(current_dir)
-        sys.path.append(parent_dir)
-        
-        # You'll need to import your homepage class
-        # from View.Homepage import HomepageApp
-        from tkinter import Tk
-        
+
         # Close current window
         self.root.destroy()
-        
+
         # Create new Homepage window
-        new_window = Tk()
-        
-        # For now, just show a message since we don't have the Homepage class
-        from tkinter import Label
-        Label(new_window, text="Homepage", font=('Montserrat', 24)).pack(pady=20)
-        new_window.mainloop()
+        homepage_root = Tk()
+        from View.BorrowReturnBook.Borrow1 import Borrow1App
+        app = Borrow1App(homepage_root)
+        homepage_root.mainloop()
