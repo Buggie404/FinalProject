@@ -18,8 +18,8 @@ class Delete():  # To confirm delection
         self.yes_callback = yes_callback
 
         # Dynamic Title and Messages
-        delete_map = {'book': ('Delete Book', "Are you sure you wnat to delete this book?"),
-                      'account': ('Delete Account', "Are you sure you wnat to delete this account?")}
+        delete_map = {'book': ('Delete Book', "Are you sure you want to delete this book?"),
+                      'account': ('Delete Account', "Are you sure you want to delete this account?")}
 
         # Setup tab
         self.delete_noti.title(" ")
