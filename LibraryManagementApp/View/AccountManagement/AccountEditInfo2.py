@@ -10,12 +10,18 @@ sys.path.append(os.path.join(base_dir, "View"))
 sys.path.append(base_dir)
 
 class AccountEditInfo2App:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_id=None, user_data=None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_id = user_id
+        self.user_data = user_data
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
+        # Import Model to fetch user_data for account tracking
+        from Model.user_model import User
+        user_data = User.get_id(self.user_id)
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -142,19 +148,19 @@ class AccountEditInfo2App:
             self.root.destroy()
             from AccountEditInfo import AccountEditInfoApp
             changepass_root = Tk()
-            changeoass = AccountEditInfoApp(changepass_root)
+            changeoass = AccountEditInfoApp(changepass_root, user_id = self.user_id)
             changepass_root.mainloop()
         elif button_name == "btn_Return": # Return to Account MainWindow
             self.root.destroy()
             from AccountMan import AccountManagement
             account_root = Tk()
-            account = AccountManagement(account_root)
+            account = AccountManagement(account_root, user_data = self.user_data)
             account_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
             from Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
+            homepage = HomepageApp(homepage_root, user_data = self.user_data)
             homepage_root.mainloop()
         else: # If clicked edit account information here, nothing happends
             pass

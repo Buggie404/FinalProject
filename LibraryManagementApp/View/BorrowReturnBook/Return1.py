@@ -187,15 +187,30 @@ class Return1App:
     # Event handlers
     def on_borrow_book_click(self):
         print("btn_BorrowBook clicked")
-        # Implement borrow book functionality here
+        self.root.destroy()
+        from Borrow1 import Borrow1App
+        borrow1_root = Tk()
+        borrow1 = Borrow1App(borrow1_root)
+        borrow1_root.mainloop()
     
     def on_return_book_click(self):
         print("btn_ReturnBook clicked")
-        # Implement return book functionality here
+        self.root.destroy()
+        from Return1 import Return1App
+        return1_root = Tk()
+        return1 = Return1App(return1_root)
+        return1_root.mainloop()
     
     def on_back_to_homepage_click(self):
         print("btn_BackToHomepage clicked")
-        # Implement back to homepage functionality here
+        self.root.destroy()
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append(os.path.join(base_dir, "View"))
+        sys.path.append(base_dir)
+        from Homepage import HomepageApp
+        homepage_root = Tk()
+        homepage = HomepageApp(homepage_root)
+        homepage_root.mainloop()
     
     # def on_search_click(self):
     #     print("btn_Search clicked")
@@ -235,15 +250,17 @@ class Return1App:
     
         # Nếu tìm thấy, đóng cửa sổ Return1 và mở Return2, truyền receipt_id qua
         self.root.destroy()
-
-        new_window = Tk()
-
-        from View.BorrowReturnBook.Return2 import Return2App 
-        Return2App(new_window)
-        new_window.mainloop()
+        from Return2 import Return2App 
+        return2_root = Tk()
+        return2 = Return2App(return2_root)
+        return2_root.mainloop()
 
 # Entry point
 if __name__ == "__main__":
     window = Tk()
     app = Return1App(window)
     window.mainloop()
+
+
+
+    

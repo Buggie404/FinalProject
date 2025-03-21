@@ -86,19 +86,30 @@ class BorrowReturnApp:
     
     def on_back_to_homepage_clicked(self):
         print("btn_BackToHomepage clicked")
-    
+        self.root.destroy()
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append(os.path.join(base_dir, "View"))
+        sys.path.append(base_dir)
+        from Homepage import HomepageApp
+        homepage_root = Tk()
+        homepage = HomepageApp(homepage_root)
+        homepage_root.mainloop()
 
     def on_borrow_book_clicked(self):
         print("btn_BorrowBook clicked")
+        self.root.destroy()
+        from Borrow1 import Borrow1App
+        borrow1_root = Tk()
+        borrow1 = Borrow1App(borrow1_root)
+        borrow1_root.mainloop()
 
     def on_return_book_clicked(self):
         print("btn_ReturnBook clicked")
         self.root.destroy()
-
         from Return1 import Return1App
-        new_root = Tk()
-        app = Return1App(new_root)
-        new_root.mainloop()
+        return1_root = Tk()
+        return1 = Return1App(return1_root)
+        return1_root.mainloop()
 
 if __name__ == "__main__":
     window = Tk()
