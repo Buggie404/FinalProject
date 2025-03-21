@@ -774,69 +774,82 @@ class add_account:
 
     
 class Delete_Users:
-    def __init__(self, root=None):
-        """Initialize the UserController"""
-        self.root = root
-        self.admin = Admin()  # Create an admin instance for user management operations
-        self.selected_user = None  # Store the currently selected user
+    def __init__(self, view, admin):
+        self.view = view
+        self.admin = admin
+        self.selected_user_id = None
 
 
-    def set_selected_user(self, user_data):
-        """Set the currently selected user"""
-        self.selected_user = user_data
-        return True
+    def on_user_select(self, event):
+        """Handle user selection in the table"""
+        selected_items = self.view.tbl_User.selection()
+        if selected_items:
+            item = self.view.tbl_User.item(selected_items[0])
+            self.selected_user_id = item["values"][0]
+            print(f"Selected user ID: {self.selected_user_id}")
+        else:
+            self.selected_user_id = None
 
 
-    def delete_user_account(self):
-        """Delete the selected user account"""
-        if not self.selected_user or not self.selected_user.get('user_id'):
-            return False
-       
-        # Show confirmation message box
-        confirm = messagebox.askyesno("Confirm Deletion", "Are you sure you want to delete this user account?")
-        if confirm:
-            return self.confirm_delete_user()
-       
-        return False
+    def delete_selected_user(self):
+        """Show delete confirmation dialog and handle deletion"""
+        if not self.selected_user_id:
+            print("❌ No user selected.")
+            Invalid(self.view.root, "account")
+            return
+
+
+        print(f"🗑️ Attempting to delete user ID: {self.selected_user_id}")
+
+
+        # Create delete confirmation dialog
+        delete_dialog = Delete(self.view.root, "account")
+        delete_dialog.set_yes_callback(self.confirm_delete_user)
+
 
     def confirm_delete_user(self):
-        """Confirm and execute user deletion"""
-        if not self.selected_user or not self.selected_user.get('user_id'):
-            return False
-       
-        # Perform deletion using Admin model
-        result = self.admin.delete_user(self.selected_user['user_id'])
-       
-        # Show success message
-        if result:
-            Message_1(self.root, 'account')
-            return True
-        return False
+        """Delete the selected user from database and UI"""
+        if not self.admin:
+            try:
+                from Model.admin_model import Admin
+                self.admin = Admin(None, None)
+            except Exception as e:
+                print(f"❌ Failed to create admin: {e}")
+                return
 
-@staticmethod
-def delete_user_from_db(user_id):
-    """Delete a user from the database"""
-    try:
-        # Try to cast user_id to integer since it might be coming as a string
-        user_id = int(user_id)
-        
-        result = Admin.delete_user(Admin, user_id)
-        
-        # If the result is None or False, consider it as failed
-        if result is None or result is False:
-            print(f"No user found with ID {user_id}")
-            return False
-        
-        print(f"User {user_id} deleted successfully")
-        return True
-        
-    except ValueError:
-        print(f"Invalid user ID format: {user_id}")
-        return False
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-        return False
-    except Exception as e:
-        print(f"Exception in delete_user_from_db: {e}")
-        return False
 
+        user_id_to_delete = self.selected_user_id
+
+
+        selected_items = self.view.tbl_User.selection()
+        selected_item = selected_items[0] if selected_items else None
+
+
+        if not selected_item:
+            print("❌ No item selected in the table")
+            return
+
+
+        # Delete user from database
+        success = self.delete_user_from_db(user_id_to_delete)
+
+
+        if success:
+            print(f"✅ Successfully deleted user ID: {user_id_to_delete}")
+            self.view.tbl_User.delete(selected_item)
+            Message_1(self.view.root, "account")
+            self.selected_user_id = None
+        else:
+            print("❌ Failed to delete user from database")
+            Invalid(self.view.root, "database error")
+
+
+    @staticmethod
+    def delete_user_from_db(user_id):
+        """Delete a user from the database by ID"""
+        try:
+            result = User.delete_user(user_id)
+            return result
+        except Exception as e:
+            print(f"Error deleting user: {e}")
+            return False
