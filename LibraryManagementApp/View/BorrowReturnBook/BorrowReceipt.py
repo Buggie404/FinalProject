@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, ttk, Listbox
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 class BorrowReceiptApp:
     def __init__(self, root, assets_path=None):
@@ -7,15 +7,18 @@ class BorrowReceiptApp:
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
-        
+
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
             self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameBorrowReceipt")
-        
+
+        # Store image references to prevent garbage collection
         self.images = {}
+        
+        # Setup UI components
         self.canvas = Canvas(
             self.root,
             bg="#FFFFFF",
@@ -26,33 +29,19 @@ class BorrowReceiptApp:
             relief="ridge"
         )
         self.canvas.place(x=0, y=0)
-        
+
+        # Load all images
         self.load_images()
-        self.create_main_layout()
+        
+        # Create UI elements
         self.create_sidebar()
         self.create_main_content()
         self.create_buttons()
+        self.create_text_fields()
     
     def relative_to_assets(self, path: str) -> Path:
+        """Convert relative asset path to absolute path"""
         return self.assets_path / Path(path)
-    
-    def load_images(self):
-        """Load all image assets"""
-        image_files = [
-            "image_1.png",
-            "image_3.png",
-            "btn_BackToHomepage.png",
-            "btn_ReturnBook.png",
-            "btn_BorrowBook.png",
-            "btn_Back.png"
-        ]
-        
-        for image_file in image_files:
-            full_path = self.relative_to_assets(image_file)
-            try:
-                self.images[image_file] = PhotoImage(file=full_path)
-            except Exception as e:
-                print(f"Error loading image {full_path}: {e}")
 
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Vẽ hình chữ nhật có bo góc."""
@@ -71,176 +60,32 @@ class BorrowReceiptApp:
         self.canvas.create_rectangle(x1 + radius, y1, x2 - radius, y2, fill=color, outline=color)
         self.canvas.create_rectangle(x1, y1 + radius, x2, y2 - radius, fill=color, outline=color)
     
-    def create_main_layout(self):
-        """Create the main layout rectangles"""
-        # Main content area background
-        self.create_rounded_rectangle(
-            285.0,
-            80.0,
-            871.0,
-            525.0,
-            radius = 10,
-            color="#F1F1F1"
-        )
+    def load_images(self):
+        """Load all required images"""
+        image_files = [
+            "image_2.png",
+            "image_3.png",
+            "image_4.png",
+            "image_5.png",
+            "image_6.png",
+            "image_7.png",
+            "image_8.png",
+            "image_9.png",
+            "btn_BackToHomepage.png",
+            "btn_ReturnBook.png",
+            "btn_BorrowBook.png",
+            "btn_Back.png"
+        ]
         
-        # Receipt table
-        # self.tbl_Receipt = self.canvas.create_rectangle(
-        #     395.0,
-        #     173.0,
-        #     760.0,
-        #     416.0,
-        #     fill="#D9D9D9",
-        #     outline=""
-        # )
-
-        """Cach 1"""
-        # self.tbl_frame = ttk.Frame(self.root)
-        # self.tbl_frame.place(x=395.0, y=193.0, width=365.0, height=224.0)
-
-        # self.tbl_scroll = ttk.Scrollbar(self.tbl_frame, orient="horizontal")
-        # self.tbl_scroll.pack(side="bottom", fill="x")
-
-        # self.tbl_Receipt = ttk.Treeview(
-        #     self.tbl_frame,
-        #     columns = ("receipt_id", "user_id", "book_id", "borrowed_quantity", "borrow_date", "return_date"),
-        #     show = "headings",
-        #     style = "Treeview"
-        # )
-
-        # self.tbl_Receipt.column("receipt_id", width=60, anchor="center")
-        # self.tbl_Receipt.column("user_id", width=60, anchor="center")
-        # self.tbl_Receipt.column("book_id", width=100, anchor="center")
-        # self.tbl_Receipt.column("borrowed_quantity", width=120, anchor="center")
-        # self.tbl_Receipt.column("borrow_date", width=100, anchor="center")
-        # self.tbl_Receipt.column("return_date", width=150, anchor="center")
-
-        # self.tbl_Receipt.heading("receipt_id", text="Receipt ID")
-        # self.tbl_Receipt.heading("user_id", text="ID")
-        # self.tbl_Receipt.heading("book_id", text="ISBN")
-        # self.tbl_Receipt.heading("borrowed_quantity", text="Borrowed Quantity")
-        # self.tbl_Receipt.heading("borrow_date", text="Borrow Date")
-        # self.tbl_Receipt.heading("return_date", text="Book Return Deadline")
-
-        # self.tbl_Receipt.pack(fill="both", expand=True)
-
-        # self.tbl_scroll.config(command=self.tbl_Receipt.xview)
-        # self.tbl_Receipt.config(xscrollcommand=self.tbl_scroll.set)
-
-        """Cach 2"""
-        """Display receipt details in a row-like format using labels."""
-        self.lbl_frame = ttk.Frame(self.root)
-        self.lbl_frame.place(x=395, y=193, width=365, height=224)
-
-        # Define Fields
-        fields = ["Receipt ID:", "User ID:", "ISBN:", "Borrowed Quantity:", "Borrow Date:", "Return Deadline:"]
-        
-        # Create Labels for Each Field
-        for i, field in enumerate(fields):
-            label = ttk.Label(self.lbl_frame, text=field, font=("Arial", 12, "bold"))
-            label.grid(row=i, column=0, sticky="w", padx=10, pady=5)
-
-            # Placeholder Label (To Be Updated with Data Later)
-            value_label = ttk.Label(self.lbl_frame, text="N/A", font=("Arial", 12))
-            value_label.grid(row=i, column=1, sticky="w", padx=10, pady=5)
-
-        """Cach 3"""
-        # """Display multiple receipts in a vertical format using Listbox."""
-        # self.list_frame = ttk.Frame(self.root)
-        # self.list_frame.place(x=395, y=193, width=365, height=224)
-
-        # self.listbox = Listbox(self.list_frame, font=("Arial", 12), height=6, width=50)
-        # self.listbox.pack(fill="both", expand=True)
-
-        # # Example Data (You Can Fetch Real Data Later)
-        # sample_data = [
-        #     "Receipt ID: 213, User ID: 136, ISBN: 966986105",
-        #     "Receipt ID: 214, User ID: 164, ISBN: 312953453",
-        #     "Receipt ID: 215, User ID: 111, ISBN: 316973742"
-        # ]
-
-        # for item in sample_data:
-        #     self.listbox.insert("end", item)
-
-        """Cach 4"""
-        # Create frame for the table
-        # self.tbl_frame = ttk.Frame(self.root)
-        # self.tbl_frame.place(x=395.0, y=193.0, width=365.0, height=224.0)
-
-        # # Create vertical scrollbar
-        # self.tbl_scroll_y = ttk.Scrollbar(self.tbl_frame, orient="vertical")
-        # self.tbl_scroll_y.pack(side="right", fill="y")
-
-        # # Create horizontal scrollbar
-        # self.tbl_scroll_x = ttk.Scrollbar(self.tbl_frame, orient="horizontal")
-        # self.tbl_scroll_x.pack(side="bottom", fill="x")
-
-        # # Define row headers (these will be displayed in the leftmost column)
-        # self.row_headers = [
-        #     "Receipt ID", 
-        #     "ID", 
-        #     "ISBN", 
-        #     "Borrowed Quantity", 
-        #     "Borrow Date", 
-        #     "Book Return Deadline"
-        # ]
-
-        # # Create the Treeview with show="tree" to hide column headers
-        # self.tbl_Receipt = ttk.Treeview(
-        #     self.tbl_frame,
-        #     show="tree",  # Only show tree structure, no column headers
-        #     style="Treeview"
-        # )
-        # self.tbl_Receipt.pack(fill="both", expand=True)
-
-        # # Configure columns for data (we'll add 3 data columns as an example)
-        # num_data_columns = 3  # Adjust based on how many records you want to display at once
-        # self.tbl_Receipt["columns"] = tuple(f"col{i}" for i in range(num_data_columns))
-
-        # # Configure the row header column width and other properties
-        # self.tbl_Receipt.column("#0", width=150, minwidth=150, stretch=False)
-
-        # # Configure data columns
-        # for i in range(num_data_columns):
-        #     self.tbl_Receipt.column(f"col{i}", width=100, minwidth=80, anchor="center", stretch=True)
-
-        # # Insert rows (what would normally be column headers)
-        # for header in self.row_headers:
-        #     self.tbl_Receipt.insert("", "end", text=header, values=("", "", ""))
-
-        # # Configure scrollbars
-        # self.tbl_scroll_x.config(command=self.tbl_Receipt.xview)
-        # self.tbl_scroll_y.config(command=self.tbl_Receipt.yview)
-        # self.tbl_Receipt.config(xscrollcommand=self.tbl_scroll_x.set, yscrollcommand=self.tbl_scroll_y.set)
-
-        # # Method to load data (call this when you have data to display)
-        # def load_data(self, data_records):
-        #     """
-        #     Load data into the transposed table
-        #     data_records: A list of receipt records (each record is a dictionary or tuple)
-        #     """
-        #     # Clear existing items first
-        #     for item in self.tbl_Receipt.get_children():
-        #         self.tbl_Receipt.delete(item)
-            
-        #     # Insert rows with data
-        #     for i, header in enumerate(self.row_headers):
-        #         # Extract the appropriate field from each record
-        #         values = []
-        #         for record in data_records:
-        #             # Get the value corresponding to this row's field
-        #             # Assuming record is a dictionary or an object with indexed access
-        #             if isinstance(record, dict):
-        #                 field_name = ["receipt_id", "user_id", "book_id", "borrowed_quantity", "borrow_date", "return_date"][i]
-        #                 values.append(record.get(field_name, ""))
-        #             else:  # If it's a tuple or list
-        #                 values.append(record[i] if i < len(record) else "")
-                
-        #         # Insert the row with its values
-        #         self.tbl_Receipt.insert("", "end", text=header, values=tuple(values))
-
+        for image_file in image_files:
+            full_path = self.relative_to_assets(image_file)
+            try:
+                self.images[image_file] = PhotoImage(file=full_path)
+            except Exception as e:
+                print(f"Error loading image {full_path}: {e}")
+    
     def create_sidebar(self):
-        """Create the sidebar with buttons and logo"""
-        # Blue sidebar background
+        """Create the blue sidebar and its content"""
         self.canvas.create_rectangle(
             0.0,
             0.0,
@@ -250,72 +95,129 @@ class BorrowReceiptApp:
             outline=""
         )
         
-        # Logo image
-        if "image_3.png" in self.images:
+        # Add Logo
+        if "image_2.png" in self.images:
             self.canvas.create_image(
                 130.0,
                 73.0,
+                image=self.images["image_2.png"]
+            )
+    
+    def create_main_content(self):
+        """Create the main content area with the background and images"""
+        # Background rectangle
+        self.create_rounded_rectangle(
+            287.0,
+            39.0,
+            873.0,
+            567.0,
+            color="#F0F0F0",
+            radius=10
+        )
+        
+        # Header image
+        if "image_3.png" in self.images:
+            self.canvas.create_image(
+                579.0,
+                70.0,
                 image=self.images["image_3.png"]
             )
         
-        self.create_button("btn_BorrowBook.png", 0.0, 181.0, 262.0, 25.0, self.on_borrow_book_click)
-        self.create_button("btn_ReturnBook.png", 0.0, 219.0, 262.0, 25.0, self.on_return_book_click)
-        self.create_button("btn_BackToHomepage.png", 0.0, 563.0, 261.0, 25.0, self.on_back_to_homepage_click)
+        # Other images
+        image_positions = [
+            ("image_4.png", 403.0, 117.0),
+            ("image_5.png", 367.0, 185.0),
+            ("image_6.png", 381.0, 253.0),
+            ("image_7.png", 415.0, 389.0),
+            ("image_8.png", 430.0, 457.0),
+            ("image_9.png", 422.0, 321.0)
+        ]
+        
+        for img_name, x, y in image_positions:
+            if img_name in self.images:
+                self.canvas.create_image(
+                    x, y, image=self.images[img_name]
+                )
     
-    def create_main_content(self):
-        """Create the main content area"""
-        # Header image
-        if "image_1.png" in self.images:
-            self.canvas.create_image(
-                578.0,
-                118.0,
-                image=self.images["image_1.png"]
+    def create_text_fields(self):
+        """Create all text fields in the application"""
+        text_configs = [
+            (579.0, 107.0, "212", "lbl_ReceiptID"),
+            (579.0, 175.0, "112", "lbl_UserID"),
+            (579.0, 244.0, "0123456789", "lbl_ISBN"),
+            (579.0, 312.0, "1", "lbl_Quantity"),
+            (579.0, 380.0, "2025/03/21", "lbl_BorrowDate"),
+            (579.0, 448.0, "2025/03/25", "lbl_ReturnDate")
+        ]
+        
+        for x, y, text, field_name in text_configs:
+            text_field = self.canvas.create_text(
+                x, y,
+                anchor="nw",
+                text=text,
+                fill="#0A66C2",
+                font=("Montserrat Medium", 18 * -1)
             )
+            
+            # Store text field references
+            setattr(self, field_name, text_field)
     
     def create_buttons(self):
-        """Create action buttons"""
-        self.create_button("btn_Back.png", 421.0, 456.0, 313.0, 48.0, self.on_back_click)
+        """Create all buttons in the application"""
+        button_configs = [
+            ("btn_BackToHomepage.png", 0.0, 563.0, 261.0, 25.0, self.on_back_to_homepage_clicked),
+            ("btn_ReturnBook.png", 0.0, 219.0, 262.0, 25.0, self.on_return_book_clicked),
+            ("btn_BorrowBook.png", 0.0, 181.0, 262.0, 25.0, self.on_borrow_book_clicked),
+            ("btn_Back.png", 424.0, 501.0, 313.0, 48.0, self.on_back_clicked)
+        ]
+        
+        for img_name, x, y, width, height, command in button_configs:
+            self.create_button(img_name, x, y, width, height, command)
     
     def create_button(self, image_name, x, y, width, height, command):
-        """Helper method to create buttons"""
+        """Helper method to create a button"""
         if image_name not in self.images:
             print(f"Warning: Image {image_name} not found")
             return None
             
         button = Button(
-            image=self.images[image_name], 
-            borderwidth=0, 
-            highlightthickness=0, 
-            command=command, 
+            image=self.images[image_name],
+            borderwidth=0,
+            highlightthickness=0,
+            command=command,
             relief="flat"
         )
         
-        button.place(x=x, y=y, width=width, height=height)
+        button.place(
+            x=x,
+            y=y,
+            width=width,
+            height=height
+        )
         
+        # Store button references
         button_name = image_name.replace(".png", "")
-        if button_name.startswith("btn_"):
-            setattr(self, button_name, button)
-            
+        setattr(self, button_name, button)
+        
         return button
     
-    # Event handlers
-    def on_borrow_book_click(self):
-        print("btn_BorrowBook clicked")
-        # Implement borrow book functionality here
-    
-    def on_return_book_click(self):
-        print("btn_ReturnBook clicked")
-        # Implement return book functionality here
-    
-    def on_back_to_homepage_click(self):
+    def on_back_to_homepage_clicked(self):
+        """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
-        # Implement back to homepage functionality here
     
-    def on_back_click(self):
+    def on_return_book_clicked(self):
+        """Handle return book button click"""
+        print("btn_ReturnBook clicked")
+    
+    def on_borrow_book_clicked(self):
+        """Handle borrow book button click"""
+        print("btn_BorrowBook clicked")
+    
+    def on_back_clicked(self):
+        """Handle back button click"""
         print("btn_Back clicked")
-        # Implement back button functionality here
 
-# Entry point
+
 if __name__ == "__main__":
     window = Tk()
     app = BorrowReceiptApp(window)
