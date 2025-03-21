@@ -114,7 +114,7 @@ class HomepageApp:
         self.root.destroy()
         from BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
         borrow_return_root = Tk()
-        borrow_return = BorrowReturnApp(borrow_return_root)
+        borrow_return = BorrowReturnApp(borrow_return_root, user_data=self.user_data)
         borrow_return_root.mainloop()
     
     def on_book_management_clicked(self):

@@ -1,6 +1,10 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
+import os, sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+project_root = os.path.dirname(parent_dir)
+sys.path.append(project_root)
 class ReturnOverdueApp:
     def __init__(self, root, assets_path=None):
         self.root = root
@@ -166,19 +170,37 @@ class ReturnOverdueApp:
     def on_back_to_homepage_clicked(self):
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
-    
+        self.root.destroy()
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append(os.path.join(base_dir, "View"))
+        sys.path.append(base_dir)
+        from View.Homepage import HomepageApp
+        homepage_root = Tk()
+        homepage = HomepageApp(homepage_root)
+        homepage_root.mainloop()
+
     def on_return_book_clicked(self):
         """Handle return book button click"""
         print("btn_ReturnBook clicked")
-    
+        self.root.destroy()
+        from View.BorrowReturnBook.Return1 import Return1App
+        return1_root = Tk()
+        return1 = Return1App(return1_root)
+        return1_root.mainloop()
+
     def on_borrow_book_clicked(self):
         """Handle borrow book button click"""
         print("btn_BorrowBook clicked")
+        self.root.destroy()
+        from View.BorrowReturnBook.Borrow1 import Borrow1App
+        borrow1_root = Tk()
+        borrow1 = Borrow1App(borrow1_root)
+        borrow1_root.mainloop()
     
     def on_pay_fine_clicked(self):
         """Handle pay fine button click"""
         print("btn_PayFine clicked")
-
+        messagebox.showinfo("Payment", "Payment Successful!")
 
 if __name__ == "__main__":
     window = Tk()

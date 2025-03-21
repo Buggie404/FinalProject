@@ -1,13 +1,21 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-
+import os, sys
+from datetime import datetime, timedelta
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+project_root = os.path.dirname(parent_dir)
+sys.path.append(project_root)
+from View.noti_tab_view_1 import Drop_Off
 class Return2App:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, receipt_id=None, user_data=None, assets_path=None):
         self.root = root
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
-
+        self.receipt_id = receipt_id
+        self.user_data = user_data
+        
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
         if assets_path:
@@ -38,7 +46,10 @@ class Return2App:
         self.create_sidebar()
         self.create_buttons()
         self.create_text_fields()
-    
+        # Load receipt data if ID is provided
+        if self.receipt_id:
+            self.load_receipt_data()
+        
     def relative_to_assets(self, path: str) -> Path:
         """Convert relative asset path to absolute path"""
         return self.assets_path / Path(path)
@@ -204,18 +215,131 @@ class Return2App:
     def on_back_to_homepage_clicked(self):
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
-    
+        self.root.destroy()
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append(os.path.join(base_dir, "View"))
+        sys.path.append(base_dir)
+        from View.Homepage import HomepageApp
+        homepage_root = Tk()
+        homepage = HomepageApp(homepage_root)
+        homepage_root.mainloop()
+
     def on_return_book_clicked(self):
         """Handle return book button click"""
         print("btn_ReturnBook clicked")
-    
+        self.root.destroy()
+        from View.BorrowReturnBook.Return1 import Return1App
+        return1_root = Tk()
+        return1 = Return1App(return1_root)
+        return1_root.mainloop()
+
     def on_borrow_book_clicked(self):
         """Handle borrow book button click"""
         print("btn_BorrowBook clicked")
-    
+        self.root.destroy()
+        from View.BorrowReturnBook.Borrow1 import Borrow1App
+        borrow1_root = Tk()
+        borrow1 = Borrow1App(borrow1_root)
+        borrow1_root.mainloop()
+
     def on_drop_off_clicked(self):
         """Handle drop off button click"""
         print("btn_DropOff clicked")
+
+        # Get the borrow date from the label
+        borrow_date_str = self.canvas.itemcget(self.lbl_BorrowDate, "text")
+        borrow_date = datetime.strptime(borrow_date_str, "%Y/%m/%d")
+
+        # Calculate return deadline (20 days after borrow date)
+        return_deadline = borrow_date + timedelta(days=20)
+        
+        # Get current date for the return
+        current_date = datetime.now()
+        formatted_current_date = current_date.strftime("%Y-%m-%d")
+
+        # Determine status: overdue or not
+        receipt_status = "Overdue" if current_date > return_deadline else "On Time"
+
+        # Show Drop Off dialog
+        Drop_Off(self.root, receipt_status)
+        from Model.receipt_model import Receipt
+        # Update receipt status in database
+        if self.receipt_id:
+            success = Receipt.return_book(formatted_current_date, self.receipt_id)
+            if success:
+                # Update the return date displayed on screen
+                self.canvas.itemconfigure(self.lbl_ReturnDate, text=current_date.strftime("%Y/%m/%d"))
+                
+                # You might want to refresh the book inventory here
+                from Model.book_model import Book
+                book_id = self.canvas.itemcget(self.lbl_ISBN, "text")
+                Book.update_book_quantity_after_return(book_id, 1)  # Assuming this method exists
+
+
+    
+    # Load receipt data from database
+    def load_receipt_data(self):
+        """Load and display receipt data for the given receipt_id"""
+        if not self.receipt_id:
+            print("No receipt ID provided")
+            return
+        from Model.receipt_model import Receipt
+        # Get receipt data from database
+        receipt_data = Receipt.get_receipt_by_id(self.receipt_id)
+
+        if not receipt_data:
+            print(f"No receipt found with ID: {self.receipt_id}")
+            return
+
+        print(f"Loaded receipt data: {receipt_data}")
+
+        # Update text fields with receipt data
+        # Assuming receipt_data format: (receipt_id, user_id, book_id, borrow_date, return_date, status, borrowed_quantity)
+        self.canvas.itemconfigure(self.lbl_ReceiptID, text=str(receipt_data[0]))  # receipt_id
+        self.canvas.itemconfigure(self.lbl_UserID, text=str(receipt_data[1]))     # user_id
+        self.canvas.itemconfigure(self.lbl_ISBN, text=str(receipt_data[2]))       # book_id (ISBN)
+
+        # For quantity - check if it exists in the data
+        if len(receipt_data) > 6 and receipt_data[6] is not None:
+            self.canvas.itemconfigure(self.lbl_Quantity, text=str(receipt_data[6]))
+        else:
+            self.canvas.itemconfigure(self.lbl_Quantity, text="1")  # Default quantity
+
+        # Format and display borrow date
+        if receipt_data[3]:  # borrow_date
+            borrow_date = receipt_data[3]
+            if isinstance(borrow_date, str):
+                # If it's a string, parse it
+                from datetime import datetime
+                borrow_date = datetime.strptime(borrow_date, "%Y-%m-%d").strftime("%Y/%m/%d")
+            else:
+                # If it's already a datetime object
+                borrow_date = borrow_date.strftime("%Y/%m/%d")
+            self.canvas.itemconfigure(self.lbl_BorrowDate, text=borrow_date)
+
+        # Calculate and display return deadline (20 days after borrow date)
+        from datetime import datetime, timedelta
+        if receipt_data[3]:
+            borrow_date_obj = receipt_data[3]
+            if isinstance(borrow_date_obj, str):
+                borrow_date_obj = datetime.strptime(borrow_date_obj, "%Y-%m-%d")
+            
+            # Calculate return deadline
+            return_deadline = (borrow_date_obj + timedelta(days=20)).strftime("%Y/%m/%d")
+            
+            # Check if return date exists
+            if True:   # # Luôn hiển thị hạn trả sách, không lấy ngày trả của người đã trả
+                return_date = receipt_data[4]
+                if isinstance(return_date, str):
+                    return_date = datetime.strptime(return_date, "%Y-%m-%d").strftime("%Y/%m/%d")
+                else:
+                    return_date = return_date.strftime("%Y/%m/%d")
+                self.canvas.itemconfigure(self.lbl_ReturnDate, text=return_date)
+            else:
+                # If no return date yet, show the deadline
+                self.canvas.itemconfigure(self.lbl_ReturnDate, text=return_deadline)
+
+
 
 
 if __name__ == "__main__":

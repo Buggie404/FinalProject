@@ -8,13 +8,15 @@ project_root = os.path.dirname(parent_dir)
 sys.path.append(project_root)
 from Model.receipt_model import Receipt
 from tkinter import messagebox
+
 class Return1App:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None):
         self.root = root
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
-        
+        self.user_data = user_data
+
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
         if assets_path:
@@ -188,15 +190,15 @@ class Return1App:
     def on_borrow_book_click(self):
         print("btn_BorrowBook clicked")
         self.root.destroy()
-        from Borrow1 import Borrow1App
+        from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow1_root = Tk()
         borrow1 = Borrow1App(borrow1_root)
         borrow1_root.mainloop()
-    
+        
     def on_return_book_click(self):
         print("btn_ReturnBook clicked")
         self.root.destroy()
-        from Return1 import Return1App
+        from View.BorrowReturnBook.Return1 import Return1App
         return1_root = Tk()
         return1 = Return1App(return1_root)
         return1_root.mainloop()
@@ -207,7 +209,7 @@ class Return1App:
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         sys.path.append(os.path.join(base_dir, "View"))
         sys.path.append(base_dir)
-        from Homepage import HomepageApp
+        from View.Homepage import HomepageApp
         homepage_root = Tk()
         homepage = HomepageApp(homepage_root)
         homepage_root.mainloop()
@@ -218,23 +220,6 @@ class Return1App:
         # receipt_id = self.lnE_ReceiptID.get()
         # print(f"Searching for receipt ID: {receipt_id}")
     def on_search_click(self):
-        # receipt_id = self.lnE_ReceiptID.get()
-        
-        # if not receipt_id:
-        #     print("Vui lòng nhập Receipt ID!")  
-        #     return
-        
-        # print(f"Tìm kiếm Receipt ID: {receipt_id}")
-        
-        # # Đóng Return1App và mở Return2App
-        # self.root.destroy()
-        
-        # new_window = Tk()
-        # parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        # sys.path.append(parent_dir)  
-        # from Return2 import Return2App  
-        # Return2App(new_window)
-        # new_window.mainloop()
         receipt_id = self.lnE_ReceiptID.get()
 
         if not receipt_id:
@@ -247,12 +232,16 @@ class Return1App:
         if not receipt_data:
             messagebox.showerror("Error", "Receipt not found!")
             return
-    
-        # Nếu tìm thấy, đóng cửa sổ Return1 và mở Return2, truyền receipt_id qua
+    # Verify the receipt belongs to the current user
+        if self.user_data and receipt_data[1] != self.user_data[0]:  # Check if user_id matches
+            messagebox.showerror("Error", "This receipt doesn't belong to your account!")
+            return
+        
+    # Nếu tìm thấy, đóng cửa sổ Return1 và mở Return2, truyền receipt_id qua
         self.root.destroy()
-        from Return2 import Return2App 
+        from View.BorrowReturnBook.Return2 import Return2App 
         return2_root = Tk()
-        return2 = Return2App(return2_root)
+        return2 = Return2App(return2_root, receipt_id = receipt_id, user_data=self.user_data)
         return2_root.mainloop()
 
 # Entry point

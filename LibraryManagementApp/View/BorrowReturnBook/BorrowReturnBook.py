@@ -4,11 +4,12 @@ import sys
 import os
 
 class BorrowReturnApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None):
         self.root = root
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        self.user_data = user_data
 
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -90,7 +91,7 @@ class BorrowReturnApp:
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         sys.path.append(os.path.join(base_dir, "View"))
         sys.path.append(base_dir)
-        from Homepage import HomepageApp
+        from View.Homepage import HomepageApp
         homepage_root = Tk()
         homepage = HomepageApp(homepage_root)
         homepage_root.mainloop()
@@ -106,7 +107,7 @@ class BorrowReturnApp:
     def on_return_book_clicked(self):
         print("btn_ReturnBook clicked")
         self.root.destroy()
-        from Return1 import Return1App
+        from View.BorrowReturnBook.Return1 import Return1App
         return1_root = Tk()
         return1 = Return1App(return1_root)
         return1_root.mainloop()
