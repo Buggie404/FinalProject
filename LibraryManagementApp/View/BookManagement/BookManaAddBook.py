@@ -24,7 +24,8 @@ class BookManagementAddBookApp:
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
-        
+        # Set font that supports Vietnamese characters
+        self.vietnamese_font = ("Arial Unicode MS", 10)  # or another Unicode font
         # Set up asset paths
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -176,6 +177,49 @@ class BookManagementAddBookApp:
                 widget._shown_warning = False
                 break
     
+    # def on_input_field_focus_out(self, event):
+    #     """Restore placeholder text if field is empty and validate field content"""
+    #     widget = event.widget
+        
+    #     # Define mapping of fields to their validation methods
+    #     field_mapping = {
+    #         "lnE_ISBN": (self.placeholders["lnE_ISBN"], add_book.validate_isbn_on_event),
+    #         "lnE_Title": (self.placeholders["lnE_Title"], add_book.validate_title_on_event),
+    #         "lnE_Author": (self.placeholders["lnE_Author"], add_book.validate_author_on_event),
+    #         "lnE_PublishedYear": (self.placeholders["lnE_PublishedYear"], add_book.validate_published_year_on_event),
+    #         "lnE_Category": (self.placeholders["lnE_Category"], add_book.validate_category_on_event),
+    #         "lnE_Quantity": (self.placeholders["lnE_Quantity"], add_book.validate_quantity_on_event)
+    #     }
+        
+    #     # Identify which field triggered the event
+    #     for field_name, (placeholder, validation_func) in field_mapping.items():
+    #         if widget == self.entries[field_name]:
+    #             field_value = widget.get()
+                
+    #             # Restore placeholder if empty
+    #             if not field_value:
+    #                 widget.insert(0, placeholder)
+    #                 widget.config(fg="grey")
+    #                 widget._shown_warning = False  # Reset warning flag
+    #                 return
+                
+    #             # Skip validation if it's still the placeholder
+    #             if field_value == placeholder:
+    #                 return
+                
+    #             # Validate field
+    #             valid, message = validation_func(field_value)
+                
+    #             if not valid:
+    #                 # Show warning only if not already shown
+    #                 if not widget._shown_warning:
+    #                     messagebox.showwarning(f"Invalid {field_name.split('_')[-1]}", message)
+    #                     widget._shown_warning = True  # Set flag to prevent duplicate warnings
+    #                 # Schedule focus to happen after the messagebox is closed
+    #                 self.root.after(100, lambda w=widget: w.focus_set())
+    #             else:
+    #                 widget._shown_warning = False  # Reset flag if validation passes
+    #             break  # Exit loop after handling the matched field
     def on_input_field_focus_out(self, event):
         """Restore placeholder text if field is empty and validate field content"""
         widget = event.widget
@@ -217,9 +261,23 @@ class BookManagementAddBookApp:
                     # Schedule focus to happen after the messagebox is closed
                     self.root.after(100, lambda w=widget: w.focus_set())
                 else:
+                    # If field is valid and it's an author or title, format it properly
+                    if field_name == "lnE_Author":
+                        _, _, formatted_value = add_book.validate_author(field_value)
+                        # Only update if the formatting changed something
+                        if formatted_value != field_value:
+                            widget.delete(0, "end")
+                            widget.insert(0, formatted_value)
+                    elif field_name == "lnE_Title":
+                        _, _, formatted_value = add_book.validate_title(field_value)
+                        # Only update if the formatting changed something
+                        if formatted_value != field_value:
+                            widget.delete(0, "end")
+                            widget.insert(0, formatted_value)
+                    
                     widget._shown_warning = False  # Reset flag if validation passes
                 break  # Exit loop after handling the matched field
-    
+
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
         self.images[image_name] = PhotoImage(
@@ -269,6 +327,7 @@ class BookManagementAddBookApp:
             bd=0,
             bg=bg_color,
             fg="#000716",
+            font=self.vietnamese_font,
             highlightthickness=0
         )
         
