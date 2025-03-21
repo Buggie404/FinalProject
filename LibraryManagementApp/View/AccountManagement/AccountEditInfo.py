@@ -14,7 +14,7 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
         self.root.resizable(False, False)
 
         # import controller that hndel Edit Account Information
-        from Controller.test_accountmmnt1 import AccountEditInfoController 
+        from Controller.account_management_controller import AccountEditInfoController 
         self.controller = AccountEditInfoController(user_id)
 
         # Set up asset paths
@@ -197,22 +197,24 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
             homepage = HomepageApp(homepage_root)
             homepage.root.mainloop()
         else: # For btn_Apply
-            new_username = self.entries["lnE_NewUserName"].get()
-            new_date_of_brith = self.entries["lnE_NewDateOfBirth"].get()
+            # new_username = self.entries["lnE_NewUsername"].get()
+            # new_date_of_birth = self.entries["lnE_NewDateOfBirth"].get()
 
-            result = self.controller.process_edit_request(new_username, new_date_of_brith)
+            # result = self.controller.process_edit_request(new_username, new_date_of_birth)
 
-            self.root.destroy()
-            if result:
-                from View.AccountManagement.AccountEditInfo1 import AccountEditInfo1
-                success_root = Tk()
-                success = AccountEditInfo1(success_root)
-                success.root.mainloop()
-            else:
-                from View.AccountManagement.AccountEditInfo2 import AccountEditInfo2
-                failed_root = Tk()
-                failed = AccountEditInfo2(failed_root)
-                failed.root.mainloop()
+            # self.root.destroy()
+            # if result:
+            #     from View.AccountManagement.AccountEditInfo1 import AccountEditInfo1
+            #     success_root = Tk()
+            #     success = AccountEditInfo1(success_root)
+            #     success.root.mainloop()
+            # else:
+            #     from View.AccountManagement.AccountEditInfo2 import AccountEditInfo2App
+            #     failed_root = Tk()
+            #     failed = AccountEditInfo2App(failed_root)
+            #     failed.root.mainloop()
+
+            self.controller.handle_apply_click(self)
 
     def run(self): # ?!?!
         """Start the application main loop"""

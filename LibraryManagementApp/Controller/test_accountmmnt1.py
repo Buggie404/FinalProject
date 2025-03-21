@@ -64,7 +64,7 @@ class AccountEditInfoController:
         if " " in username:
             return (False, "Username must not contain space", False)
         
-        valids_chars_pattern = re.complile(r'a-zA-Z0-9\W_}+$')
+        valids_chars_pattern = re.compile(r'^[a-zA-Z0-9\W_]+$')
         if not valids_chars_pattern.match(username):
             return (False, "Invalid username format", False)
         
@@ -77,7 +77,7 @@ class AccountEditInfoController:
     
     def validate_date_of_birth(self, date_str):
         """
-        Validate if the date is in a valid format (YYYY-MM-DD), not in the future,
+        Validate if the date is in an acceptable format, not in the future,
         and at least 10 years ago
         
         Parameters:
@@ -89,30 +89,44 @@ class AccountEditInfoController:
         # Check if date is empty
         if not date_str or date_str.strip() == "":
             return (False, "Date of birth cannot be empty.")
-                
-        # Check date format using regex
-        date_pattern = re.compile(r'^\d{4}-\d{2}-\d{2}$')
-        if not date_pattern.match(date_str):
-            return (False, "Date must be in YYYY-MM-DD format.")
-                
-        try:
-            # Convert string to date object
-            date_of_birth = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-            
-            # Get current date
-            current_date = datetime.datetime.now().date()
-            
-            # Calculate minimum allowed date (10 years ago)
-            min_date = current_date.replace(year=current_date.year - 10)
-            
-            # Check if date is at least 10 years ago
-            if date_of_birth > min_date:
-                return (False, "You must be at least 10 years old to register.")
-                    
-            return (True, "")
-        except ValueError:
-            # Date conversion failed
-            return (False, "Invalid date. Please use YYYY-MM-DD format.")
+        
+        # Try to parse different date formats
+        date_of_birth = None
+        
+        # Try YYYY-MM-DD format (the desired format)
+        if re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
+            try:
+                date_of_birth = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+        
+        # Try MM/DD/YYYY format (what the user might enter)
+        if date_of_birth is None and re.match(r'^\d{1,2}/\d{1,2}/\d{4}$', date_str):
+            try:
+                date_of_birth = datetime.datetime.strptime(date_str, "%m/%d/%Y").date()
+                return (False, "Please use YYYY-MM-DD format (e.g., 2010-06-03 instead of 06/03/2010).")
+            except ValueError:
+                pass
+        
+        # If we couldn't parse the date in any recognized format
+        if date_of_birth is None:
+            return (False, "Invalid date format. Please use YYYY-MM-DD format.")
+        
+        # Get current date
+        current_date = datetime.datetime.now().date()
+        
+        # Check if date is in the future
+        if date_of_birth > current_date:
+            return (False, "Date of birth cannot be in the future.")
+        
+        # Calculate minimum allowed date (10 years ago)
+        min_date = current_date.replace(year=current_date.year - 10)
+        
+        # Check if date is at least 10 years ago
+        if date_of_birth > min_date:
+            return (False, "You must be at least 10 years old to register.")
+        
+        return (True, "")
     
     def process_edit_request(self, new_username, new_date_of_birth):
         """
@@ -128,14 +142,16 @@ class AccountEditInfoController:
         # Check if user is loaded
         if not self.current_user:
             return False
-            
+                
         # Validate inputs
-        if not self.validate_username(new_username):
+        username_valid, _, username_taken = self.validate_username(new_username)
+        if not username_valid:
             return False
-            
-        if not self.validate_date_of_birth(new_date_of_birth):
+                
+        dob_valid, _ = self.validate_date_of_birth(new_date_of_birth)
+        if not dob_valid:
             return False
-            
+                
         # Call model to update information
         result = self.current_user.edit_account_info(new_username, new_date_of_birth)
         return result
@@ -172,27 +188,33 @@ class AccountEditInfoController:
         new_username = app.entries["lnE_NewUsername"].get()
         new_date_of_birth = app.entries["lnE_NewDateOfBirth"].get()
         
-        # Validate username
-        username_valid, username_error, username_taken = self.validate_username(new_username)
-        if not username_valid:
-            if username_taken:
-                # Close current window
-                app.root.destroy()
-                # Show the failure view for taken username
-                self.show_failure_view()
-                return
-            else:
-                # Show error message for invalid format
-                messagebox.showerror("Invalid Username", username_error)
-                return
+        # First check for format errors before checking if username is taken
         
-        # Validate date of birth
+        # Validate username format first (without checking if taken)
+        username_valid, username_error, username_taken = self.validate_username(new_username)
+        
+        # If there's a format error with username (not related to it being taken)
+        if not username_valid and not username_taken:
+            messagebox.showerror("Invalid Username", username_error)
+            return
+        
+        # Validate date of birth format
         dob_valid, dob_error = self.validate_date_of_birth(new_date_of_birth)
         if not dob_valid:
             messagebox.showerror("Invalid Date of Birth", dob_error)
             return
         
+        # At this point, all format validations have passed
+        # Now we check if the username is taken (which would redirect to AccountEditInfo2)
+        if username_taken:
+            # Close current window
+            app.root.destroy()
+            # Show the failure view for taken username
+            self.show_failure_view()
+            return
+        
         # Process the edit request - at this point both validations have passed
+        # and username is not taken
         result = self.current_user.edit_account_info(new_username, new_date_of_birth)
         
         # Close current window
