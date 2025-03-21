@@ -151,19 +151,43 @@ class Drop_Off():
     def __init__(self, root, receipt_status):
         # Config Notification tab
         self.root = root
+        self.status = receipt_status
         self.delete_noti = Toplevel(root)
         self.delete_noti.title(" ")
         self.delete_noti.geometry("400x200")
         self.delete_noti.resizable(False, False)
         self.delete_noti.config(bg='white')
-        self.status = receipt_status
+
 
         # Title Label
         Label(self.delete_noti, text="Drop Off Successfully!", font=('Montserrat', 18, 'bold'), bg='white',
               fg='black').pack(pady=(20, 10))
-
-        # Config to switch window depands on receipt_status
-        # if receipt_status == 'overdue': -> switch to overdue window, else: -> switch back to first-window
+        
+        # Notification Button based on receipt staus
+        if self.status == "Overdue":
+            # Pay Overdue Fine
+            Button(self.delete_noti, width=13, text="Pay Overdue Fine", highlightbackground='white', highlightthickness=1, command = lambda: self.pay_overdue_fine()).pack(pady=10)
+        else: 
+            # Return Button
+            Button(self.delete_noti, width=13, text="Return to Home", highlightbackground='white', highlightthickness=1, command = lambda: self.switch_to_return()).pack(pady=10)
+        
+    # Switch to Return Book Window
+    def switch_to_return(self):
+        self.delete_noti.destroy()
+        self.root.destroy()
+        from View.BorrowReturnBook.Return1 import Return1App
+        return_1_root = Tk()
+        return_1 = Return1App(return_1_root)
+        return_1_root.mainloop()
+        
+    # Switch to Overdue Window
+    def pay_overdue_fine(self):
+        self.delete_noti.destroy()
+        self.root.destroy()
+        from View.BorrowReturnBook.ReturnOverdue import ReturnOverdueApp
+        overdue_root = Tk()
+        overdue = ReturnOverdueApp(overdue_root)
+        overdue_root.mainloop()
 
 
 class Sign_Out():  # To Sign out, when clicked "Yes" -> switch to Log_In window
