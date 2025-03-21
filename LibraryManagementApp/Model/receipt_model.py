@@ -113,21 +113,25 @@ class Receipt:
     def get_receipt_by_id(receipt_id):
         # Get receipt by ID
         db = Database()
-        db.cursor.execute("SELECT status FROM receipts WHERE receipt_id = ? ", 
-                         (receipt_id,))
+        db.cursor.execute("""
+            SELECT r.receipt_id, r.user_id, r.book_id, r.borrow_date, r.return_date,
+                r.status, r.borrowed_quantity
+            FROM receipts r
+            WHERE r.receipt_id = ?
+        """, (receipt_id,))
         return db.cursor.fetchone()
-        return result[0] if result else None  # Return status if found, else None
-    
+
+
     @staticmethod
     def return_book(return_date, receipt_id):
         db = Database()
         if not Receipt.get_receipt_by_id(receipt_id):
             return False  # Receipt not found
-        
+       
         # Update receipt with return date and change status to 'returned'
         db.cursor.execute("""
-            UPDATE receipts 
-            SET return_date = ?, status = 'returned' 
+            UPDATE receipts
+            SET return_date = ?, status = 'returned'
             WHERE receipt_id = ?
         """, (return_date, receipt_id))
         db.conn.commit()
