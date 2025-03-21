@@ -1,5 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Button, PhotoImage
+import sys
+import os
 
 class BorrowReturnApp:
     def __init__(self, root, assets_path=None):
@@ -85,11 +87,18 @@ class BorrowReturnApp:
     def on_back_to_homepage_clicked(self):
         print("btn_BackToHomepage clicked")
     
-    def on_return_book_clicked(self):
-        print("btn_ReturnBook clicked")
-    
+
     def on_borrow_book_clicked(self):
         print("btn_BorrowBook clicked")
+
+    def on_return_book_clicked(self):
+        print("btn_ReturnBook clicked")
+        self.root.destroy()
+
+        from Return1 import Return1App
+        new_root = Tk()
+        app = Return1App(new_root)
+        new_root.mainloop()
 
 if __name__ == "__main__":
     window = Tk()

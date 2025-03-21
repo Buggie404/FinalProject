@@ -1,6 +1,13 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-
+import sys
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+project_root = os.path.dirname(parent_dir)
+sys.path.append(project_root)
+from Model.receipt_model import Receipt
+from tkinter import messagebox
 class Return1App:
     def __init__(self, root, assets_path=None):
         self.root = root
@@ -190,11 +197,50 @@ class Return1App:
         print("btn_BackToHomepage clicked")
         # Implement back to homepage functionality here
     
-    def on_search_click(self):
-        print("btn_Search clicked")
+    # def on_search_click(self):
+    #     print("btn_Search clicked")
         # Implement search functionality here
         # receipt_id = self.lnE_ReceiptID.get()
         # print(f"Searching for receipt ID: {receipt_id}")
+    def on_search_click(self):
+        # receipt_id = self.lnE_ReceiptID.get()
+        
+        # if not receipt_id:
+        #     print("Vui lòng nhập Receipt ID!")  
+        #     return
+        
+        # print(f"Tìm kiếm Receipt ID: {receipt_id}")
+        
+        # # Đóng Return1App và mở Return2App
+        # self.root.destroy()
+        
+        # new_window = Tk()
+        # parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # sys.path.append(parent_dir)  
+        # from Return2 import Return2App  
+        # Return2App(new_window)
+        # new_window.mainloop()
+        receipt_id = self.lnE_ReceiptID.get()
+
+        if not receipt_id:
+            messagebox.showwarning("Warning", "Please enter a Receipt ID")
+            return
+    
+    # Kiểm tra receipt trong database
+        receipt_data = Receipt.get_receipt_by_id(receipt_id)
+
+        if not receipt_data:
+            messagebox.showerror("Error", "Receipt not found!")
+            return
+    
+        # Nếu tìm thấy, đóng cửa sổ Return1 và mở Return2, truyền receipt_id qua
+        self.root.destroy()
+
+        new_window = Tk()
+
+        from View.BorrowReturnBook.Return2 import Return2App 
+        Return2App(new_window)
+        new_window.mainloop()
 
 # Entry point
 if __name__ == "__main__":

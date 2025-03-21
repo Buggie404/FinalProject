@@ -1,9 +1,12 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-
+import sys
+import os
+from tkinter import messagebox
 class Return2App:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, assets_path=None, receipt_id=None):
         self.root = root
+        self.receipt_id = receipt_id
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
@@ -32,7 +35,31 @@ class Return2App:
         self.create_sidebar()
         self.create_main_content()
         self.create_buttons()
-    
+      # Hiển thị dữ liệu receipt khi mở màn Return2
+        if self.receipt_id:
+            self.display_receipt_info()
+
+    def display_receipt_info(self):
+        parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append(parent_dir)  
+        from Model.receipt_model import Receipt  
+
+        data = Receipt.get_receipt_by_id(self.receipt_id)
+        if not data:
+            messagebox.showerror("Error", "Receipt not found")
+            return
+        
+        # Giả sử data có cấu trúc (receipt_id, user_id, book_id, borrow_date, return_date, status)
+        receipt_id, user_id, book_id, borrow_date, return_date, status = data
+
+        # Hiển thị thông tin lên canvas (hoặc Label, Entry tuỳ thiết kế)
+        self.canvas.create_text(400, 200, anchor="nw", text=f"Receipt ID: {receipt_id}", font=("Arial", 16), fill="#000000")
+        self.canvas.create_text(400, 230, anchor="nw", text=f"User ID: {user_id}", font=("Arial", 16), fill="#000000")
+        self.canvas.create_text(400, 260, anchor="nw", text=f"Book ID: {book_id}", font=("Arial", 16), fill="#000000")
+        self.canvas.create_text(400, 290, anchor="nw", text=f"Borrow Date: {borrow_date}", font=("Arial", 16), fill="#000000")
+        self.canvas.create_text(400, 320, anchor="nw", text=f"Return Date: {return_date}", font=("Arial", 16), fill="#000000")
+        self.canvas.create_text(400, 350, anchor="nw", text=f"Status: {status}", font=("Arial", 16), fill="#000000")
+
     def relative_to_assets(self, path: str) -> Path:
         return self.assets_path / Path(path)
     
