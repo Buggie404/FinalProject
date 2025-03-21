@@ -310,13 +310,14 @@ class BookManagementApp:
             books = Book.get_all_book()
             if books:
                 for book in books:
+                    book_id = str(book[0])
                     self.tbl_Book.insert('', 'end', values=(
-                        book[0],  # book_id
-                        book[1],  # title
-                        book[2],  # author
-                        book[3],  # published_year
-                        book[4],  # category
-                        book[5]  # quantity
+                        book_id,          # book_id (as string)
+                        book[1],          # title
+                        book[2],          # author
+                        book[3],          # published_year
+                        book[4],          # category
+                        book[5]           # quantity
                     ))
                 return True
             return False

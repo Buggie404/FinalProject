@@ -28,11 +28,26 @@ class Book:
                                (new_data['title'], new_data['author'], new_data['category'], new_data['published_year'], new_data['quantity'], self.book_id))
         self.db.conn.commit()
 
+    # @staticmethod
+    # def get_book_by_id(book_id):
+    #     # Search book by ID
+    #     db = Database()
+    #     # Ensure book_id is treated as string to preserve leading zeros
+    #     book_id = str(book_id)
+    #     db.cursor.execute("SELECT * FROM Books WHERE book_id = ? ", (book_id,))
+    #     return db.cursor.fetchone()
     @staticmethod
-    def get_book_by_id(book_id): # Search book by ID
+    def get_book_by_id(book_id):
+        # Search book by ID
         db = Database()
-        db.cursor.execute("SELECT * FROM Books WHERE book_id = ?", (book_id,))
+        
+        # Ensure book_id is a string with 10 digits (padded with leading zeros if needed)
+        book_id = str(book_id).zfill(10)
+        
+        db.cursor.execute("SELECT * FROM Books WHERE book_id = ? ", (book_id,))
         return db.cursor.fetchone()
+
+
     
     @staticmethod
     def get_all_book(): #Display all books
@@ -55,7 +70,7 @@ class Book:
         db = Database()
         # Ensure keyword is a string 
         keyword = str(keyword) if keyword is not None else ""
-        db.cursor.execute("SELECT * FROM books WHERE title LIKE ?", (f'%{keyword}%',))
+        db.cursor.execute("SELECT * FROM Books WHERE title LIKE ?", (f'%{keyword}%',))
         return db.cursor.fetchall()
     
     @staticmethod

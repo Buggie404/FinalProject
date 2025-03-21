@@ -57,9 +57,16 @@ class Admin(User): # Include all the ADMIN ONLY function
             return True
         return False # Book not found
        
+    # def delete_book(self, book_id):
+    #     if not Book.get_book_by_id(book_id):
+    #         return False # Book not found
+    #     self.db.cursor.execute("DELETE FROM Books WHERE book_id = ?", (book_id,))
+    #     self.db.conn.commit()
+    #     return True
     def delete_book(self, book_id):
+        # Don't convert book_id to int, keep it as string to preserve leading zeros
         if not Book.get_book_by_id(book_id):
-            return False # Book not found
-        self.db.cursor.execute("DELETE FROM books WHERE book_id = ?", (book_id,))
+            return False  # Book not found
+        self.db.cursor.execute("DELETE FROM Books WHERE book_id = ? ", (book_id,))
         self.db.conn.commit()
         return True
