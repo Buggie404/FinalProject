@@ -1,9 +1,11 @@
+# Import Lib
 from tkinter import Tk, messagebox
 from pathlib import Path
 import datetime
-
 import sys
 import os
+
+# File directory
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 # Import view classes
