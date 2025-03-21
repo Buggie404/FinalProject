@@ -64,12 +64,12 @@ class AccountChangePwApp:
         self.create_sidebar()
         self.create_main_panel()
 
-        # # Add validation error text placeholders
-        # self.error_messages = {
-        #     'current_password': None,
-        #     'new_password': None,
-        #     'confirm_password': None
-        # }
+        # Add validation error text placeholders
+        self.error_messages = {
+            'current_password': None,
+            'new_password': None,
+            'confirm_password': None
+        }
 
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
@@ -140,40 +140,71 @@ class AccountChangePwApp:
             image=self.images[image_name]
         )
 
-    def validate_current_password_event(self, event):
-        """Validate current password when focus leaves the field"""
+    def simple_validate_current_password(self):
+        """Simple validation for current password - only shows error if invalid"""
         current_password = self.entries["lnE_CurrentPassword"].get()
-        valid, message = self.controller.validate_current_password(current_password)
-        self.password_validation_errors['current_password'] = not valid
         
-        # Update or create error message
-        if not valid:
-            messagebox.showerror("Password Error", message)
+        # Skip validation if empty (will be caught when submitting)
+        if not current_password:
+            return True
         
-        return valid
+        if self.user_data and current_password != self.user_data[4]:
+            messagebox.showerror("Password Error", "Current password is incorrect.")
+            self.entries["lnE_CurrentPassword"].focus_set()
+            return False
+        
+        return True
 
-    def validate_new_password_event(self, event):
-        """Validate new password when focus leaves the field"""
+    def simple_validate_new_password(self):
+        """Simple validation for new password - only shows error if invalid"""
         new_password = self.entries["lnE_NewPassword"].get()
-        valid, message = self.controller.validate_new_password(new_password)
-        self.password_validation_errors['new_password'] = not valid
         
-        if not valid:
-            messagebox.showerror("Password Error", message)
+        # Skip validation if empty (will be caught when submitting)
+        if not new_password:
+            return True
         
-        return valid
+        # Check length (8-15 characters)
+        if len(new_password) < 8:
+            messagebox.showerror("Password Error", "Password must be at least 8 characters.")
+            self.entries["lnE_NewPassword"].focus_set()
+            return False
+        
+        if len(new_password) > 15:
+            messagebox.showerror("Password Error", "Password must be less than 15 characters.")
+            self.entries["lnE_NewPassword"].focus_set()
+            return False
+        
+        # Check for spaces
+        if ' ' in new_password:
+            messagebox.showerror("Password Error", "Password cannot contain spaces.")
+            self.entries["lnE_NewPassword"].focus_set()
+            return False
+        
+        # Check for valid characters
+        valid_chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*_-+=`|\\(){}[]:;'<>,.?/"
+        for char in new_password:
+            if char not in valid_chars:
+                messagebox.showerror("Password Error", f"Password contains invalid character: {char}")
+                self.entries["lnE_NewPassword"].focus_set()
+                return False
+        
+        return True
 
-    def validate_confirm_password_event(self, event):
-        """Validate confirm password when focus leaves the field"""
+    def simple_validate_confirm_password(self):
+        """Simple validation for confirm password - only shows error if invalid"""
         new_password = self.entries["lnE_NewPassword"].get()
         confirm_password = self.entries["lnE_ConfirmPassword"].get()
-        valid, message = self.controller.validate_confirm_password(new_password, confirm_password)
-        self.password_validation_errors['confirm_password'] = not valid
         
-        if not valid:
-            messagebox.showerror("Password Error", message)
+        # Skip validation if empty (will be caught when submitting)
+        if not confirm_password:
+            return True
         
-        return valid
+        if new_password != confirm_password:
+            messagebox.showerror("Password Error", "Passwords do not match.")
+            self.entries["lnE_ConfirmPassword"].focus_set()
+            return False
+        
+        return True
 
 
     def create_button(self, button_name, dimensions):
@@ -215,7 +246,7 @@ class AccountChangePwApp:
             bg="#E7DCDC",
             fg="#000716",
             highlightthickness=0,
-            show="•"
+            show="•" if "Password" in entry_name else ""
         )
 
         entry.place(
@@ -227,11 +258,11 @@ class AccountChangePwApp:
 
         # Add validation bindings based on entry type
         if entry_name == "lnE_CurrentPassword":
-            entry.bind("<FocusOut>", self.validate_current_password_event)
+            entry.bind("<FocusOut>", lambda e: self.simple_validate_current_password())
         elif entry_name == "lnE_NewPassword":
-            entry.bind("<FocusOut>", self.validate_new_password_event)
+            entry.bind("<FocusOut>", lambda e: self.simple_validate_new_password())
         elif entry_name == "lnE_ConfirmPassword":
-            entry.bind("<FocusOut>", self.validate_confirm_password_event)
+            entry.bind("<FocusOut>", lambda e: self.simple_validate_confirm_password())
 
         self.entries[entry_name] = entry
         self.load_image(icon_name, icon_position)
@@ -239,75 +270,107 @@ class AccountChangePwApp:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+        
         if button_name == "btn_ChangePasswordConfirm":
             # Get values from entry fields
             current_password = self.entries["lnE_CurrentPassword"].get()
             new_password = self.entries["lnE_NewPassword"].get()
             confirm_password = self.entries["lnE_ConfirmPassword"].get()
             
-            # Create event objects for validation
-            class DummyEvent:
-                pass
-            
-            event = DummyEvent()
-            
-            # Validate all fields
-            current_valid = self.validate_current_password_event(event)
-            new_valid = self.validate_new_password_event(event)
-            confirm_valid = self.validate_confirm_password_event(event)
-            
-            # Check if current password is correct and new password is valid
-            if current_valid and new_valid and confirm_valid:
-                # Update password in database
-                success = self.controller.change_password(new_password)
+            # Check for empty fields first
+            if not current_password:
+                messagebox.showerror("Password Error", "Current password cannot be empty.")
+                self.entries["lnE_CurrentPassword"].focus_set()
+                return
                 
-                if success:
-                    # Navigate to success screen
-                    self.root.destroy()
-                    from View.AccountManagement.AccountChangePassword1 import AccountChangePw1App
-                    success_root = Tk()
-                    success_app = AccountChangePw1App(success_root, user_data=self.controller.user_data)
-                    success_root.mainloop()
-                else:
-                    # Navigate to failure screen due to database error
-                    self.root.destroy()
-                    from View.AccountManagement.AccountChangePassword2 import AccountChangePw2App
-                    failure_root = Tk()
-                    failure_app = AccountChangePw2App(failure_root, user_data=self.controller.user_data)
-                    failure_root.mainloop()
-            else:
-                # Navigate to failure screen due to validation errors
+            if not new_password:
+                messagebox.showerror("Password Error", "New password cannot be empty.")
+                self.entries["lnE_NewPassword"].focus_set()
+                return
+                
+            if not confirm_password:
+                messagebox.showerror("Password Error", "Confirm password cannot be empty.")
+                self.entries["lnE_ConfirmPassword"].focus_set()
+                return
+            
+            # Check current password
+            if current_password != self.user_data[4]:
+                messagebox.showerror("Password Error", "Current password is incorrect.")
+                self.entries["lnE_CurrentPassword"].focus_set()
+                return
+            
+            # Check new password format
+            if not self.simple_validate_new_password():
+                return  # Focus is set in the validation method
+            
+            # Check if passwords match
+            if new_password != confirm_password:
+                # For confirm password mismatch, we go straight to failure screen
                 self.root.destroy()
                 from View.AccountManagement.AccountChangePassword2 import AccountChangePw2App
                 failure_root = Tk()
-                failure_app = AccountChangePw2App(failure_root, user_data=self.controller.user_data)
+                failure_app = AccountChangePw2App(failure_root, user_data=self.user_data)
                 failure_root.mainloop()
+                return
+            
+            # All validations passed, update password
+            # Create User object to update password
+            from Model.user_model import User
+            user = User(
+                user_id=self.user_data[0],
+                name=self.user_data[1],
+                username=self.user_data[2],
+                email=self.user_data[3],
+                password=self.user_data[4],
+                date_of_birth=self.user_data[5],
+                role=self.user_data[6]
+            )
+            
+            try:
+                # Update password in database
+                user.change_pass(new_password)
+                
+                # Update user_data with new password
+                self.user_data = list(self.user_data)
+                self.user_data[4] = new_password
+                self.user_data = tuple(self.user_data)
+                
+                # Navigate to success screen
+                self.root.destroy()
+                from View.AccountManagement.AccountChangePassword1 import AccountChangePw1App
+                success_root = Tk()
+                success_app = AccountChangePw1App(success_root, user_data=self.user_data)
+                success_root.mainloop()
+            except Exception as e:
+                print(f"Error changing password: {e}")
+                # Navigate to failure screen due to database error
+                self.root.destroy()
+                from View.AccountManagement.AccountChangePassword2 import AccountChangePw2App
+                failure_root = Tk()
+                failure_app = AccountChangePw2App(failure_root, user_data=self.user_data)
+                failure_root.mainloop()
+        
+        # Handle other button clicks...
+        elif button_name == "btn_ChangePassword":
+            # When clicked Change Password on Change Password window -> go back to Account MainWindow
+            self.root.destroy()
+            from View.AccountManagement.AccountMan import AccountManagement
+            accountman_root = Tk()
+            accountman = AccountManagement(accountman_root, user_data=self.user_data)
+            accountman_root.mainloop()
+        elif button_name == "btn_EditAccountInformation":
+            self.root.destroy()
+            from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
+            editinfo_root = Tk()
+            editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
+            editinfo_root.mainloop()
+        elif button_name == "btn_BackToHomepage":
+            self.root.destroy()
+            from View.Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root, user_data=self.user_data)
+            homepage_root.mainloop()
 
-        # if button_name == "btn_ChangePassword": # When clicked Change Password on Change Password window -> go back to Account MainWindow
-        #     self.root.destroy()
-        #     from AccountMan import AccountManagement
-        #     accountman_root = Tk()
-        #     accountman = AccountManagement(accountman_root)
-        #     accountman_root.mainloop()
-        # elif button_name == "btn_EditAccountInformation":
-        #     self.root.destroy()
-        #     from AccountEditInfo import AccountEditInfoApp
-        #     editinfo_root = Tk()
-        #     editinfo = AccountEditInfoApp(editinfo_root)
-        #     editinfo_root.mainloop()
-        # elif button_name == "btn_BackToHomepage":
-        #     self.root.destroy()
-        #     from Homepage import HomepageApp
-        #     homepage_root = Tk()
-        #     homepage = HomepageApp(homepage_root)
-        #     homepage_root.mainloop()
-        # # else: # For btn_ChangePasswordConfirm
-        # """ changepass_success: check for new_password input, in Controller folder
-        # if input of lnE_CurrentPassword ≠ user_password: -> Failed
-        # if input of lnE_NewPassword ≠ input of lnE_ConfrimPassword: -> Failed"""
-        # #     import Controller that handle the check for password validation
-        # #     if changepass_success: # If password changed successfully -> switch to ChangePassword1 window -> update new_password in database through user_model
-        # #     else: # Switch to AccountChangePassword2
 
     def run(self):
         """Start the application main loop"""
