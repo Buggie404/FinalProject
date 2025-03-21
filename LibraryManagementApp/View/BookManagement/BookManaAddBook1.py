@@ -113,7 +113,7 @@ class BookManaAddBook1App:
 
     def create_book_details(self):
         """Create the text elements displaying book information"""
-    
+        font_name = "Arial Unicode MS"
         # Book details
         self.lbl_ISBN = self.canvas.create_text(
             581.0, 119.0,
