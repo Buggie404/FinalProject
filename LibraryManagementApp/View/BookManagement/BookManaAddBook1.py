@@ -201,7 +201,14 @@ class BookManaAddBook1App:
         """Handle button click events"""
         print(f"{button_name} clicked")
 
-      
+    def set_book_details(self, book_data):
+        """Set the book details in the confirmation screen"""
+        self.canvas.itemconfig(self.lbl_ISBN, text=book_data['book_id'])
+        self.canvas.itemconfig(self.lbl_Title, text=book_data['title'])
+        self.canvas.itemconfig(self.lbl_Author, text=book_data['author'])
+        self.canvas.itemconfig(self.lbl_PublishedYear, text=book_data['published_year'])
+        self.canvas.itemconfig(self.lbl_Category, text=book_data['category'])
+        self.canvas.itemconfig(self.lbl_Quantity, text=book_data['quantity'])
 
     def run(self):
         """Start the application main loop"""
