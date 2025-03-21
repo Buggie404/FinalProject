@@ -6,7 +6,7 @@ import os
 class UserAddAccount1App:
     def __init__(self, root, user_id=None, assets_path=None):
         self.root = root
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.user_id = user_id  # Store the user ID
