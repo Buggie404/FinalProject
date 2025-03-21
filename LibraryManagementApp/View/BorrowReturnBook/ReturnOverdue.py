@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 class ReturnOverdueApp:
     def __init__(self, root, assets_path=None):
@@ -7,7 +7,7 @@ class ReturnOverdueApp:
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
-        
+
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
         if assets_path:
@@ -15,7 +15,10 @@ class ReturnOverdueApp:
         else:
             self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameReturnOverdue")
         
+        # Store image references to prevent garbage collection
         self.images = {}
+        
+        # Setup UI components
         self.canvas = Canvas(
             self.root,
             bg="#FFFFFF",
@@ -26,35 +29,18 @@ class ReturnOverdueApp:
             relief="ridge"
         )
         self.canvas.place(x=0, y=0)
-        
-        self.load_images()
-        self.create_main_layout()
-        self.create_sidebar()
+
+        # Create UI elements
         self.create_main_content()
+        self.create_sidebar()
         self.create_buttons()
+        self.create_text_fields()
+        self.create_images()
     
     def relative_to_assets(self, path: str) -> Path:
+        """Convert relative asset path to absolute path"""
         return self.assets_path / Path(path)
-    
-    def load_images(self):
-        """Load all image assets"""
-        image_files = [
-            "image_1.png",
-            "image_3.png",
-            "image_4.png",
-            "btn_BackToHomepage.png",
-            "btn_ReturnBook.png",
-            "btn_BorrowBook.png",
-            "btn_PayFine.png"
-        ]
-        
-        for image_file in image_files:
-            full_path = self.relative_to_assets(image_file)
-            try:
-                self.images[image_file] = PhotoImage(file=full_path)
-            except Exception as e:
-                print(f"Error loading image {full_path}: {e}")
-    
+
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Vẽ hình chữ nhật có bo góc."""
         # Bo góc trên bên trái
@@ -72,31 +58,8 @@ class ReturnOverdueApp:
         self.canvas.create_rectangle(x1 + radius, y1, x2 - radius, y2, fill=color, outline=color)
         self.canvas.create_rectangle(x1, y1 + radius, x2, y2 - radius, fill=color, outline=color)
     
-    def create_main_layout(self):
-        """Create the main layout rectangles"""
-        # Main content area background
-        self.create_rounded_rectangle(
-            285.0,
-            80.0,
-            871.0,
-            525.0,
-            radius = 10,
-            color="#F1F1F1"
-        )
-        
-        # Overdue fine table
-        self.tbl_OverdueFine = self.canvas.create_rectangle(
-            395.0,
-            193.0,
-            760.0,
-            417.0,
-            fill="#D9D9D9",
-            outline=""
-        )
-
     def create_sidebar(self):
-        """Create the sidebar with buttons and logo"""
-        # Blue sidebar background
+        """Create the blue sidebar and its content"""
         self.canvas.create_rectangle(
             0.0,
             0.0,
@@ -106,80 +69,117 @@ class ReturnOverdueApp:
             outline=""
         )
         
-        # Logo images  
-        if "image_3.png" in self.images:
-            self.image_3 = self.canvas.create_image(
-                130.0,
-                73.0,
-                image=self.images["image_3.png"]
-            )
-        
-        # Create sidebar buttons
-        self.create_button("btn_BorrowBook.png", 0.0, 181.0, 262.0, 25.0, self.on_borrow_book_click)
-        self.create_button("btn_ReturnBook.png", 0.0, 219.0, 262.0, 25.0, self.on_return_book_click)
-        self.create_button("btn_BackToHomepage.png", 0.0, 563.0, 261.0, 25.0, self.on_back_to_homepage_click)
+        # Add Logo
+        self.images["image_3"] = PhotoImage(file=self.relative_to_assets("image_3.png"))
+        self.canvas.create_image(
+            130.0,
+            73.0,
+            image=self.images["image_3"]
+        )
     
     def create_main_content(self):
-        """Create the main content area with images"""
-        # Header images
-        if "image_1.png" in self.images:
-            self.image_1 = self.canvas.create_image(
-                578.0,
-                118.0,
-                image=self.images["image_1.png"]
-            )
+        """Create the main content area with background"""
+        self.create_rounded_rectangle(
+            285.0,
+            103.0,
+            871.0,
+            469.0,
+            color="#F1F1F1",
+            radius=10
+        )
         
-        if "image_4.png" in self.images:
-            self.image_4 = self.canvas.create_image(
-                578.0,
-                162.0,
-                image=self.images["image_4.png"]
+        # Header image
+        self.images["image_1"] = PhotoImage(file=self.relative_to_assets("image_1.png"))
+        self.canvas.create_image(
+            578.0,
+            141.0,
+            image=self.images["image_1"]
+        )
+    
+    def create_text_fields(self):
+        """Create all text fields in the application"""
+        text_configs = [
+            (579.0, 246.0, "1", "#0A66C2", ("Montserrat Medium", 18 * -1), "lbl_Quantity"),
+            (579.0, 314.0, "10.000", "#0A66C2", ("Montserrat Medium", 18 * -1), "lbl_Amount")
+        ]
+        
+        for x, y, text, fill, font, field_name in text_configs:
+            text_field = self.canvas.create_text(
+                x, y,
+                anchor="nw",
+                text=text,
+                fill=fill,
+                font=font
             )
+            
+            # Store text field references
+            setattr(self, field_name, text_field)
+    
+    def create_images(self):
+        """Create additional images in the UI"""
+        image_configs = [
+            ("image_4", "image_4.png", 578.0, 185.0),
+            ("image_5", "image_5.png", 446.0, 256.0),
+            ("image_6", "image_6.png", 396.0, 324.0)
+        ]
+        
+        for name, file, x, y in image_configs:
+            self.images[name] = PhotoImage(file=self.relative_to_assets(file))
+            self.canvas.create_image(x, y, image=self.images[name])
     
     def create_buttons(self):
-        """Create action buttons"""
-        self.create_button("btn_PayFine.png", 421.0, 456.0, 313.0, 48.0, self.on_pay_fine_click)
+        """Create all buttons in the application"""
+        button_configs = [
+            ("btn_BackToHomepage", "btn_BackToHomepage.png", 0.0, 563.0, 261.0, 25.0, self.on_back_to_homepage_clicked),
+            ("btn_ReturnBook", "btn_ReturnBook.png", 0.0, 219.0, 262.0, 25.0, self.on_return_book_clicked),
+            ("btn_BorrowBook", "btn_BorrowBook.png", 0.0, 181.0, 262.0, 25.0, self.on_borrow_book_clicked),
+            ("btn_PayFine", "btn_PayFine.png", 421.0, 382.0, 313.0, 48.0, self.on_pay_fine_clicked)
+        ]
+        
+        for btn_name, img_name, x, y, width, height, command in button_configs:
+            self.create_button(btn_name, img_name, x, y, width, height, command)
     
-    def create_button(self, image_name, x, y, width, height, command):
-        """Helper method to create buttons"""
-        if image_name not in self.images:
-            print(f"Warning: Image {image_name} not found")
-            return None
+    def create_button(self, btn_name, image_name, x, y, width, height, command):
+        """Helper method to create a button"""
+        self.images[btn_name] = PhotoImage(file=self.relative_to_assets(image_name))
             
         button = Button(
-            image=self.images[image_name], 
-            borderwidth=0, 
-            highlightthickness=0, 
-            command=command, 
+            image=self.images[btn_name],
+            borderwidth=0,
+            highlightthickness=0,
+            command=command,
             relief="flat"
         )
         
-        button.place(x=x, y=y, width=width, height=height)
+        button.place(
+            x=x,
+            y=y,
+            width=width,
+            height=height
+        )
         
-        button_name = image_name.replace(".png", "")
-        if button_name.startswith("btn_"):
-            setattr(self, button_name, button)
-            
+        # Store button references
+        setattr(self, btn_name, button)
+        
         return button
     
-    # Event handlers
-    def on_borrow_book_click(self):
-        print("btn_BorrowBook clicked")
-        # Implement borrow book functionality here
-    
-    def on_return_book_click(self):
-        print("btn_ReturnBook clicked")
-        # Implement return book functionality here
-    
-    def on_back_to_homepage_click(self):
+    def on_back_to_homepage_clicked(self):
+        """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
-        # Implement back to homepage functionality here
     
-    def on_pay_fine_click(self):
+    def on_return_book_clicked(self):
+        """Handle return book button click"""
+        print("btn_ReturnBook clicked")
+    
+    def on_borrow_book_clicked(self):
+        """Handle borrow book button click"""
+        print("btn_BorrowBook clicked")
+    
+    def on_pay_fine_clicked(self):
+        """Handle pay fine button click"""
         print("btn_PayFine clicked")
-        # Implement pay fine functionality here
 
-# Entry point
+
 if __name__ == "__main__":
     window = Tk()
     app = ReturnOverdueApp(window)
