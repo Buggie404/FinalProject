@@ -1,10 +1,16 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Button, PhotoImage, messagebox
 
 class Borrow1App:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data = None, receipt_id = None, assets_path=None):
         self.root = root
-        self.root.geometry("898x605")
+        self.user_data = user_data
+        if self.user_data:
+            self.user_id = self.user_data[0] # get user id from user data
+        else:
+            self.user_id = None
+        self.receipt_id = receipt_id
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
@@ -219,6 +225,54 @@ class Borrow1App:
     def on_search_clicked(self):
         """Handle Search button click event"""
         print("btn_Search clicked")
+
+        # Get user input
+        # Used logged-in account if any
+        if hasattr(self, 'user_id') and self.user_id:
+            user_id = self.user_id
+        else:
+            user_id = self.lnE_ID.get().strip()
+        
+        book_id = self.lnE_ISBN.get().strip()
+
+        # Import View and Controller
+        from Controller.test_borrowbook_controller import BorrowController
+        from View.noti_tab_view_1 import Message_1, Invalid, Print_Receipt
+        from View.BorrowReturnBook.Borrow2 import Borrow2App
+        from Model.book_model import Book
+
+        # Validate user and book
+        is_valid, user_data, book_data, error_messgae = BorrowController.validate_user_and_book(user_id, book_id)
+
+        # Check if user has reached borrowing limit
+        can_borrow, remaining = BorrowController.check_borrowing_limit(user_id)
+        if not can_borrow:
+            messagebox.showwarning("Borrow Limit Reach", f"You have reached your maximum borrow limit. You can borrow {remaining} more books.")
+            return
+
+        if not is_valid:
+            # Display error message
+            if "ID" in error_messgae:
+                Message_1(self.root, 'edit_pass_id')
+            else:
+                Message_1(self.root, 'edit_book_id')
+            return
+        
+        # If valid, switch to Borrow2 window
+        self.root.destroy()
+        borrowing_root = Tk()
+        borrowing = Borrow2App(borrowing_root)
+
+        # Set values in Borrow2
+        borrowing.lbl_ID.config(text = user_id)
+        borrowing.lbl_ISBN.config(text = book_id)
+
+        # Get and set available quantity
+        available_quantity = Book.get_quantity(book_id)
+        borrowing.lbl_AvailableQuantities.config(text = str(available_quantity))
+        borrowing_root.mainloop()
+        
+
 
 
 if __name__ == "__main__":

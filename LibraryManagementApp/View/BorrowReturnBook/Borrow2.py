@@ -254,6 +254,43 @@ class Borrow2App:
     def on_confirm_clicked(self):
         """Handle confirm button click"""
         print("btn_Confirm clicked")
+        
+        # Get requested quantity
+        requested_quantity_str = self.lnE_BorrowedNumber.get().strip()
+        available_quantity = int(self.lbl_AvailableQuantities.cget("text"))
+        
+        # Import controller and notification
+        import sys
+        import os
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        sys.path.append(parent_dir)
+        
+        from Controller.test_borrowbook_controller import BorrowController
+        from View.noti_tab_view_1 import Invalid, Print_Receipt
+        from Model.book_model import Book
+        
+        # Validate quantity format
+        try:
+            requested_quantity = int(requested_quantity_str)
+        except ValueError:
+            Invalid(self.root, "quantity")
+            return
+        
+        # Validate quantity against available books
+        if requested_quantity <= 0 or requested_quantity > available_quantity:
+            Invalid(self.root, "quantity")
+            return
+        
+        # Get book data for cart
+        book_data = Book.get_book_by_id(self.book_id)
+        
+        # Show Print_Receipt with book data and quantity
+        Print_Receipt(self.root, book_data, requested_quantity)
+        
+        # Show Print_Receipt with book data and quantity
+        Print_Receipt(self.root, book_data, requested_quantity)
+
 
 
 if __name__ == "__main__":

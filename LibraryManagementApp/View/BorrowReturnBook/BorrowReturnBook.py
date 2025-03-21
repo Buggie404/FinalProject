@@ -98,7 +98,7 @@ class BorrowReturnApp:
     def on_borrow_book_clicked(self):
         print("btn_BorrowBook clicked")
         self.root.destroy()
-        from Borrow1 import Borrow1App
+        from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow1_root = Tk()
         borrow1 = Borrow1App(borrow1_root)
         borrow1_root.mainloop()
