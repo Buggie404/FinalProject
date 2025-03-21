@@ -4,6 +4,8 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 import re
 import datetime
+import unidecode
+
 from Model.book_model import Book
 from Model.admin_model import Admin
 from View.noti_tab_view_1 import Delete, Message_1, Invalid
@@ -353,14 +355,14 @@ class add_book:
         isbn = isbn.strip()
         
         # Check for non-numeric characters
-        # if not isbn.isdigit():
-        #     return False, "ISBN must be a positive integer, no spaces, no leading zeros."
-        # Check for exactly 10 digits
+        if not isbn.isdigit():
+            return False, "ISBN must be a positive integer, no spaces."
+        #Check for exactly 10 digits
         if len(isbn) != 10:
             return False, "ISBN must be exactly 10 digits long."
         # Check for leading zeros
-        if isbn.startswith('0'):
-            return False, "ISBN must be a positive integer, no spaces, no leading zeros."
+        # if isbn.startswith('0'):
+        #     return False, "ISBN must be a positive integer, no spaces, no leading zeros."
         
         # Check if ISBN already exists
         if Book.get_book_by_id(isbn):
@@ -383,10 +385,42 @@ class add_book:
         add_book.field_validation_errors['title'] = not valid
         return valid, message
     
+    # @staticmethod
+    # def validate_title(title):
+    #     """
+    #     Validate book title
+        
+    #     Args:
+    #         title (str): Title to validate
+            
+    #     Returns:
+    #         tuple: (is_valid, error_message, formatted_title)
+    #     """
+    #     if not title or title.strip() == "":
+    #         return False, "Title cannot be empty.", ""
+        
+    #     # Check length
+    #     if len(title.strip()) < 2:
+    #         return False, "Length: 2 to 255 characters.", ""
+    #     if len(title.strip()) > 255:
+    #         return False, "Length: 2 to 255 characters.", ""
+        
+    #     # Remove extra spaces at beginning and end
+    #     formatted_title = title.strip()
+        
+    #     # Standardize multiple spaces to single space
+    #     formatted_title = re.sub(r'\s+', ' ', formatted_title)
+        
+    #     # Check for invalid special characters
+    #     allowed_pattern = r'^[a-zA-Z0-9\s\-_.,:"\'!?]+$'
+    #     if not re.match(allowed_pattern, formatted_title):
+    #         return False, "Special characters (@, #, $, %, *, etc.) are not allowed.", ""
+        
+    #     return True, "", formatted_title
     @staticmethod
     def validate_title(title):
         """
-        Validate book title
+        Validate book title with support for Vietnamese characters
         
         Args:
             title (str): Title to validate
@@ -409,9 +443,13 @@ class add_book:
         # Standardize multiple spaces to single space
         formatted_title = re.sub(r'\s+', ' ', formatted_title)
         
-        # Check for invalid special characters
+        # Convert to ASCII for validation but keep original for storage
+        ascii_title = unidecode.unidecode(formatted_title)
+        
+        # Define allowed characters (after conversion to ASCII)
+        # Allow letters, numbers, spaces, basic punctuation
         allowed_pattern = r'^[a-zA-Z0-9\s\-_.,:"\'!?]+$'
-        if not re.match(allowed_pattern, formatted_title):
+        if not re.match(allowed_pattern, ascii_title):
             return False, "Special characters (@, #, $, %, *, etc.) are not allowed.", ""
         
         return True, "", formatted_title
@@ -431,10 +469,47 @@ class add_book:
         add_book.field_validation_errors['author'] = not valid
         return valid, message
     
+    # @staticmethod
+    # def validate_author(author):
+    #     """
+    #     Validate book author
+        
+    #     Args:
+    #         author (str): Author to validate
+            
+    #     Returns:
+    #         tuple: (is_valid, error_message, formatted_author)
+    #     """
+    #     if not author or author.strip() == "":
+    #         return False, "Author cannot be empty.", ""
+        
+    #     # Check length
+    #     if len(author.strip()) < 2:
+    #         return False, "Length: 2 to 100 characters.", ""
+    #     if len(author.strip()) > 100:
+    #         return False, "Length: 2 to 100 characters.", ""
+        
+    #     # Remove extra spaces at beginning and end
+    #     author = author.strip()
+        
+    #     # Check for numbers
+    #     if re.search(r'\d', author):
+    #         return False, "Special characters (@, #, $, %, *, etc.) and numbers are not allowed.", ""
+        
+    #     # Check for allowed characters
+    #     allowed_pattern = r'^[a-zA-Z\s\-\.]+$'
+    #     if not re.match(allowed_pattern, author):
+    #         return False, "Only letters, spaces, hyphens (-), and periods (.) are allowed.", ""
+        
+    #     # Convert to Title Case
+    #     formatted_author = ' '.join(word.capitalize() for word in author.split())
+        
+    #     return True, "", formatted_author
+    
     @staticmethod
     def validate_author(author):
         """
-        Validate book author
+        Validate book author with support for Vietnamese characters
         
         Args:
             author (str): Author to validate
@@ -454,17 +529,22 @@ class add_book:
         # Remove extra spaces at beginning and end
         author = author.strip()
         
+        # Convert to ASCII for validation but keep original for storage
+        ascii_author = unidecode.unidecode(author)
+        
         # Check for numbers
-        if re.search(r'\d', author):
+        if re.search(r'\d', ascii_author):
             return False, "Special characters (@, #, $, %, *, etc.) and numbers are not allowed.", ""
         
-        # Check for allowed characters
+        # Check for allowed characters (after conversion to ASCII)
         allowed_pattern = r'^[a-zA-Z\s\-\.]+$'
-        if not re.match(allowed_pattern, author):
+        if not re.match(allowed_pattern, ascii_author):
             return False, "Only letters, spaces, hyphens (-), and periods (.) are allowed.", ""
         
-        # Convert to Title Case
-        formatted_author = ' '.join(word.capitalize() for word in author.split())
+        # Convert to Title Case (properly handling Vietnamese)
+        # First convert to lowercase then capitalize each word
+        words = author.lower().split()
+        formatted_author = ' '.join(word[0].upper() + word[1:] for word in words)
         
         return True, "", formatted_author
     
