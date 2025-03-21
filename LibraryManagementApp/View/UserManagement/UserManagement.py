@@ -352,40 +352,36 @@ class UserManagementApp:
             selected_item = selected_items[0]
             user_values = self.tbl_User.item(selected_item, 'values')
             
-    #         if not user_values:
-    #             messagebox.showinfo("Error", "No user data found.")
-    #             return
+            if not user_values:
+                messagebox.showinfo("Error", "No user data found.")
+                return
                 
-    #         user_id = user_values[0]  # First column is user_id
-    #         print(f"Attempting to delete user ID: {user_id}")
+            user_id = user_values[0]  # First column is user_id
+            print(f"Attempting to delete user ID: {user_id}")
 
-    #     # Define a direct callback function to handle deletion
-    # def confirm_delete_callback():
-    #     print(f"Executing delete callback for user ID: {user_id}")
-    #     try:
-    #         # Create admin and use its delete_user method
-    #         admin = Admin()
-    #         success = admin.delete_user(user_id)
+            # Define a direct callback function to handle deletion
+            def confirm_delete_callback():
+                print(f"Executing delete callback for user ID: {user_id}")
+                try:
+                    # Create admin and use its delete_user method
+                    admin = Admin()
+                    success = admin.delete_user(user_id)
 
-    #         if success:
-    #             print(f"Successfully deleted user ID: {user_id}")
-    #             # Remove from UI
-    #             self.tbl_User.delete(selected_item)
-    #             # Show success message
-    #             Message_1(self.root, "account")
-    #         else:
-    #             print(f"Failed to delete user ID: {user_id}")
-    #             messagebox.showerror("Error", "Failed to delete user")
-    #     except Exception as e:
-    #         print(f"Error during deletion: {e}")
-    #         messagebox.showerror("Error", f"Error: {str(e)}")
-    #     # Create delete confirmation dialog
-    #     delete_dialog = Delete(self.root, "account")
-    #     delete_dialog.set_yes_callback(confirm_delete_callback)
-    
-
-
-
+                    if success:
+                        print(f"Successfully deleted user ID: {user_id}")
+                        # Remove from UI
+                        self.tbl_User.delete(selected_item)
+                        # Show success message
+                        Message_1(self.root, "account")
+                    else:
+                        print(f"Failed to delete user ID: {user_id}")
+                        messagebox.showerror("Error", "Failed to delete user")
+                except Exception as e:
+                    print(f"Error during deletion: {e}")
+                    messagebox.showerror("Error", f"Error: {str(e)}")
+            # Create delete confirmation dialog
+            delete_dialog = Delete(self.root, "account")
+            delete_dialog.set_yes_callback(confirm_delete_callback) 
 
 
 
