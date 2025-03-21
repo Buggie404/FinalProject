@@ -252,7 +252,7 @@ class AccountManagement:
             self.root.destroy()
             from Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
+            homepage = HomepageApp(homepage_root, role=self.user_data[6], user_data=self.user_data)
             homepage_root.mainloop()
 
 
