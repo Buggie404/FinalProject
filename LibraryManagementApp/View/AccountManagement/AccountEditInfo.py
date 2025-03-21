@@ -14,7 +14,7 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
         self.root.resizable(False, False)
 
         # import controller that hndel Edit Account Information
-        from Controller.test_accountmmnt1 import AccountEditInfoController 
+        from Controller.account_management_controller import AccountEditInfoController 
         self.controller = AccountEditInfoController(user_id)
 
         # Set up asset paths
