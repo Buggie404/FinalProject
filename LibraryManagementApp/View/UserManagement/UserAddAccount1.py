@@ -1,15 +1,8 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-import sys
-import os
-
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(base_dir, "View"))
-sys.path.append(base_dir)
 
 class UserAddAccount1App:
     def __init__(self, root, assets_path=None):
-        # Initialize the main window
         self.root = root
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
@@ -22,8 +15,11 @@ class UserAddAccount1App:
             self.assets_path = Path(assets_path)
         else:
             self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameUserAddAccount1")
-
-        # Create canvas
+        
+        # Store image references to prevent garbage collection
+        self.images = {}
+        
+        # Setup UI components
         self.canvas = Canvas(
             self.root,
             bg="#FFFFFF",
@@ -35,19 +31,17 @@ class UserAddAccount1App:
         )
         self.canvas.place(x=0, y=0)
 
-        # Store images and UI elements as instance variables
-        self.images = {}
-        self.buttons = {}
-
-        # Build UI components
-        self.create_background()
+        # Create UI elements
+        self.create_main_content()
         self.create_sidebar()
-        self.create_main_panel()
-
-    def relative_to_assets(self, path):
-        """Helper function to get the absolute path to assets"""
+        self.create_buttons()
+        self.create_text_fields()
+        self.create_images()
+    
+    def relative_to_assets(self, path: str) -> Path:
+        """Convert relative asset path to absolute path"""
         return self.assets_path / Path(path)
-
+    
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Vẽ hình chữ nhật có bo góc."""
         # Bo góc trên bên trái
@@ -64,111 +58,137 @@ class UserAddAccount1App:
         # Phần thân của hình chữ nhật
         self.canvas.create_rectangle(x1 + radius, y1, x2 - radius, y2, fill=color, outline=color)
         self.canvas.create_rectangle(x1, y1 + radius, x2, y2 - radius, fill=color, outline=color)
-
-    def create_background(self):
-        """Tạo nền chính với bo góc"""
-        # Sidebar (không cần bo góc)
-        self.canvas.create_rectangle(
-            0.0, 0.0, 262.0, 605.0,
-            fill="#0A66C2", outline=""
-        )
-
-        # Hình chữ nhật lớn nằm ngang (bo góc)
-        self.create_rounded_rectangle(285.0, 59.0, 871.0, 547.0, radius=10, color="#F1F1F1")
-
-        # Inner content panel
-        self.tbl_AddAccount = self.canvas.create_rectangle(
-            338.0, 121.0, 817.0, 467.0,
-            fill="#D9D9D9", outline=""
-        )
-
+    
     def create_sidebar(self):
-        """Create the sidebar logo and buttons"""
-        # Load and place logo
-        self.load_image("image_1", (130.0, 74.0))
-
-        # Create sidebar buttons
-        self.create_button("btn_AddAccount", (0.0, 181.0, 262.0, 25.0))
-        self.create_button("btn_EditAccountPassword", (0.0, 219.0, 262.0, 25.0))
-        self.create_button("btn_BackToHomepage", (0.0, 563.0, 261.0, 25.0))
-
-    def create_main_panel(self):
-        """Create the main panel elements"""
-        # Load header image
-        self.load_image("image_2", (577.0, 93.0))
-
-        # Create action button
-        self.create_button("btn_Return", (421.0, 486.0, 313.0, 48.0))
-
-    def load_image(self, image_name, position):
-        """Load an image and place it on the canvas"""
-        self.images[image_name] = PhotoImage(
-            file=self.relative_to_assets(f"{image_name}.png")
+        """Create the blue sidebar and its content"""
+        self.canvas.create_rectangle(
+            0.0,
+            0.0,
+            262.0,
+            605.0,
+            fill="#0A66C2",
+            outline=""
         )
+        
+        # Add Logo
+        self.images["image_1"] = PhotoImage(file=self.relative_to_assets("image_1.png"))
         self.canvas.create_image(
-            position[0],
-            position[1],
-            image=self.images[image_name]
+            130.0,
+            74.0,
+            image=self.images["image_1"]
         )
-
-    def create_button(self, button_name, dimensions):
-        """Create a button with the given name and dimensions"""
-        self.images[button_name] = PhotoImage(
-            file=self.relative_to_assets(f"{button_name}.png")
+    
+    def create_main_content(self):
+        """Create the main content area with background"""
+        self.create_rounded_rectangle(
+            285.0,
+            39.0,
+            871.0,
+            567.0,
+            color="#F1F1F1",
+            radius=10
         )
-
+        
+        # Header image
+        self.images["image_2"] = PhotoImage(file=self.relative_to_assets("image_2.png"))
+        self.canvas.create_image(
+            577.0,
+            70.0,
+            image=self.images["image_2"]
+        )
+    
+    def create_text_fields(self):
+        """Create all text fields in the application"""
+        text_configs = [
+            (577.0, 107.0, "170", "#0A66C2", ("Montserrat Medium", 18 * -1), "lbl_UserID"),
+            (577.0, 175.0, "Adam Smith", "#0A66C2", ("Montserrat Medium", 18 * -1), "lbl_Name"),
+            (577.0, 244.0, "smitha0170", "#0A66C2", ("Montserrat Medium", 18 * -1), "lbl_Username"),
+            (577.0, 312.0, "smitha0170@user.libma", "#0A66C2", ("Montserrat Medium", 18 * -1), "lbl_Email"),
+            (577.0, 380.0, "User", "#0A66C2", ("Montserrat Medium", 18 * -1), "lbl_Role"),
+            (577.0, 448.0, "2005/12/30", "#0A66C2", ("Montserrat Medium", 18 * -1), "lbl_DateOfBirth")
+        ]
+        
+        for x, y, text, fill, font, field_name in text_configs:
+            text_field = self.canvas.create_text(
+                x, y,
+                anchor="nw",
+                text=text,
+                fill=fill,
+                font=font
+            )
+            
+            # Store text field references
+            setattr(self, field_name, text_field)
+    
+    def create_images(self):
+        """Create additional images in the UI"""
+        image_configs = [
+            ("image_3", "image_3.png", 367.0, 117.0),
+            ("image_4", "image_4.png", 382.0, 185.0),
+            ("image_5", "image_5.png", 402.0, 253.0),
+            ("image_6", "image_6.png", 375.0, 389.0),
+            ("image_7", "image_7.png", 412.0, 457.0),
+            ("image_8", "image_8.png", 381.0, 321.0)
+        ]
+        
+        for name, file, x, y in image_configs:
+            self.images[name] = PhotoImage(file=self.relative_to_assets(file))
+            self.canvas.create_image(x, y, image=self.images[name])
+    
+    def create_buttons(self):
+        """Create all buttons in the application"""
+        button_configs = [
+            ("btn_BackToHomepage", "btn_BackToHomepage.png", 0.0, 563.0, 261.0, 25.0, self.on_back_to_homepage_clicked),
+            ("btn_AddAccount", "btn_AddAccount.png", 0.0, 181.0, 262.0, 25.0, self.on_add_account_clicked),
+            ("btn_EditAccountPassword", "btn_EditAccountPassword.png", 0.0, 219.0, 262.0, 25.0, self.on_edit_account_password_clicked),
+            ("btn_Return", "btn_Return.png", 421.0, 501.0, 313.0, 48.0, self.on_return_clicked)
+        ]
+        
+        for btn_name, img_name, x, y, width, height, command in button_configs:
+            self.create_button(btn_name, img_name, x, y, width, height, command)
+    
+    def create_button(self, btn_name, image_name, x, y, width, height, command):
+        """Helper method to create a button"""
+        self.images[btn_name] = PhotoImage(file=self.relative_to_assets(image_name))
+            
         button = Button(
-            image=self.images[button_name],
+            image=self.images[btn_name],
             borderwidth=0,
             highlightthickness=0,
-            command=lambda b=button_name: self.button_click(b),
+            command=command,
             relief="flat"
         )
-
+        
         button.place(
-            x=dimensions[0],
-            y=dimensions[1],
-            width=dimensions[2],
-            height=dimensions[3]
+            x=x,
+            y=y,
+            width=width,
+            height=height
         )
-
-        self.buttons[button_name] = button
-
-    def button_click(self, button_name):
-        """Handle button click events"""
-        print(f"{button_name} clicked")
-
-        if button_name == "btn_AddAccount":
-            self.root.destroy()
-            from UserAddAccount import UserAddAccountApp
-            add_user_root = Tk()
-            add_user = UserAddAccountApp(add_user_root)
-            add_user_root.mainloop()
-        elif button_name == 'btn_EditAccountPassword':
-            self.root.destroy()
-            from UserEditAccount import UserEditAccountApp
-            edit_pass_root = Tk()
-            edit_pass = UserEditAccountApp(edit_pass_root)
-            edit_pass_root.mainloop()
-        elif button_name == "btn_Return":
-            self.root.destroy()
-            from UserManagement import UserManagementApp
-            user_management_root = Tk()
-            user_management = UserManagementApp(user_management_root)
-            user_management_root.mainloop()
-        else:
-            self.root.destroy()
-            from Homepage import HomepageApp
-            homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
-            homepage_root.mainloop()
-
-    def run(self):
-        """Start the application main loop"""
-        self.root.mainloop()
+        
+        # Store button references
+        setattr(self, btn_name, button)
+        
+        return button
+    
+    def on_back_to_homepage_clicked(self):
+        """Handle back to homepage button click"""
+        print("btn_BackToHomepage clicked")
+    
+    def on_add_account_clicked(self):
+        """Handle add account button click"""
+        print("btn_AddAccount clicked")
+    
+    def on_edit_account_password_clicked(self):
+        """Handle edit account password button click"""
+        print("btn_EditAccountPassword clicked")
+    
+    def on_return_clicked(self):
+        """Handle return button click"""
+        print("btn_Return clicked")
 
 
 if __name__ == "__main__":
-    root = Tk()
-    app = UserAddAccount1App(root)
-    app.run()
+    window = Tk()
+    app = UserAddAccount1App(window)
+    window.mainloop()
