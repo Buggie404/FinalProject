@@ -232,7 +232,7 @@ class AccountEditInfoController: # For Edit Account Information
         """Display the success view"""
         from View.AccountManagement.AccountEditInfo1 import AccountEditInfo1
         root = Tk()
-        app = AccountEditInfo1(root)
+        app = AccountEditInfo1(root, user_id=self.user_id)
         app.run()
     
     def show_failure_view(self):
