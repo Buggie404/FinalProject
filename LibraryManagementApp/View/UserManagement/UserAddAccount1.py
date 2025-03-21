@@ -1,12 +1,15 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+import sys
+import os
 
 class UserAddAccount1App:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_id=None, assets_path=None):
         self.root = root
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        self.user_id = user_id  # Store the user ID
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -37,6 +40,10 @@ class UserAddAccount1App:
         self.create_buttons()
         self.create_text_fields()
         self.create_images()
+
+        # Load user data if a user_id was provided
+        if self.user_id:
+            self.load_user_data()
     
     def relative_to_assets(self, path: str) -> Path:
         """Convert relative asset path to absolute path"""
@@ -174,19 +181,66 @@ class UserAddAccount1App:
     def on_back_to_homepage_clicked(self):
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
+        self.root.destroy()
+        parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append(parent_dir)
+        from Homepage import HomepageApp
+        homepage_root = Tk()
+        homepage = HomepageApp(homepage_root)
+        homepage_root.mainloop()
     
     def on_add_account_clicked(self):
         """Handle add account button click"""
         print("btn_AddAccount clicked")
+        self.root.destroy()
+        from UserAddAccount import UserAddAccountApp
+        add_user_root = Tk()
+        add_user = UserAddAccountApp(add_user_root)
+        add_user_root.mainloop()
     
     def on_edit_account_password_clicked(self):
         """Handle edit account password button click"""
         print("btn_EditAccountPassword clicked")
+        self.root.destroy()
+        from UserEditAccount import UserEditAccountApp
+        edit_pass_root = Tk()
+        edit_pass = UserEditAccountApp(edit_pass_root)
+        edit_pass_root.mainloop()
     
     def on_return_clicked(self):
         """Handle return button click"""
         print("btn_Return clicked")
-
+        self.root.destroy()
+        from UserManagement import UserManagementApp
+        add_user_root = Tk()
+        add_user = UserManagementApp(add_user_root)
+        add_user_root.mainloop()
+    
+    def load_user_data(self):
+        """Load user data from the database and update UI labels"""
+        # Import necessary modules
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from Model.user_model import User
+        
+        # Get user data
+        user_data = User.get_id(self.user_id)
+        
+        if user_data:
+            # Update labels with user data
+            # Print the user_data to debug what's being returned
+            print(f"User data from database: {user_data}")
+            
+            # Check the structure of user_data and extract fields accordingly
+            # Assuming user_data is a tuple with fields in order of the database columns:
+            user_id, name, username, email, password, date_of_birth, role = user_data
+            
+            # Update the text of the text fields
+            self.canvas.itemconfig(self.lbl_UserID, text=str(user_id))
+            self.canvas.itemconfig(self.lbl_Name, text=name)
+            self.canvas.itemconfig(self.lbl_Username, text=username)
+            self.canvas.itemconfig(self.lbl_Email, text=email)
+            self.canvas.itemconfig(self.lbl_Role, text=role)
+            self.canvas.itemconfig(self.lbl_DateOfBirth, text=date_of_birth)
 
 if __name__ == "__main__":
     window = Tk()

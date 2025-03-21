@@ -12,6 +12,7 @@ project_root = os.path.dirname(parent_dir)
 # Add project root to sys.path
 sys.path.append(project_root)
 from Controller.user_controller import add_account
+from Model.user_model import User
 
 class UserAddAccountApp:
     def __init__(self, root, assets_path=None):
@@ -167,42 +168,6 @@ class UserAddAccountApp:
             # Reset warning flag when user starts editing
             widget._shown_warning = False
 
-    # def on_input_field_focus_out(self, event):
-    #     """Restore placeholder text if field is empty and validate field content."""
-    #     widget = event.widget
-
-    #     # Define mapping of fields to their attributes
-    #     field_mapping = {
-    #         "lnE_Name": (self.name_placeholder, add_account.validate_name_on_event),
-    #         "lnE_Role": (self.role_placeholder, add_account.validate_role_on_event),
-    #         "lnE_DateOfBirth": (self.date_placeholder, add_account.validate_date_on_event)
-    #     }
-
-    #     # Identify which field triggered the event
-    #     for field_name, (placeholder, validation_func) in field_mapping.items():
-    #         if widget == self.entries[field_name]:
-    #             field_value = widget.get()
-
-    #             # Restore placeholder if empty
-    #             if not field_value:
-    #                 widget.insert(0, placeholder)
-    #                 widget.config(fg="grey")
-    #                 widget._shown_warning = False  # Reset warning flag when placeholder is restored
-    #                 return
-
-    #             # Validate field only if flag is not set
-    #             valid, message = validation_func(field_value)
-
-    #             if not valid:
-    #                 # Show warning only if not already shown
-    #                 if not widget._shown_warning:
-    #                     messagebox.showwarning(f"Invalid {field_name.split('_')[-1]}", message)
-    #                     widget._shown_warning = True  # Set flag to prevent duplicate warnings
-    #                 widget.focus_set()  # Keep focus on the widget
-    #             else:
-    #                 widget._shown_warning = False  # Reset flag if validation passes
-    #             break  # Exit loop after handling the matched field
-
     def on_input_field_focus_out(self, event):
         """Restore placeholder text if field is empty and validate field content."""
         widget = event.widget
@@ -335,11 +300,12 @@ class UserAddAccountApp:
             # Process the form if all validations pass
             success, message, user_data = add_account.process_user_form(name, role, date_of_birth)
 
+            # In UserAddAccount.py - Modify the button_click method (btn_Confirm section)
             if success:
                 self.root.destroy()
                 from UserAddAccount1 import UserAddAccount1App
                 user_management_root = Tk()
-                user_management = UserAddAccount1App(user_management_root)
+                user_management = UserAddAccount1App(user_management_root, user_data['user_id'])  # Pass user_id
                 user_management_root.mainloop()
             else:
                 messagebox.showerror("Error", message)
