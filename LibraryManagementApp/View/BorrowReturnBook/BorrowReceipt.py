@@ -2,15 +2,17 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 import sys
 import os
+import datetime
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 class BorrowReceiptApp:
-    def __init__(self, root, receipt_id = None, borrow_date = None, assets_path=None):
+    def __init__(self, root, receipt_id=None, borrow_date=None, return_deadline=None, assets_path=None):
         self.root = root
         self.receipt_id = receipt_id
         self.borrow_date = borrow_date
+        self.return_deadline = return_deadline  # Store the return deadline
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
@@ -67,13 +69,13 @@ class BorrowReceiptApp:
             # Get primary receipt data
             receipt_data = Receipt.get_receipt_by_id(self.receipt_id)
             print(f"Receipt data: {receipt_data}")
-            
+
             if not receipt_data:
                 # If receipt not found, use placeholders
                 print("Receipt not found, using placeholders")
                 self.create_text_fields_with_placeholders()
                 return
-            
+
             # Receipt_data structure: (receipt_id, user_id, book_id, borrow_date, return_date, status, borrowed_quantity)
             receipt_id = receipt_data[0]
             user_id = receipt_data[1]
@@ -81,12 +83,12 @@ class BorrowReceiptApp:
             borrow_date = receipt_data[3]
             return_date = receipt_data[4]
             status = receipt_data[5]
-            
+
             # Get borrowed_quantity - this might be at index 6
             borrowed_quantity = receipt_data[6] if len(receipt_data) > 6 else 1
-            
+
             print(f"Parsed receipt data: id={receipt_id}, user={user_id}, book={book_id}, qty={borrowed_quantity}")
-            
+
             # Get all related receipts (same user_id, same borrow_date)
             related_receipts = []
             if self.borrow_date:
@@ -95,24 +97,24 @@ class BorrowReceiptApp:
                 # If borrow_date wasn't provided, get it from the receipt
                 self.borrow_date = borrow_date
                 related_receipts = Receipt.get_related_receipts(user_id, borrow_date)
-                
+
             print(f"Found {len(related_receipts)} related receipts with same user_id and borrow_date")
-            
+
             # Initialize display_book_id variable
             display_book_id = book_id
-            
+
             # If we have multiple related receipts, handle as a multi-book receipt
             if len(related_receipts) > 1:
                 # For multiple books, display a comma-separated list of ISBNs
                 book_ids = [receipt[2] for receipt in related_receipts]
                 combined_book_ids = ", ".join(book_ids)
-                
+
                 # Truncate the combined book_ids if too long
                 if len(combined_book_ids) > 26:
                     display_book_id = combined_book_ids[:23] + "..."
                 else:
                     display_book_id = combined_book_ids
-                
+
                 # Calculate total quantity from related receipts
                 total_quantity = 0
                 for related_receipt in related_receipts:
@@ -120,7 +122,17 @@ class BorrowReceiptApp:
                     receipt_quantity = related_receipt[6] if len(related_receipt) > 6 else 1
                     total_quantity += receipt_quantity
                     print(f"Adding quantity {receipt_quantity} from receipt {related_receipt[0]}")
-                
+
+                # Use return_deadline if provided, otherwise calculate it
+                display_return_date = self.return_deadline
+                if not display_return_date and borrow_date:
+                    # Calculate return deadline (20 days after borrow_date)
+                    try:
+                        borrow_date_obj = datetime.datetime.strptime(borrow_date, '%Y-%m-%d')
+                        display_return_date = (borrow_date_obj + datetime.timedelta(days=20)).strftime('%Y-%m-%d')
+                    except ValueError:
+                        display_return_date = "N/A"
+
                 # Create text fields with multi-book receipt data
                 self.create_text_fields(
                     receipt_id=str(receipt_id),
@@ -128,9 +140,9 @@ class BorrowReceiptApp:
                     book_id=display_book_id,
                     quantity=str(total_quantity),
                     borrow_date=borrow_date,
-                    return_date=return_date
+                    return_date=display_return_date  # Use calculated return deadline
                 )
-                
+
                 # Display list of all borrowed books
                 self.display_multiple_books(related_receipts)
             else:
@@ -140,14 +152,24 @@ class BorrowReceiptApp:
                     display_book_id = book_id[:23] + "..."
                 else:
                     display_book_id = book_id
-                    
+
+                # Use return_deadline if provided, otherwise calculate it
+                display_return_date = self.return_deadline
+                if not display_return_date and borrow_date:
+                    # Calculate return deadline (20 days after borrow_date)
+                    try:
+                        borrow_date_obj = datetime.datetime.strptime(borrow_date, '%Y-%m-%d')
+                        display_return_date = (borrow_date_obj + datetime.timedelta(days=20)).strftime('%Y-%m-%d')
+                    except ValueError:
+                        display_return_date = "N/A"
+
                 self.create_text_fields(
                     receipt_id=str(receipt_id),
                     user_id=str(user_id),
                     book_id=display_book_id,
                     quantity=str(borrowed_quantity),
                     borrow_date=borrow_date,
-                    return_date=return_date
+                    return_date=display_return_date  # Use calculated return deadline
                 )
         except Exception as e:
             print(f"Error processing receipt data: {e}")
@@ -287,13 +309,17 @@ class BorrowReceiptApp:
 
     def create_text_fields_with_placeholders(self):
         """Create text fields with placeholder values (for backward compatibility)"""
+        # Calculate return deadline (20 days from today)
+        today = datetime.datetime.now()
+        return_deadline = (today + datetime.timedelta(days=20)).strftime('%Y-%m-%d')
+        
         self.create_text_fields(
             receipt_id="212",
             user_id="112",
             book_id="0123456789",
             quantity="1",
-            borrow_date="2025/03/21",
-            return_date="2025/03/25"
+            borrow_date=today.strftime('%Y-%m-%d'),
+            return_date=return_deadline
         )
 
     def display_multiple_books(self, related_receipts):
@@ -301,12 +327,13 @@ class BorrowReceiptApp:
         # Create a header for the book list
         y_position = 500  # Starting Y position for the list (adjust as needed)
 
-        # self.canvas.create_text(
-        #     400, y_position-30,
-        #     text="Books Borrowed:",
-        #     fill="#0A66C2",
-        #     font=("Montserrat Bold", 14*-1)
-        # )
+        self.canvas.create_text(
+            400, 
+            y_position-30,
+            text="Books Borrowed:",
+            fill="#0A66C2",
+            font=("Montserrat Bold", 14*-1)
+        )
 
         # Get book titles
         import sys
@@ -322,33 +349,34 @@ class BorrowReceiptApp:
                 # Receipt structure: (receipt_id, user_id, book_id, borrow_date, return_date, status, borrowed_quantity)
                 if len(receipt) >= 3:
                     book_id = receipt[2]  # book_id is at index 2
-                    
+
                     # Ensure we don't display "MULTIPLE" entries
                     if book_id.upper() == "MULTIPLE":
                         continue
-                    
+
                     if len(book_id) > 15:
                         display_book_id = book_id[:12] + "..."
                     else:
                         display_book_id = book_id
-                    # Check if borrowed_quantity is available at index 6
-                    # quantity = receipt[6] if len(receipt) > 6 else 1
                     
+                    # Check if borrowed_quantity is available at index 6
+                    quantity = receipt[6] if len(receipt) > 6 else 1
+
                     # Get book title
                     book_data = Book.get_book_by_id(book_id)
                     title = book_data[1] if book_data and len(book_data) > 1 else "Unknown Book"
-                    
-                    # # Truncate title if too long
-                    # display_title = title if len(title) < 25 else title[:22] + "..."
-                    
-                    # # Create text for each book
-                    # self.canvas.create_text(
-                    #     400,
-                    #     y_position + (i * 20),
-                    #     text=f"{book_id} - {display_title} (Qty: {quantity})",
-                    #     fill="#0A66C2",
-                    #     font=("Montserrat Medium", 12 * -1)
-                    # )
+
+                    # Truncate title if too long
+                    display_title = title if len(title) < 25 else title[:22] + "..."
+
+                    # Create text for each book
+                    self.canvas.create_text(
+                        400,
+                        y_position + (i * 20),
+                        text=f"{display_book_id} - {display_title} (Qty: {quantity})",
+                        fill="#0A66C2",
+                        font=("Montserrat Medium", 12 * -1)
+                    )
             except Exception as e:
                 print(f"Error displaying book {i}: {e}")
                 import traceback
@@ -390,24 +418,71 @@ class BorrowReceiptApp:
         # Store button references
         button_name = image_name.replace(".png", "")
         setattr(self, button_name, button)
-        
         return button
 
     def on_back_to_homepage_clicked(self):
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
+        try:
+            self.root.destroy()
+            # Import and create the homepage window
+            from tkinter import Tk
+            from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
+            homepage_root = Tk()
+            app = BorrowReturnApp(homepage_root)
+            homepage_root.mainloop()
+        except Exception as e:
+            print(f"Error navigating to homepage: {e}")
+            import traceback
+            traceback.print_exc()
 
     def on_return_book_clicked(self):
         """Handle return book button click"""
         print("btn_ReturnBook clicked")
+        try:
+            self.root.destroy()
+            # Import and create the return book window
+            from tkinter import Tk
+            from View.BorrowReturnBook.Return1 import Return1App
+            return_root = Tk()
+            app = Return1App(return_root)
+            return_root.mainloop()
+        except Exception as e:
+            print(f"Error navigating to return book: {e}")
+            import traceback
+            traceback.print_exc()
 
     def on_borrow_book_clicked(self):
         """Handle borrow book button click"""
         print("btn_BorrowBook clicked")
+        try:
+            self.root.destroy()
+            # Import and create the borrow book window
+            from tkinter import Tk
+            from View.BorrowReturnBook.Borrow1 import Borrow1App
+            borrow_root = Tk()
+            app = Borrow1App(borrow_root)
+            borrow_root.mainloop()
+        except Exception as e:
+            print(f"Error navigating to borrow book: {e}")
+            import traceback
+            traceback.print_exc()
 
     def on_back_clicked(self):
         """Handle back button click"""
         print("btn_Back clicked")
+        try:
+            self.root.destroy()
+            # Import and create the previous window (likely Borrow1)
+            from tkinter import Tk
+            from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
+            back_root = Tk()
+            app = BorrowReturnApp(back_root)
+            back_root.mainloop()
+        except Exception as e:
+            print(f"Error navigating back: {e}")
+            import traceback
+            traceback.print_exc()
 
 if __name__ == "__main__":
     window = Tk()

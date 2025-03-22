@@ -2,7 +2,7 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
-class BookEdit1App:
+class BookManagementApp:
     def __init__(self, root, assets_path=None):
         # Initialize the main window
         self.root = root
@@ -33,6 +33,7 @@ class BookEdit1App:
         # Store images as instance variables to prevent garbage collection
         self.images = {}
         self.entries = {}
+        self.buttons = {}
 
         # Build UI components
         self.create_background()
@@ -70,7 +71,7 @@ class BookEdit1App:
         )
 
         # Hình chữ nhật lớn nằm ngang (bo góc)
-        self.create_rounded_rectangle(291.0, 39.0, 877.0, 567.0, radius=10, color="#F1F1F1")
+        self.create_rounded_rectangle(285.0, 47.0, 871.0, 558.0, radius=10, color="#F1F1F1")
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -85,36 +86,32 @@ class BookEdit1App:
     def create_main_panel(self):
         """Create the main panel elements"""
         # Load title and icons
-        self.load_image("image_2", (583.0, 69.0))
-        self.load_image("image_3", (337.0, 124.0))
-        self.load_image("image_4", (337.0, 192.0))
-        self.load_image("image_5", (346.0, 260.0))
-        self.load_image("image_8", (381.0, 328.0))
-        self.load_image("image_6", (355.0, 396.0))
-        self.load_image("image_7", (353.0, 464.0))
+        self.load_image("image_2", (577.0, 70.0))
+        self.load_image("image_3", (336.0, 135.0))
+        self.load_image("image_4", (345.0, 212.0))
+        self.load_image("image_7", (380.0, 289.0))
+        self.load_image("image_5", (354.0, 366.0))
+        self.load_image("image_6", (352.0, 443.0))
 
         # Create save button
-        self.create_button("btn_Confirm", (425.0, 508.0, 313.0, 48.0))
+        self.create_button("btn_Confirm", (421.0, 498.0, 313.0, 48.0))
 
     def create_entry_fields(self):
         """Create the entry fields for book information"""
-        # ISBN Entry
-        self.create_entry_field("lnE_ISBN", (681.5, 124.0), (545.0, 100.0, 273.0, 46.0))
+        # First Entry (Title)
+        self.create_entry_field("lnE_Title", (679.5, 136.0), (543.0, 112.0, 273.0, 46.0))
 
-        # Title Entry
-        self.create_entry_field("lnE_Title", (681.5, 192.0), (545.0, 168.0, 273.0, 46.0))
+        # Second Entry (Author)
+        self.create_entry_field("lnE_Author", (679.5, 213.0), (543.0, 189.0, 273.0, 46.0))
 
-        # Author Entry
-        self.create_entry_field("lnE_Author", (681.5, 260.0), (545.0, 236.0, 273.0, 46.0))
+        # Third Entry (PublishedYear)
+        self.create_entry_field("lnE_PublishedYear", (679.5, 290.0), (543.0, 266.0, 273.0, 46.0))
 
-        # Year Entry
-        self.create_entry_field("lnE_PublishedYear", (681.5, 328.0), (545.0, 304.0, 273.0, 46.0))
+        # Fourth Entry (Category)
+        self.create_entry_field("lnE_Category", (679.5, 367.0), (543.0, 343.0, 273.0, 46.0))
 
-        # Category Entry
-        self.create_entry_field("lnE_Category", (681.5, 396.0), (545.0, 372.0, 273.0, 46.0))
-
-        # Quantity Entry
-        self.create_entry_field("lnE_Quantity", (681.5, 464.0), (545.0, 440.0, 273.0, 46.0))
+        # Fifth Entry (Quantity)
+        self.create_entry_field("lnE_Quantity", (679.5, 444.0), (543.0, 420.0, 273.0, 46.0))
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -148,16 +145,19 @@ class BookEdit1App:
             height=dimensions[3]
         )
 
+        # Store button widget in dictionary
+        self.buttons[button_name] = button
+
     def create_entry_field(self, entry_name, bg_position, dimensions):
         """Create an entry field with background image"""
         # Create entry background image
-        self.images[entry_name] = PhotoImage(
+        self.images[f"{entry_name}_bg"] = PhotoImage(
             file=self.relative_to_assets(f"{entry_name}.png")
         )
         self.canvas.create_image(
             bg_position[0],
             bg_position[1],
-            image=self.images[entry_name]
+            image=self.images[f"{entry_name}_bg"]
         )
 
         # Create entry widget
@@ -188,5 +188,5 @@ class BookEdit1App:
 
 if __name__ == "__main__":
     window = Tk()
-    app = BookEdit1App(window)
+    app = BookManagementApp(window)
     app.run()

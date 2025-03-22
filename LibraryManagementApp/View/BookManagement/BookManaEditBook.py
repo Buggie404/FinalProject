@@ -1,12 +1,15 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from Controller.book_edit_controller import BookEditController
+from Model.book_model import Book  
+from View.noti_tab_view_1 import Invalid
 
 
 class BookManaEditBook:
     def __init__(self, root, assets_path=None):
         # Initialize the main window
         self.root = root
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
@@ -94,6 +97,10 @@ class BookManaEditBook:
         # Create search button
         self.create_button("btn_Search", (421.0, 181.0, 313.0, 48.0))
 
+        # Bind search button to search function
+        if "btn_Search" in self.buttons:
+            self.buttons["btn_Search"].config(command=self.search_book)
+
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
         self.images[image_name] = PhotoImage(
@@ -158,13 +165,53 @@ class BookManaEditBook:
 
         self.entries[entry_name] = entry
 
+    # def button_click(self, button_name):
+    #     """Handle button click events"""
+    #     print(f"{button_name} clicked")
+
+    # def run(self):
+    #     """Start the application main loop"""
+    #     self.root.mainloop()
+    
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
-
-    def run(self):
-        """Start the application main loop"""
-        self.root.mainloop()
+        
+        if button_name == "btn_BackToHomepage":
+            self.root.destroy()
+            from View.Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
+    
+    def search_book(self):
+        """Search for a book by ISBN and open edit screen if found"""
+        if 'lnE_ISBN' not in self.entries:
+            print("Error: ISBN entry field not found")
+            return
+            
+        isbn = self.entries['lnE_ISBN'].get().strip()
+        
+        # Validate ISBN format
+        if not isbn.isdigit() or len(isbn) != 13:
+            Invalid(self.root, 'Input')
+            return
+            
+        # Try to find the book
+        book = Book.get_book_by_id(isbn)
+        
+        if not book:
+            Invalid(self.root, 'search_book')
+            return
+            
+        # Book found, navigate to edit screen
+        self.root.destroy()
+        
+        # Create new edit screen
+        edit_root = Tk()
+        from View.BookManagement.BookManaEditBook1 import BookEdit1App
+        edit_app = BookEdit1App(edit_root, book_data=book)
+        edit_root.mainloop()
 
 
 if __name__ == "__main__":

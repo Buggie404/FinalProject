@@ -17,17 +17,20 @@ project_root = os.path.dirname(parent_dir)
 sys.path.append(project_root)
 
 # Now import using the package path
-from Controller.book_management_controller import DeleteBook
+from Controller.book_management_controller import DeleteBook, SearchBooks 
 
 class BookManagementApp:
     def __init__(self, root, assets_path=None, admin_user=None, role=None):
         # Initialize the main window
         self.root = root
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.admin_user = admin_user
         self.role = role
+
+        # Track active category filter
+        self.active_category = None
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -65,6 +68,9 @@ class BookManagementApp:
         # Load book data into the table
         self.load_book()
 
+        # Set up search and filter functionality AFTER table is created and data is loaded
+        self.setup_search_and_filter()
+
         # Update UI based on user role
         self.update_ui_based_on_role()
 
@@ -74,6 +80,18 @@ class BookManagementApp:
         # Set admin user in the controller
         if self.admin_user:
             self.controller.set_admin(self.admin_user)
+
+    def setup_search_and_filter(self):
+        """Set up search and filter functionality after table is created"""
+        # Bind search entry to Enter key
+        self.entries["lnE_SearchBook"].bind("<Return>", lambda event: self.search_books())
+
+        # Bind category buttons to toggle_category_filter
+        self.buttons["btn_Fiction"].config(command=lambda: self.toggle_category_filter("Fiction"))
+        self.buttons["btn_Fantasy"].config(command=lambda: self.toggle_category_filter("Fantasy"))
+        self.buttons["btn_Romance"].config(command=lambda: self.toggle_category_filter("Romance"))
+        self.buttons["btn_Technology"].config(command=lambda: self.toggle_category_filter("Technology"))
+        self.buttons["btn_Biography"].config(command=lambda: self.toggle_category_filter("Biography"))
 
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
@@ -208,6 +226,16 @@ class BookManagementApp:
                 selected_item = selected_items[0]
                 print(f"Deleting book: {self.tbl_Book.item(selected_item, 'values')}")
                 self.tbl_Book.delete(selected_item)
+        elif button_name == "btn_Fiction":
+            self.toggle_category_filter("Fiction")
+        elif button_name == "btn_Fantasy":
+            self.toggle_category_filter("Fantasy")
+        elif button_name == "btn_Romance":
+            self.toggle_category_filter("Romance")
+        elif button_name == "btn_Technology":
+            self.toggle_category_filter("Technology")
+        elif button_name == "btn_Biography":
+            self.toggle_category_filter("Biography")
 
         if button_name == "btn_AddBook":
             self.root.destroy()
@@ -229,10 +257,111 @@ class BookManagementApp:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role = self.admin_user)
             homepage.mainloop()
+            
+    def toggle_category_filter(self, category):
+        """Toggle filter by category - if same category clicked twice, show all books"""
+        try:
+            print(f"Toggle category: {category}, current active: {self.active_category}")
+            
+            if self.active_category == category:
+                # If the same category is clicked again, clear filter and show all books
+                print(f"Clearing filter for category: {category}")
+                self.active_category = None
+                self.load_book()  # Reset to show all books
+                
+                # Reset visual indicators for all category buttons
+                self.reset_category_button_styles()
+            else:
+                # Filter by the selected category
+                print(f"Setting filter to category: {category}")
+                self.active_category = category
+                self.filter_by_category(category)
+                
+                # Highlight the active category button
+                self.highlight_active_category_button(category)
+        except Exception as e:
+            print(f"Error in toggle_category_filter: {str(e)}")
+            import traceback
+            traceback.print_exc()
 
-    def run(self):
-        """Start the application main loop"""
-        self.root.mainloop()
+    def reset_category_button_styles(self):
+        """Reset the visual styles of all category buttons"""
+        # This is a placeholder for visual feedback - you might want to 
+        # implement actual visual changes to indicate active/inactive state
+        category_buttons = ["btn_Fiction", "btn_Fantasy", "btn_Romance", 
+                           "btn_Technology", "btn_Biography"]
+        
+        for btn_name in category_buttons:
+            # Reset button appearance to default
+            # You might need to implement this based on your UI design
+            print(f"Resetting button style: {btn_name}")
+            # Example: self.buttons[btn_name].config(bg="#default_color")
+
+    def highlight_active_category_button(self, active_category):
+        """Highlight the active category button"""
+        # This is a placeholder for visual feedback - you might want to 
+        # implement actual visual changes to indicate active state
+        category_to_button = {
+            "Fiction": "btn_Fiction",
+            "Fantasy": "btn_Fantasy",
+            "Romance": "btn_Romance",
+            "Technology": "btn_Technology",
+            "Biography": "btn_Biography"
+        }
+        
+        # Reset all buttons first
+        self.reset_category_button_styles()
+        
+        # Highlight the active button
+        btn_name = category_to_button.get(active_category)
+        if btn_name:
+            print(f"Highlighting button: {btn_name}")
+            # Example: self.buttons[btn_name].config(bg="#highlight_color")
+
+    def search_books(self):
+        """Search books by ISBN or title"""
+        search_term = self.entries["lnE_SearchBook"].get()
+        
+        # Clear active category when performing a search
+        self.active_category = None
+        self.reset_category_button_styles()
+        
+        try:
+            # Call the controller's filter_books method
+            from Controller.book_management_controller import SearchBooks
+            SearchBooks.filter_books(
+                self.tbl_Book,    # The Treeview widget
+                search_term,      # The search term
+                self.load_book,   # The function to reload all books
+                self.root         # Pass the root window for notifications
+            )
+        except Exception as e:
+            print(f"Error while searching books: {e}")
+            # Reload all books if searching fails
+            self.load_book()
+
+    def filter_by_category(self, category):
+        """Filter books by category"""
+        try:
+            # Call the controller's filter_by_category method
+            from Controller.book_management_controller import SearchBooks
+            SearchBooks.filter_by_category(
+                self.tbl_Book,    # The Treeview widget
+                category,         # The category to filter by
+                self.load_book,   # The function to reload all books
+                self.root         # Pass the root window for notifications
+            )
+        except Exception as e:
+            print(f"Error while filtering books by category: {e}")
+            # Reload all books if filtering fails
+            self.load_book()
+            # Reset active category on error
+            self.active_category = None
+            self.reset_category_button_styles()
+
+    # def run(self):
+    #     """Start the application main loop"""
+    #     self.root.mainloop()
     
     def create_book_table(self):
        """Create the user table using ttk.Treeview"""
@@ -346,6 +475,9 @@ class BookManagementApp:
         except Exception as e:
             print(f"Error loading user data: {e}")
             return False
+    def run(self):
+        """Start the application main loop"""
+        self.root.mainloop()
 
 if __name__ == "__main__":
     root = Tk()

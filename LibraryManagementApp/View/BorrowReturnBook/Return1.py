@@ -213,12 +213,7 @@ class Return1App:
         homepage_root = Tk()
         homepage = HomepageApp(homepage_root)
         homepage_root.mainloop()
-    
-    # def on_search_click(self):
-    #     print("btn_Search clicked")
-        # Implement search functionality here
-        # receipt_id = self.lnE_ReceiptID.get()
-        # print(f"Searching for receipt ID: {receipt_id}")
+
     def on_search_click(self):
         receipt_id = self.lnE_ReceiptID.get()
 
@@ -228,7 +223,7 @@ class Return1App:
     
     # Kiểm tra receipt trong database
         from Model.receipt_model import Receipt
-        receipt_data = Receipt.get_receipt_by_id(receipt_id)
+        receipt_data = Receipt.get_single_receipt_by_id(receipt_id)
 
         if not receipt_data:
             messagebox.showerror("Error", "Receipt not found!")
