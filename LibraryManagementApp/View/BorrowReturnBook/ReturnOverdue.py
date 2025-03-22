@@ -6,12 +6,13 @@ parent_dir = os.path.dirname(current_dir)
 project_root = os.path.dirname(parent_dir)
 sys.path.append(project_root)
 class ReturnOverdueApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, receipt_id=None, assets_path=None):
         self.root = root
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
-
+        self.receipt_id = receipt_id
+        
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
         if assets_path:
@@ -207,6 +208,17 @@ class ReturnOverdueApp:
         homepage = HomepageApp(homepage_root)
         homepage_root.mainloop()
         
+    def load_due_and_fine_data(self):
+        from Controller.return_controller import ReturnOverdueController
+        if not self.receipt_id:
+            print("Không có receipt_id!")
+            return
+
+        total_due_books, total_fine = ReturnOverdueController.calculate_due_and_fine(self.receipt_id)
+        self.canvas.itemconfigure(self.lbl_Quantity, text=str(total_due_books))
+        self.canvas.itemconfigure(self.lbl_Amount, text=f"{total_fine:,} VND")
+
+
 if __name__ == "__main__":
     window = Tk()
     app = ReturnOverdueApp(window)
