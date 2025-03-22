@@ -1,7 +1,6 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Button, PhotoImage
 
-
 class Borrow2App:
     def __init__(self, root, book_id=None, assets_path=None):
         self.root = root
@@ -74,11 +73,9 @@ class Borrow2App:
         # Bo góc trên bên phải
         self.canvas.create_arc(x2 - 2 * radius, y1, x2, y1 + 2 * radius, start=0, extent=90, fill=color, outline=color)
         # Bo góc dưới bên trái
-        self.canvas.create_arc(x1, y2 - 2 * radius, x1 + 2 * radius, y2, start=180, extent=90, fill=color,
-                               outline=color)
+        self.canvas.create_arc(x1, y2 - 2 * radius, x1 + 2 * radius, y2, start=180, extent=90, fill=color, outline=color)
         # Bo góc dưới bên phải
-        self.canvas.create_arc(x2 - 2 * radius, y2 - 2 * radius, x2, y2, start=270, extent=90, fill=color,
-                               outline=color)
+        self.canvas.create_arc(x2 - 2 * radius, y2 - 2 * radius, x2, y2, start=270, extent=90, fill=color, outline=color)
 
         # Phần thân của hình chữ nhật
         self.canvas.create_rectangle(x1 + radius, y1, x2 - radius, y2, fill=color, outline=color)
@@ -132,7 +129,9 @@ class Borrow2App:
         ]:
             if img_name in self.images:
                 self.canvas.create_image(
-                    x, y, image=self.images[img_name]
+                    x,
+                    y,
+                    image=self.images[img_name]
                 )
 
         # Text fields
@@ -142,7 +141,7 @@ class Borrow2App:
             anchor="nw",
             text="000",
             fill="#0A66C2",
-            font=("Montserrat Medium", 18 * -1)
+            font=("Montserrat Medium", 18*-1)
         )
 
         self.lbl_ISBN = self.canvas.create_text(
@@ -151,7 +150,7 @@ class Borrow2App:
             anchor="nw",
             text="123456789",
             fill="#0A66C2",
-            font=("Montserrat Medium", 18 * -1)
+            font=("Montserrat Medium", 18*-1)
         )
 
         self.lbl_AvailableQuantities = self.canvas.create_text(
@@ -160,7 +159,7 @@ class Borrow2App:
             anchor="nw",
             text="0",
             fill="#0A66C2",
-            font=("Montserrat Medium", 18 * -1)
+            font=("Montserrat Medium", 18*-1)
         )
 
         # Create entry field
@@ -199,7 +198,6 @@ class Borrow2App:
 
         # Store entry reference
         self.lnE_BorrowedNumber = entry
-
         return entry
 
     def create_buttons(self):
@@ -238,7 +236,6 @@ class Borrow2App:
         # Store button references
         button_name = image_name.replace(".png", "")
         setattr(self, button_name, button)
-
         return button
 
     def on_back_to_homepage_clicked(self):
@@ -260,6 +257,7 @@ class Borrow2App:
         # Get requested quantity
         requested_quantity_str = self.lnE_BorrowedNumber.get().strip()
         available_quantity = int(self.canvas.itemcget(self.lbl_AvailableQuantities, "text"))
+        user_id = self.canvas.itemcget(self.lbl_ID, "text")
 
         # Import controller and notification
         import sys
@@ -268,7 +266,7 @@ class Borrow2App:
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(parent_dir)
 
-        from Controller.test_borrowbook_controller import BorrowController
+        from Controller.test_borrowbook_controller import BorrowController, BorrowingCart
         from View.noti_tab_view_1 import Invalid, Print_Receipt
         from Model.book_model import Book
 
@@ -280,8 +278,27 @@ class Borrow2App:
             return
 
         # Validate quantity against available books
-        if requested_quantity <= 0 or requested_quantity > available_quantity:
+        is_valid, error_message = BorrowController.validate_quantity(requested_quantity, available_quantity)
+        if not is_valid:
             Invalid(self.root, "quantity")
+            return
+
+        # Check borrowing limit
+        cart = BorrowingCart.get_instance()
+        can_borrow, remaining, total_borrowed = BorrowController.check_borrowing_limit(
+            user_id, 
+            requested_quantity
+        )
+
+        if not can_borrow:
+            from tkinter import messagebox
+            messagebox.showwarning(
+                "Borrowing Limit Exceeded",
+                f"You cannot borrow {requested_quantity} more books.\n"
+                f"You currently have {total_borrowed} books borrowed.\n"
+                f"Your limit is {BorrowController.MAX_TOTAL_BOOKS} books in total.\n"
+                f"You can borrow up to {remaining} more books."
+            )
             return
 
         # Get book data for cart
@@ -289,7 +306,6 @@ class Borrow2App:
 
         # Show Print_Receipt with book data and quantity
         Print_Receipt(self.root, book_data, requested_quantity)
-
 
 if __name__ == "__main__":
     window = Tk()
