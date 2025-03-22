@@ -6,7 +6,7 @@ class BookManagementApp:
     def __init__(self, root, assets_path=None):
         # Initialize the main window
         self.root = root
-        self.root.geometry("898x605+0+0")
+        self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
@@ -44,7 +44,7 @@ class BookManagementApp:
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
         return self.assets_path / Path(path)
-    
+
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Vẽ hình chữ nhật có bo góc."""
         # Bo góc trên bên trái
@@ -98,14 +98,14 @@ class BookManagementApp:
 
     def create_entry_fields(self):
         """Create the entry fields for book information"""
-        # First Entry (ISBN)
-        self.create_entry_field("lnE_ISBN", (679.5, 136.0), (543.0, 112.0, 273.0, 46.0))
+        # First Entry (Title)
+        self.create_entry_field("lnE_Title", (679.5, 136.0), (543.0, 112.0, 273.0, 46.0))
 
-        # Second Entry (Title)
-        self.create_entry_field("lnE_Title", (679.5, 213.0), (543.0, 189.0, 273.0, 46.0))
+        # Second Entry (Author)
+        self.create_entry_field("lnE_Author", (679.5, 213.0), (543.0, 189.0, 273.0, 46.0))
 
-        # Third Entry (Author)
-        self.create_entry_field("lnE_Author", (679.5, 290.0), (543.0, 266.0, 273.0, 46.0))
+        # Third Entry (PublishedYear)
+        self.create_entry_field("lnE_PublishedYear", (679.5, 290.0), (543.0, 266.0, 273.0, 46.0))
 
         # Fourth Entry (Category)
         self.create_entry_field("lnE_Category", (679.5, 367.0), (543.0, 343.0, 273.0, 46.0))
