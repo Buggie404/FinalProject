@@ -189,22 +189,25 @@ class UserEditAccountApp:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
-
-        # Specific button actions can be added here
-        if button_name == "button_4":
-            self.update_user_info()
-        elif button_name == "button_1":
-            self.go_back_to_homepage()
-
-    def update_user_info(self):
-        """Handle updating the user information"""
-        print("Updating user information...")
-        # Code to update user information in a database would go here
-
-    def go_back_to_homepage(self):
-        """Navigate back to homepage"""
-        print("Navigating back to homepage...")
-        # Code to navigate back to homepage would go here
+        if button_name == "btn_AddAccount":
+            # Nothing happens
+            pass
+        elif button_name == "btn_EditAccountPassword":
+            # Switch back to first Edit Account Password
+            from tkinter import Tk
+            from View.UserManagement.UserEditAccount import UserEditAccountApp
+            self.root.destroy()
+            reset_root = Tk()
+            reset = UserEditAccountApp(reset_root)
+            reset_root.mainloop()
+        elif button_name == "btn_BackToHomepage":
+            # Switch back to Homepage
+            self.root.destroy()
+            # Import and create Homepage window here
+        elif button_name == "btn_ResetPassword":
+            # This will be handled by the controller via the command we set
+            # when switching to this window
+            pass
 
     def run(self):
         """Start the application main loop"""

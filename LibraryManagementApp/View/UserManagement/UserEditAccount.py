@@ -3,9 +3,11 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
 class UserEditAccountApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data = None, role = None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.role = role
+        self.user_data = user_data
         self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
@@ -161,17 +163,25 @@ class UserEditAccountApp:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
-
-    #     # Update password functionality
-    #     if button_name == "btn_Search":
-    #         self.update_password()
-    #
-    # def update_password(self):
-    #     """Handle updating the password"""
-    #     new_password = self.entries["lnE_InputID"].get()
-    #     print(f"Updating password to: {new_password}")
-
-        # Here you would add code to update the password in a database or file
+        if button_name == "btn_AddAccount":
+        # Switch to Add Account
+            pass
+        if button_name == "btn_EditAccountPassword":
+            # Switch back to User Management
+            pass
+        if button_name == "btn_BackToHomepage":
+            # Switch to Homepage
+            pass
+        elif button_name == "btn_Search":
+            # Get user ID from input field
+            user_id = self.entries["lnE_InputID"].get().strip()
+            
+            # Create controller instance
+            from Controller.test_resetpass_controller import ResetPasswordController
+            controller = ResetPasswordController()
+            
+            # The controller will handle validation and notifications
+            controller.switch_to_user_edit_account1(self.root, user_id)
 
     def run(self):
         """Start the application main loop"""

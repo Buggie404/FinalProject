@@ -173,7 +173,7 @@ class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id forma
 
 
 class Drop_Off():
-    def __init__(self, root, receipt_status):
+    def __init__(self, root, receipt_status, receipt_id=None):
         # Config Notification tab
         self.root = root
         self.status = receipt_status
@@ -182,7 +182,7 @@ class Drop_Off():
         self.delete_noti.geometry("400x200")
         self.delete_noti.resizable(False, False)
         self.delete_noti.config(bg='white')
-
+        self.receipt_id = receipt_id 
 
         # Title Label
         Label(self.delete_noti, text="Drop Off Successfully!", font=('Montserrat', 18, 'bold'), bg='white',
@@ -211,7 +211,7 @@ class Drop_Off():
         self.root.destroy()
         from View.BorrowReturnBook.ReturnOverdue import ReturnOverdueApp
         overdue_root = Tk()
-        overdue = ReturnOverdueApp(overdue_root)
+        overdue = ReturnOverdueApp(overdue_root, receipt_id = self.receipt_id)
         overdue_root.mainloop()
 
 

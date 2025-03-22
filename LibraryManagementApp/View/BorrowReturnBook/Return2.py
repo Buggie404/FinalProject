@@ -246,31 +246,62 @@ class Return2App:
         from Controller.return_controller import ReturnController
         from View.noti_tab_view_1 import Drop_Off
         from tkinter import messagebox
+        from datetime import datetime, timedelta
+        import traceback
 
         print("btn_DropOff clicked")
+        
+        try:
+            # Get the current date for database update
+            current_date = datetime.now()
+            formatted_return_date = current_date.strftime("%Y-%m-%d")
+            
+            # Get the book_id from the UI
+            book_id = self.canvas.itemcget(self.lbl_ISBN, "text")
+            
+            # Compare current date with return deadline to determine status
+            if hasattr(self, 'return_deadline'):
+                if current_date.date() <= self.return_deadline.date():
+                    receipt_status = "Returned"
+                else:
+                    receipt_status = "Overdue"
+            else:
+                # Fallback if return_deadline is not set
+                receipt_status = "Returned"
+            
+            # Update return_date and status in database ONLY
+            from Model.receipt_model import Receipt
+            success = Receipt.update_return_status(self.receipt_id, formatted_return_date, receipt_status)
+            
+            if not success:
+                messagebox.showerror("Error", "Database update failed!")
+                return
+            
+            # Update book quantity in database
+            from Model.book_model import Book
+            Book.update_book_quantity_after_return(book_id, 1)
+            
+            # IMPORTANT: Do NOT update the UI display for return_date
+            # The UI should continue showing the original return deadline
+            
+            # Display Drop Off notification
+            drop_off_window = Drop_Off(self.root, receipt_status, self.receipt_id)
+            
+            # Wait for popup to close before continuing
+            self.root.wait_window(drop_off_window.delete_noti)
+            
+            # Handle next steps based on receipt status
+            if receipt_status == "Overdue":
+                drop_off_window.pay_overdue_fine()
+            else:
+                drop_off_window.switch_to_return()
+                
+        except Exception as e:
+            print(f"Error in on_drop_off_clicked: {e}")
+            traceback.print_exc()
+            messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
-        # Gọi controller xử lý
-        success, receipt_status, message = ReturnController.process_return(self.receipt_id)
 
-        if not success:
-            messagebox.showerror("Error", message)
-            return
-
-        # Cập nhật giao diện ReturnDate
-        current_date_str = datetime.now().strftime("%Y/%m/%d")
-        self.canvas.itemconfigure(self.lbl_ReturnDate, text=current_date_str)
-
-        # Hiển thị thông báo Drop Off
-        drop_off_window = Drop_Off(self.root, receipt_status)
-
-        # Chờ popup đóng xong mới tiếp tục
-        self.root.wait_window(drop_off_window.delete_noti)
-
-        # Xử lý tiếp sau khi đóng popup
-        if receipt_status == "Overdue":
-            drop_off_window.pay_overdue_fine()
-        else:
-            drop_off_window.switch_to_return()
 
         # Load receipt data from database
     def load_receipt_data(self):
@@ -278,13 +309,14 @@ class Return2App:
         if not self.receipt_id:
             print("No receipt ID provided")
             return
-        
+
         from Model.receipt_model import Receipt
         # Get receipt data from database
         receipt_data = Receipt.get_single_receipt_by_id(self.receipt_id)
 
         if not receipt_data:
             print(f"No receipt found with ID: {self.receipt_id}")
+            messagebox.showerror("Error", f"No receipt found with ID: {self.receipt_id}")
             return
 
         print(f"Loaded receipt data: {receipt_data}")
@@ -294,20 +326,27 @@ class Return2App:
         self.canvas.itemconfigure(self.lbl_ReceiptID, text=str(receipt_data[0]))  # receipt_id
         self.canvas.itemconfigure(self.lbl_UserID, text=str(receipt_data[1]))     # user_id
         self.canvas.itemconfigure(self.lbl_ISBN, text=str(receipt_data[2]))       # book_id (ISBN)
-        
-
 
         # For quantity - check if it exists in the data
         if len(receipt_data) > 6 and receipt_data[6] is not None:
             self.canvas.itemconfigure(self.lbl_Quantity, text=str(receipt_data[6]))
         else:
             self.canvas.itemconfigure(self.lbl_Quantity, text="1")  # Default quantity
+            
         # Ngày mượn sách
         if receipt_data[3]:
             borrow_date_obj = receipt_data[3]
             if isinstance(borrow_date_obj, str):
-                borrow_date_obj = datetime.strptime(borrow_date_obj, "%Y-%m-%d")
-
+                try:
+                    borrow_date_obj = datetime.strptime(borrow_date_obj, "%Y-%m-%d")
+                except ValueError:
+                    try:
+                        borrow_date_obj = datetime.strptime(borrow_date_obj, "%Y/%m/%d")
+                    except ValueError:
+                        print(f"Invalid borrow date format: {borrow_date_obj}")
+                        return
+                        
+            # Format and display borrow date
             borrow_date_str = borrow_date_obj.strftime("%Y/%m/%d")
             self.canvas.itemconfigure(self.lbl_BorrowDate, text=borrow_date_str)
 
@@ -317,6 +356,7 @@ class Return2App:
 
             # Hiển thị deadline vào lbl_ReturnDate
             self.canvas.itemconfigure(self.lbl_ReturnDate, text=return_deadline_str)
+
 
 
 if __name__ == "__main__":
