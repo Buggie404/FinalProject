@@ -95,6 +95,9 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
         self.message_2.resizable(False, False)
         self.message_2.config(bg='white')
 
+        # Lưu message_type vào biến instance
+        self.message_type = message_type
+
         message_2_map = {'pass_reset': "Password Reset Successfully!",
                          'edit_book': "Updated Successfully!",
                          'pay fine': "Fine Paid"}

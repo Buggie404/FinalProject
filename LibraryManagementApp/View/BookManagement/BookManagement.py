@@ -242,7 +242,7 @@ class BookManagementApp:
             from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
             add_book_root = Tk()
             add_book = BookManagementAddBookApp(add_book_root)
-            add_book.mainloop()
+            add_book.root.mainloop()
 
         if button_name == "btn_EditBookInformation":
             self.root.destroy()
