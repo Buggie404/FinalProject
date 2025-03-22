@@ -201,7 +201,12 @@ class ReturnOverdueApp:
         """Handle pay fine button click"""
         print("btn_PayFine clicked")
         messagebox.showinfo("Payment", "Payment Successful!")
-
+        self.root.destroy()
+        from View.Homepage import HomepageApp
+        homepage_root = Tk()
+        homepage = HomepageApp(homepage_root)
+        homepage_root.mainloop()
+        
 if __name__ == "__main__":
     window = Tk()
     app = ReturnOverdueApp(window)

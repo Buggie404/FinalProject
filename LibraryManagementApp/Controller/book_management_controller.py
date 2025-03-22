@@ -236,9 +236,9 @@ class add_book:
         # Check for non-numeric characters
         if not isbn.isdigit():
             return False, "ISBN must be a series of numbers, no spaces."
-        #Check for exactly 10 digits
-        if len(isbn) != 10:
-            return False, "ISBN must be exactly 10 digits long."
+        #Check for exactly 13 digits
+        if len(isbn) != 13:
+            return False, "ISBN must be exactly 13 digits long."
        
         # Check if ISBN already exists
         if Book.get_book_by_id(isbn):

@@ -227,6 +227,7 @@ class Return1App:
             return
     
     # Kiểm tra receipt trong database
+        from Model.receipt_model import Receipt
         receipt_data = Receipt.get_receipt_by_id(receipt_id)
 
         if not receipt_data:

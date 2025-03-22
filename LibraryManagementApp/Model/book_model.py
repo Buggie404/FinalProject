@@ -24,7 +24,7 @@ class Book:
         Update existing book details in the database.
         Only the title, author, category, published year, and quantity can be updated.
         """
-        self.db.cursor.execute("UPDATE books SET title = ?, author = ?, category = ?, published_year = ?, quantity = ? WHERE id = ?", 
+        self.db.cursor.execute("UPDATE books SET title = ?, author = ?, category = ?, published_year = ?, quantity = ? WHERE book_id = ?", 
                                (new_data['title'], new_data['author'], new_data['category'], new_data['published_year'], new_data['quantity'], self.book_id))
         self.db.conn.commit()
 
