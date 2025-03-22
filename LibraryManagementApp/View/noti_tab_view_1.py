@@ -74,7 +74,8 @@ class Message_1():  # To notify message (Type 1: When clicked 'OK' button -> mes
                          'edit_pass_id': 'No match ID!',
                          'edit_book_id': "No match ISBN!",
                          'receipt': "No match receipt ID!",
-                         'search_account': 'No match User!'}
+                         'search_account': 'No match User!',
+                         'search_book': 'No match book!'}
 
         # Tile Label
         Label(self.message_1, text=message_1_map[delete_type], font=("Montserrat", 18, 'bold'), bg='white',
@@ -133,7 +134,8 @@ class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id forma
         invalid_map = {'account': ("Invalid Account", "Please double-check your email and password!"),
                        'quantity': ('Invalid Quantities',
                                     "No. of books borrow need to be larger than zero and lower or equal to Availible quantities"), 
-                                    'Input':("Invalid input", "Please double-check your input")}
+                                    'Input':("Invalid input", "Please double-check your input"),
+                                    'search_book': ("Book Not Found", "No books match your search criteria. Please try a different search term.")}
 
         # Title Label
         Label(self.invalid, text=invalid_map[invalid_type][0], font=("Montserrat", 18, 'bold'), bg='white',
