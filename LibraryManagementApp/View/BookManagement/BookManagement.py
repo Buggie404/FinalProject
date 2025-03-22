@@ -249,7 +249,7 @@ class BookManagementApp:
             from View.BookManagement.BookManaEditBook import BookManaEditBook
             edit_book_root = Tk()
             edit_book = BookManaEditBook(edit_book_root)
-            edit_book.mainloop()
+            edit_book_root.mainloop()
         
         if button_name == "btn_BackToHomepage":
             self.root.destroy()

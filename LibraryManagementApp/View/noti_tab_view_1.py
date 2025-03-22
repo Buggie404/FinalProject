@@ -111,8 +111,19 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
     def back_to_subfun(self):
         self.message_2.destroy()  # -> def từng new window xong gọi tên lại
         # If we came from book editing
+        # if self.message_type == 'edit_book':
+        #     self.message_2.master.destroy()
+        #     from View.BookManagement.BookManaEditBook import BookManaEditBook
+        #     edit_book_root = Tk()
+        #     edit_book = BookManaEditBook(edit_book_root)
+        #     edit_book_root.mainloop()
         if self.message_type == 'edit_book':
-            self.message_2.master.destroy()
+            # Đóng màn hình hiện tại
+            parent_window = self.message_2.master
+            parent_window.destroy()
+            
+            # Mở màn hình BookManaEditBook mới
+            from tkinter import Tk
             from View.BookManagement.BookManaEditBook import BookManaEditBook
             edit_book_root = Tk()
             edit_book = BookManaEditBook(edit_book_root)

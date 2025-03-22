@@ -1,9 +1,7 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 from Controller.book_edit_controller import BookEditController
 from Model.book_model import Book  
-from View.noti_tab_view_1 import Invalid
-
 
 class BookManaEditBook:
     def __init__(self, root, assets_path=None):
@@ -42,6 +40,9 @@ class BookManaEditBook:
         self.create_background()
         self.create_sidebar()
         self.create_main_panel()
+
+        # Initialize controller
+        self.controller = BookEditController(self)
 
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
@@ -173,6 +174,17 @@ class BookManaEditBook:
     #     """Start the application main loop"""
     #     self.root.mainloop()
     
+    # def button_click(self, button_name):
+    #     """Handle button click events"""
+    #     print(f"{button_name} clicked")
+        
+    #     if button_name == "btn_BackToHomepage":
+    #         self.root.destroy()
+    #         from View.Homepage import HomepageApp
+    #         homepage_root = Tk()
+    #         homepage = HomepageApp(homepage_root)
+    #         homepage_root.mainloop()
+
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
@@ -183,6 +195,14 @@ class BookManaEditBook:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root)
             homepage_root.mainloop()
+        elif button_name == "btn_Search":
+            self.controller.search_book()
+        elif button_name == "btn_AddBook":
+            self.root.destroy()
+            from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
+            add_book_root = Tk()
+            add_book = BookManagementAddBookApp(add_book_root)
+            add_book_root.mainloop()
     
     def search_book(self):
         """Search for a book by ISBN and open edit screen if found"""
@@ -192,16 +212,20 @@ class BookManaEditBook:
             
         isbn = self.entries['lnE_ISBN'].get().strip()
         
-        # Validate ISBN format
-        if not isbn.isdigit() or len(isbn) != 13:
-            Invalid(self.root, 'Input')
+        # Validate ISBN format - Sửa thành 10 ký tự theo yêu cầu của bạn
+        if not isbn.isdigit() or len(isbn) != 10:
+            messagebox.showerror("Invalid ISBN", "ISBN must be exactly 10 digits.")
+            # Đặt focus vào trường ISBN
+            self.entries['lnE_ISBN'].focus_set()
             return
             
         # Try to find the book
         book = Book.get_book_by_id(isbn)
         
         if not book:
-            Invalid(self.root, 'search_book')
+            messagebox.showerror("Book Not Found", "No book found with this ISBN in the database.")
+            # Đặt focus vào trường ISBN
+            self.entries['lnE_ISBN'].focus_set()
             return
             
         # Book found, navigate to edit screen
