@@ -101,7 +101,7 @@ class UserEditAccountApp:
         """Create the text elements displaying user information"""
         # User details
         self.lbl_ID = self.canvas.create_text(
-            598.0, 185.0,
+            598.0, 179.0,
             anchor="nw",
             text="123456789",
             fill="#0A66C2",
@@ -109,7 +109,7 @@ class UserEditAccountApp:
         )
 
         self.lbl_Name = self.canvas.create_text(
-            598.0, 249.0,
+            598.0, 245.0,
             anchor="nw",
             text="Bichnhi89",
             fill="#0A66C2",
@@ -117,7 +117,7 @@ class UserEditAccountApp:
         )
 
         self.lbl_EmailAddress = self.canvas.create_text(
-            598.0, 313.0,
+            598.0, 307.0,
             anchor="nw",
             text="bnhi@.com",
             fill="#0A66C2",
@@ -125,7 +125,7 @@ class UserEditAccountApp:
         )
 
         self.lbl_Username = self.canvas.create_text(
-            598.0, 377.0,
+            598.0, 372.0,
             anchor="nw",
             text="fghjkkm",
             fill="#0A66C2",
