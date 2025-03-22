@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 import os, sys
 from datetime import datetime, timedelta
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -246,43 +246,55 @@ class Return2App:
         """Handle drop off button click"""
         print("btn_DropOff clicked")
 
-        # Get the borrow date from the label
-        borrow_date_str = self.canvas.itemcget(self.lbl_BorrowDate, "text")
-        borrow_date = datetime.strptime(borrow_date_str, "%Y/%m/%d")
-
-        # Calculate return deadline (20 days after borrow date)
-        return_deadline = borrow_date + timedelta(days=20)
-        
-        # Get current date for the return
-        current_date = datetime.now()
-        formatted_current_date = current_date.strftime("%Y-%m-%d")
-
-        # Determine status: overdue or not
-        receipt_status = "Overdue" if current_date > return_deadline else "On Time"
-
-        # Show Drop Off dialog
-        Drop_Off(self.root, receipt_status)
+        # Lấy dữ liệu phiếu mượn từ database
         from Model.receipt_model import Receipt
-        # Update receipt status in database
-        if self.receipt_id:
-            success = Receipt.return_book(formatted_current_date, self.receipt_id)
+        if not self.receipt_id:
+            print("No receipt ID provided")
+            return
+
+        receipt_data = Receipt.get_receipt_by_id(self.receipt_id)
+        if not receipt_data:
+            print(f"No receipt found with ID: {self.receipt_id}")
+            return
+
+        # Lấy trạng thái sách từ dữ liệu
+        receipt_status = receipt_data[5]  # Trạng thái: "Overdue", "Borrowed", "Returned"
+
+        # Hiển thị thông báo Drop Off
+        from View.noti_tab_view_1 import Drop_Off
+        drop_off_window = Drop_Off(self.root, receipt_status)
+
+            # ✅ Chờ popup đóng xong mới tiếp tục
+        self.root.wait_window(drop_off_window.delete_noti)
+
+        # Xử lý logic khi nhấn nút trong cửa sổ Drop Off
+        if receipt_status == "Overdue":
+            drop_off_window.pay_overdue_fine()  # Chuyển sang đóng phạt
+        else:
+            drop_off_window.switch_to_return()  # Chuyển sang màn hình trả sách bình thường
+
+        # Nếu sách chưa trả hoặc bị quá hạn, cập nhật ngày trả
+        if receipt_status == "Borrowed":
+            current_date = datetime.now().strftime("%Y-%m-%d")
+            success = Receipt.return_book(current_date, self.receipt_id)
             if success:
-                # Update the return date displayed on screen
-                self.canvas.itemconfigure(self.lbl_ReturnDate, text=current_date.strftime("%Y/%m/%d"))
-                
-                # You might want to refresh the book inventory here
+                self.canvas.itemconfigure(self.lbl_ReturnDate, text=datetime.now().strftime("%Y/%m/%d"))
+
+                # Cập nhật số lượng sách trong kho
                 from Model.book_model import Book
                 book_id = self.canvas.itemcget(self.lbl_ISBN, "text")
-                Book.update_book_quantity_after_return(book_id, 1)  # Assuming this method exists
+                Book.update_book_quantity_after_return(book_id, 1)
+
 
 
     
-    # Load receipt data from database
+        # Load receipt data from database
     def load_receipt_data(self):
         """Load and display receipt data for the given receipt_id"""
         if not self.receipt_id:
             print("No receipt ID provided")
             return
+        
         from Model.receipt_model import Receipt
         # Get receipt data from database
         receipt_data = Receipt.get_receipt_by_id(self.receipt_id)
@@ -298,6 +310,8 @@ class Return2App:
         self.canvas.itemconfigure(self.lbl_ReceiptID, text=str(receipt_data[0]))  # receipt_id
         self.canvas.itemconfigure(self.lbl_UserID, text=str(receipt_data[1]))     # user_id
         self.canvas.itemconfigure(self.lbl_ISBN, text=str(receipt_data[2]))       # book_id (ISBN)
+        
+
 
         # For quantity - check if it exists in the data
         if len(receipt_data) > 6 and receipt_data[6] is not None:
@@ -318,26 +332,16 @@ class Return2App:
             self.canvas.itemconfigure(self.lbl_BorrowDate, text=borrow_date)
 
         # Calculate and display return deadline (20 days after borrow date)
-        from datetime import datetime, timedelta
         if receipt_data[3]:
             borrow_date_obj = receipt_data[3]
             if isinstance(borrow_date_obj, str):
                 borrow_date_obj = datetime.strptime(borrow_date_obj, "%Y-%m-%d")
             
-            # Calculate return deadline
+            # Calculate return deadline (always borrow_date + 20 days)
             return_deadline = (borrow_date_obj + timedelta(days=20)).strftime("%Y/%m/%d")
-            
-            # Check if return date exists
-            if True:   # # Luôn hiển thị hạn trả sách, không lấy ngày trả của người đã trả
-                return_date = receipt_data[4]
-                if isinstance(return_date, str):
-                    return_date = datetime.strptime(return_date, "%Y-%m-%d").strftime("%Y/%m/%d")
-                else:
-                    return_date = return_date.strftime("%Y/%m/%d")
-                self.canvas.itemconfigure(self.lbl_ReturnDate, text=return_date)
-            else:
-                # If no return date yet, show the deadline
-                self.canvas.itemconfigure(self.lbl_ReturnDate, text=return_deadline)
+            self.canvas.itemconfigure(self.lbl_ReturnDate, text=return_deadline)
+
+
 
 
 
