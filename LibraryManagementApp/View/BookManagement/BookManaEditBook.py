@@ -193,7 +193,7 @@ class BookManaEditBook:
         isbn = self.entries['lnE_ISBN'].get().strip()
         
         # Validate ISBN format
-        if not isbn.isdigit() or len(isbn) != 10:
+        if not isbn.isdigit() or len(isbn) != 13:
             Invalid(self.root, 'Input')
             return
             

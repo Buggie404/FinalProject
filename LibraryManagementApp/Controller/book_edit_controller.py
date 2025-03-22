@@ -38,7 +38,7 @@ class BookEditController:
         isbn = self.view.entries['lnE_ISBN'].get().strip()
         
         # Validate ISBN format
-        if not isbn.isdigit() or len(isbn) != 10:
+        if not isbn.isdigit() or len(isbn) != 13:
             Invalid(self.view.root, 'Input')
             return
             
@@ -129,8 +129,8 @@ class BookEditController:
     def validate_all_fields(self, isbn, title, author, published_year, category, quantity):
         """Validate all fields and return validation result."""
         # ISBN validation (read-only, shouldn't change)
-        if not isbn or not isbn.isdigit() or len(isbn) != 10:
-            return False, "ISBN must be exactly 10 digits.", {}
+        if not isbn or not isbn.isdigit() or len(isbn) != 13:
+            return False, "ISBN must be exactly 13 digits.", {}
         
         # Title validation
         if not title or title.strip() == "":

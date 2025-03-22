@@ -332,8 +332,8 @@ class BookEdit1App:
         ]
         
         # ISBN validation (read-only, shouldn't change)
-        if not isbn or not str(isbn).isdigit() or len(str(isbn)) != 10:
-            return False, "ISBN must be exactly 10 digits.", {}
+        if not isbn or not str(isbn).isdigit() or len(str(isbn)) != 13:
+            return False, "ISBN must be exactly 13 digits.", {}
         
         # Title validation
         if not title or title.strip() == "":
