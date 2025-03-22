@@ -558,6 +558,12 @@ class add_account:
         # Check for numbers or special characters
         if re.search(r'[^a-zA-ZÀ-ỹ\s]', name):
             return False, "Name should contain only letters and spaces."
+
+        # Check if name is in Title Case (each word starts with uppercase, rest lowercase)
+        name_parts = name.strip().split()
+        for part in name_parts:
+            if not part[0].isupper() or not part[1:].islower():
+                return False, "Name must be in Title Case."
         
         return True, ""
     
@@ -586,7 +592,7 @@ class add_account:
     @staticmethod
     def validate_date_format(date_text):
         """
-        Validate date format (YYYY/MM/DD)
+        Validate date format (YYYY/MM/DD) and check if user is at least 10 years old
         
         Args:
             date_text (str): Date text to validate
@@ -624,6 +630,13 @@ class add_account:
             # Check if date is in the future
             if date_obj.date() > datetime.datetime.now().date():
                 return False, "Date of birth cannot be in the future."
+            
+            # Check if user is at least 10 years old
+            current_date = datetime.datetime.now()
+            age = current_date.year - date_obj.year - ((current_date.month, current_date.day) < (date_obj.month, date_obj.day))
+            
+            if age < 10:
+                return False, "User must be at least 10 years old."
                 
             return True, ""
             
