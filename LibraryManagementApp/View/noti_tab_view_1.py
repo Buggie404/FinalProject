@@ -125,12 +125,12 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
             parent_window = self.message_2.master
             parent_window.destroy()
             
-            # Mở màn hình BookManaEditBook mới
+            # Open BookManagement screen
             from tkinter import Tk
-            from View.BookManagement.BookManaEditBook import BookManaEditBook
-            edit_book_root = Tk()
-            edit_book = BookManaEditBook(edit_book_root)
-            edit_book_root.mainloop()
+            from View.BookManagement.BookManagement import BookManagementApp
+            management_root = Tk()
+            management_app = BookManagementApp(management_root)
+            management_root.mainloop()
         # import first_sub_win ở trên
         # parent_window = self.message_2.master
         # new_root = Tk()
