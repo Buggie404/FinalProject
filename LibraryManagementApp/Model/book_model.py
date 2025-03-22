@@ -20,13 +20,34 @@ class Book:
         self.db.conn.commit()
 
     def update_book(self, new_data): #Update book information 
-        """
-        Update existing book details in the database.
+        """Update existing book details in the database.
         Only the title, author, category, published year, and quantity can be updated.
         """
-        self.db.cursor.execute("UPDATE books SET title = ?, author = ?, category = ?, published_year = ?, quantity = ? WHERE book_id = ?", 
-                               (new_data['title'], new_data['author'], new_data['category'], new_data['published_year'], new_data['quantity'], self.book_id))
-        self.db.conn.commit()
+        try:
+            self.db.cursor.execute(
+                "UPDATE Books SET title = ?, author = ?, published_year = ?, category = ?, quantity = ? WHERE book_id = ?",
+                (
+                    new_data['title'],
+                    new_data['author'],
+                    new_data['published_year'],
+                    new_data['category'],
+                    new_data['quantity'],
+                    self.book_id
+                )
+            )
+            self.db.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error updating book: {e}")
+            return False
+
+        # """
+        # Update existing book details in the database.
+        # Only the title, author, category, published year, and quantity can be updated.
+        # """
+        # self.db.cursor.execute("UPDATE books SET title = ?, author = ?, category = ?, published_year = ?, quantity = ? WHERE book_id = ?", 
+        #                        (new_data['title'], new_data['author'], new_data['category'], new_data['published_year'], new_data['quantity'], self.book_id))
+        # self.db.conn.commit()
 
     # @staticmethod
     # def get_book_by_id(book_id):
