@@ -249,3 +249,13 @@ class Receipt:
         print("Receipts table schema:")
         for column in columns:
             print(f"Column: {column[1]}, Type: {column[2]}")
+    @staticmethod
+    def update_return_status(receipt_id, return_date, status):
+        db = Database()
+        db.cursor.execute("""
+            UPDATE receipts 
+            SET return_date = ?, status = ? 
+            WHERE receipt_id = ?
+        """, (return_date, status, receipt_id))
+
+        db.conn.commit()
