@@ -209,6 +209,27 @@ class BookManagementApp:
                 print(f"Deleting book: {self.tbl_Book.item(selected_item, 'values')}")
                 self.tbl_Book.delete(selected_item)
 
+        if button_name == "btn_AddBook":
+            self.root.destroy()
+            from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
+            add_book_root = Tk()
+            add_book = BookManagementAddBookApp(add_book_root)
+            add_book.mainloop()
+
+        if button_name == "btn_EditBookInformation":
+            self.root.destroy()
+            from View.BookManagement.BookManaEditBook import BookManaEditBook
+            edit_book_root = Tk()
+            edit_book = BookManaEditBook(edit_book_root)
+            edit_book.mainloop()
+        
+        if button_name == "btn_BackToHomepage":
+            self.root.destroy()
+            from View.Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root, role = self.admin_user)
+            homepage.mainloop()
+
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()
