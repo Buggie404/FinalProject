@@ -98,8 +98,7 @@ class BorrowController:
         # Query the database to count currently borrowed books
         db.cursor.execute(
             "SELECT SUM(borrowed_quantity) FROM receipts "
-            "WHERE user_id = ? AND status = 'Borrowed'",
-            (user_id,)
+            "WHERE user_id = ? AND status = 'Borrowed'", (user_id,)
         )
         result = db.cursor.fetchone()
 
@@ -124,26 +123,26 @@ class BorrowController:
         cart_items - List of items in the cart
 
         Returns:
-        (success, receipt_id, borrow_date) - Tuple with status and receipt info
+        (success, receipt_id, borrow_date, return_deadline) - Tuple with status and receipt info
         """
         if not cart_items:
             print("Cart is empty, cannot complete borrowing")
-            return False, None, None
+            return False, None, None, None
 
         print(f"Starting complete_borrowing for user {user_id} with {len(cart_items)} items")
         for i, item in enumerate(cart_items):
             print(f"  Item {i+1}: {item}")
 
-        # Calculate borrow date (today) and return date (20 days from today)
+        # Calculate borrow date (today) and return deadline (20 days from today)
         today = datetime.datetime.now()
         today_str = today.strftime('%Y-%m-%d')
-        return_date_str = (today + datetime.timedelta(days=20)).strftime('%Y-%m-%d')
+        return_deadline_str = (today + datetime.timedelta(days=20)).strftime('%Y-%m-%d')
 
-        # Create receipt object
+        # Create receipt object - without return_deadline parameter
+        # Note: return_date is left as default (None) since books haven't been returned yet
         receipt = Receipt(
             user_id=user_id,
             borrow_date=today_str,
-            return_date=return_date_str,
             status="Borrowed"
         )
 
@@ -153,7 +152,7 @@ class BorrowController:
 
             if not success:
                 print("Failed to save receipts")
-                return False, None, None
+                return False, None, None, None
 
             print(f"Successfully saved receipts with ID {receipt.receipt_id}")
 
@@ -193,12 +192,14 @@ class BorrowController:
                     traceback.print_exc()
                     # Continue with other books even if one fails
 
-            return True, receipt.receipt_id, today_str
+            # Return success status, receipt ID, borrow date, and return deadline
+            return True, receipt.receipt_id, today_str, return_deadline_str
+
         except Exception as e:
             print(f"Error in complete_borrowing: {e}")
             import traceback
             traceback.print_exc()
-            return False, None, None
+            return False, None, None, None
 
 class BorrowingCart:
     _instance = None
