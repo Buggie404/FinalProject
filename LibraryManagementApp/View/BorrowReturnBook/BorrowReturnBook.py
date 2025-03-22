@@ -101,7 +101,7 @@ class BorrowReturnApp:
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow1_root = Tk()
-        borrow1 = Borrow1App(borrow1_root)
+        borrow1 = Borrow1App(borrow1_root, user_data=self.user_data)
         borrow1_root.mainloop()
 
     def on_return_book_clicked(self):
