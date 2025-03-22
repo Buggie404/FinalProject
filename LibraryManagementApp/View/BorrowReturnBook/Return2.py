@@ -285,7 +285,7 @@ class Return2App:
             # The UI should continue showing the original return deadline
             
             # Display Drop Off notification
-            drop_off_window = Drop_Off(self.root, receipt_status)
+            drop_off_window = Drop_Off(self.root, receipt_status, self.receipt_id)
             
             # Wait for popup to close before continuing
             self.root.wait_window(drop_off_window.delete_noti)

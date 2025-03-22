@@ -12,7 +12,7 @@ class ReturnOverdueApp:
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.receipt_id = receipt_id
-        
+
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
         if assets_path:
@@ -41,7 +41,8 @@ class ReturnOverdueApp:
         self.create_buttons()
         self.create_text_fields()
         self.create_images()
-    
+        self.load_due_and_fine_data()
+        
     def relative_to_assets(self, path: str) -> Path:
         """Convert relative asset path to absolute path"""
         return self.assets_path / Path(path)
