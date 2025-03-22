@@ -211,7 +211,10 @@ class UserAddAccount1App:
         """Handle return button click"""
         print("btn_Return clicked")
         self.root.destroy()
-        from UserManagement import UserManagementApp
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append(os.path.join(base_dir, "View"))
+        sys.path.append(base_dir)
+        from View.UserManagement.UserManagement import UserManagementApp
         add_user_root = Tk()
         add_user = UserManagementApp(add_user_root)
         add_user_root.mainloop()

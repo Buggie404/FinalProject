@@ -142,6 +142,12 @@ class UserAddAccountApp:
             if field_name in self.entries:
                 self.entries[field_name].bind("<FocusIn>", self.on_input_field_focus_in)
                 self.entries[field_name].bind("<FocusOut>", self.on_input_field_focus_out)
+                self.entries[field_name].bind("<KeyRelease>", self.on_input_field_change)
+    
+    def on_input_field_change(self, event):
+        """Reset warning flag when field content changes"""
+        widget = event.widget
+        widget._shown_warning = False
     
     def on_input_field_focus_in(self, event):
         """Clear placeholder text when field receives focus"""
