@@ -2,11 +2,11 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
-class UserEditAccountApp:
+class UserEditAccount1App:
     def __init__(self, root, assets_path=None):
         # Initialize the main window
         self.root = root
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
@@ -16,7 +16,7 @@ class UserEditAccountApp:
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
-            self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameUserEditAccount")
+            self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameUserEditAccount1")
 
         # Create canvas
         self.canvas = Canvas(
@@ -32,7 +32,6 @@ class UserEditAccountApp:
 
         # Store images and UI elements as instance variables
         self.images = {}
-        self.entries = {}
         self.buttons = {}
 
         # Build UI components
@@ -47,9 +46,11 @@ class UserEditAccountApp:
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Vẽ hình chữ nhật có bo góc."""
         # Bo góc trên bên trái
-        self.canvas.create_arc(x1, y1, x1 + 2 * radius, y1 + 2 * radius, start=90, extent=90, fill=color, outline=color)
+        self.canvas.create_arc(x1, y1, x1 + 2 * radius, y1 + 2 * radius, start=90, extent=90, fill=color,
+                               outline=color)
         # Bo góc trên bên phải
-        self.canvas.create_arc(x2 - 2 * radius, y1, x2, y1 + 2 * radius, start=0, extent=90, fill=color, outline=color)
+        self.canvas.create_arc(x2 - 2 * radius, y1, x2, y1 + 2 * radius, start=0, extent=90, fill=color,
+                               outline=color)
         # Bo góc dưới bên trái
         self.canvas.create_arc(x1, y2 - 2 * radius, x1 + 2 * radius, y2, start=180, extent=90, fill=color,
                                outline=color)
@@ -70,7 +71,13 @@ class UserEditAccountApp:
         )
 
         # Hình chữ nhật lớn nằm ngang (bo góc)
-        self.create_rounded_rectangle(285.0, 56.0, 871.0, 244.0, radius=10, color="#F1F1F1")
+        self.create_rounded_rectangle(285.0, 59.0, 871.0, 547.0, radius=10, color="#F1F1F1")
+
+        # Inner content panel
+        self.tbl_PersonalInfo = self.canvas.create_rectangle(
+            338.0, 121.0, 817.0, 467.0,
+            fill="#D9D9D9", outline=""
+        )
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -85,16 +92,10 @@ class UserEditAccountApp:
     def create_main_panel(self):
         """Create the main panel elements"""
         # Load header image
-        self.load_image("image_3", (578.0, 84.0))
+        self.load_image("image_2", (578.0, 83.0))
 
-        # Load user icon
-        self.load_image("image_2", (456.0, 139.0))
-
-        # Create password entry field
-        self.create_entry("lnE_InputID", (678.5, 140.5), (549.5, 124.0, 258.0, 31.0), "#D9D9D9")
-
-        # Create update button
-        self.create_button("btn_Search", (421.0, 181.0, 313.0, 48.0))
+        # Create action button
+        self.create_button("btn_ResetPassword", (421.0, 486.0, 313.0, 48.0))
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -130,48 +131,9 @@ class UserEditAccountApp:
 
         self.buttons[button_name] = button
 
-    def create_entry(self, entry_name, image_position, dimensions, bg_color):
-        """Create an entry field with the given parameters"""
-        self.images[entry_name] = PhotoImage(
-            file=self.relative_to_assets(f"{entry_name}.png")
-        )
-
-        entry_bg = self.canvas.create_image(
-            image_position[0],
-            image_position[1],
-            image=self.images[entry_name]
-        )
-
-        entry = Entry(
-            bd=0,
-            bg=bg_color,
-            fg="#000716",
-            highlightthickness=0
-        )
-
-        entry.place(
-            x=dimensions[0],
-            y=dimensions[1],
-            width=dimensions[2],
-            height=dimensions[3]
-        )
-
-        self.entries[entry_name] = entry
-
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
-
-    #     # Update password functionality
-    #     if button_name == "btn_Search":
-    #         self.update_password()
-    #
-    # def update_password(self):
-    #     """Handle updating the password"""
-    #     new_password = self.entries["lnE_InputID"].get()
-    #     print(f"Updating password to: {new_password}")
-
-        # Here you would add code to update the password in a database or file
 
     def run(self):
         """Start the application main loop"""
@@ -180,5 +142,5 @@ class UserEditAccountApp:
 
 if __name__ == "__main__":
     root = Tk()
-    app = UserEditAccountApp(root)
+    app = UserEditAccount1App(root)
     app.run()

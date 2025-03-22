@@ -2,11 +2,11 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
-class UserEditAccount1App:
+class UserEditAccountApp:
     def __init__(self, root, assets_path=None):
         # Initialize the main window
         self.root = root
-        self.root.geometry("898x605+0+0")
+        self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
@@ -32,12 +32,14 @@ class UserEditAccount1App:
 
         # Store images and UI elements as instance variables
         self.images = {}
+        self.entries = {}
         self.buttons = {}
 
         # Build UI components
         self.create_background()
         self.create_sidebar()
         self.create_main_panel()
+        self.create_user_details()
 
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
@@ -46,11 +48,9 @@ class UserEditAccount1App:
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Vẽ hình chữ nhật có bo góc."""
         # Bo góc trên bên trái
-        self.canvas.create_arc(x1, y1, x1 + 2 * radius, y1 + 2 * radius, start=90, extent=90, fill=color,
-                               outline=color)
+        self.canvas.create_arc(x1, y1, x1 + 2 * radius, y1 + 2 * radius, start=90, extent=90, fill=color, outline=color)
         # Bo góc trên bên phải
-        self.canvas.create_arc(x2 - 2 * radius, y1, x2, y1 + 2 * radius, start=0, extent=90, fill=color,
-                               outline=color)
+        self.canvas.create_arc(x2 - 2 * radius, y1, x2, y1 + 2 * radius, start=0, extent=90, fill=color, outline=color)
         # Bo góc dưới bên trái
         self.canvas.create_arc(x1, y2 - 2 * radius, x1 + 2 * radius, y2, start=180, extent=90, fill=color,
                                outline=color)
@@ -71,13 +71,7 @@ class UserEditAccount1App:
         )
 
         # Hình chữ nhật lớn nằm ngang (bo góc)
-        self.create_rounded_rectangle(285.0, 59.0, 871.0, 547.0, radius=10, color="#F1F1F1")
-
-        # Inner content panel
-        self.tbl_PersonalInfo = self.canvas.create_rectangle(
-            338.0, 121.0, 817.0, 467.0,
-            fill="#D9D9D9", outline=""
-        )
+        self.create_rounded_rectangle(285.0, 80.0, 871.0, 525.0, radius=10, color="#F1F1F1")
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -91,11 +85,52 @@ class UserEditAccount1App:
 
     def create_main_panel(self):
         """Create the main panel elements"""
-        # Load header image
-        self.load_image("image_2", (578.0, 83.0))
+        # Load header image and user icon
+        self.load_image("image_6", (578.0, 122.0))
 
-        # Create action button
-        self.create_button("btn_ResetPassword", (421.0, 486.0, 313.0, 48.0))
+        # Load field icons
+        self.load_image("image_3", (375.0, 197.0))  # ID icon
+        self.load_image("image_2", (391.0, 258.0))  # Name icon
+        self.load_image("image_5", (429.0, 322.0))  # Email icon
+        self.load_image("image_4", (412.0, 386.0))  # Username icon
+
+        # Create update button
+        self.create_button("btn_ResetPassword", (421.0, 443.0, 313.0, 48.0))
+
+    def create_user_details(self):
+        """Create the text elements displaying user information"""
+        # User details
+        self.lbl_ID = self.canvas.create_text(
+            598.0, 185.0,
+            anchor="nw",
+            text="123456789",
+            fill="#0A66C2",
+            font=("Montserrat Medium", 18 * -1)
+        )
+
+        self.lbl_Name = self.canvas.create_text(
+            598.0, 249.0,
+            anchor="nw",
+            text="Bichnhi89",
+            fill="#0A66C2",
+            font=("Montserrat Medium", 18 * -1)
+        )
+
+        self.lbl_EmailAddress = self.canvas.create_text(
+            598.0, 313.0,
+            anchor="nw",
+            text="bnhi@.com",
+            fill="#0A66C2",
+            font=("Montserrat Medium", 18 * -1)
+        )
+
+        self.lbl_Username = self.canvas.create_text(
+            598.0, 377.0,
+            anchor="nw",
+            text="fghjkkm",
+            fill="#0A66C2",
+            font=("Montserrat Medium", 18 * -1)
+        )
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -131,9 +166,45 @@ class UserEditAccount1App:
 
         self.buttons[button_name] = button
 
+    def create_entry(self, entry_name, dimensions, bg_color="#FFFFFF"):
+        """Create an entry field with the given parameters"""
+        entry = Entry(
+            self.root,
+            bd=0,
+            bg=bg_color,
+            fg="#000716",
+            highlightthickness=0
+        )
+
+        entry.place(
+            x=dimensions[0],
+            y=dimensions[1],
+            width=dimensions[2],
+            height=dimensions[3]
+        )
+
+        self.entries[entry_name] = entry
+        return entry
+
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+
+        # Specific button actions can be added here
+        if button_name == "button_4":
+            self.update_user_info()
+        elif button_name == "button_1":
+            self.go_back_to_homepage()
+
+    def update_user_info(self):
+        """Handle updating the user information"""
+        print("Updating user information...")
+        # Code to update user information in a database would go here
+
+    def go_back_to_homepage(self):
+        """Navigate back to homepage"""
+        print("Navigating back to homepage...")
+        # Code to navigate back to homepage would go here
 
     def run(self):
         """Start the application main loop"""
@@ -142,5 +213,5 @@ class UserEditAccount1App:
 
 if __name__ == "__main__":
     root = Tk()
-    app = UserEditAccount1App(root)
+    app = UserEditAccountApp(root)
     app.run()

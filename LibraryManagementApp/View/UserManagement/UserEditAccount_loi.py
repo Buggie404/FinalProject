@@ -1,12 +1,18 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+import os
+import sys
 
+# Import base file path
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(base_dir, "View"))
+sys.path.append(base_dir)
 
 class UserEditAccountApp:
     def __init__(self, root, assets_path=None):
         # Initialize the main window
         self.root = root
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
@@ -32,8 +38,8 @@ class UserEditAccountApp:
 
         # Store images and UI elements as instance variables
         self.images = {}
-        self.entries = {}
         self.buttons = {}
+        self.entries = {}
 
         # Build UI components
         self.create_background()
@@ -70,7 +76,7 @@ class UserEditAccountApp:
         )
 
         # Hình chữ nhật lớn nằm ngang (bo góc)
-        self.create_rounded_rectangle(285.0, 56.0, 871.0, 244.0, radius=10, color="#F1F1F1")
+        self.create_rounded_rectangle(285.0, 56.0, 871.0, 201.0, radius=10, color="#F1F1F1")
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -87,14 +93,11 @@ class UserEditAccountApp:
         # Load header image
         self.load_image("image_3", (578.0, 84.0))
 
-        # Load user icon
-        self.load_image("image_2", (456.0, 139.0))
+        # Load label image
+        self.load_image("image_2", (454.0, 140.0))
 
-        # Create password entry field
+        # Create entry field
         self.create_entry("lnE_InputID", (678.5, 140.5), (549.5, 124.0, 258.0, 31.0), "#D9D9D9")
-
-        # Create update button
-        self.create_button("btn_Search", (421.0, 181.0, 313.0, 48.0))
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -130,15 +133,14 @@ class UserEditAccountApp:
 
         self.buttons[button_name] = button
 
-    def create_entry(self, entry_name, image_position, dimensions, bg_color):
-        """Create an entry field with the given parameters"""
+    def create_entry(self, entry_name, bg_position, entry_dimensions, bg_color):
+        """Create an entry field"""
         self.images[entry_name] = PhotoImage(
             file=self.relative_to_assets(f"{entry_name}.png")
         )
-
-        entry_bg = self.canvas.create_image(
-            image_position[0],
-            image_position[1],
+        self.canvas.create_image(
+            bg_position[0],
+            bg_position[1],
             image=self.images[entry_name]
         )
 
@@ -150,10 +152,10 @@ class UserEditAccountApp:
         )
 
         entry.place(
-            x=dimensions[0],
-            y=dimensions[1],
-            width=dimensions[2],
-            height=dimensions[3]
+            x=entry_dimensions[0],
+            y=entry_dimensions[1],
+            width=entry_dimensions[2],
+            height=entry_dimensions[3]
         )
 
         self.entries[entry_name] = entry
@@ -161,17 +163,25 @@ class UserEditAccountApp:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
-
-    #     # Update password functionality
-    #     if button_name == "btn_Search":
-    #         self.update_password()
-    #
-    # def update_password(self):
-    #     """Handle updating the password"""
-    #     new_password = self.entries["lnE_InputID"].get()
-    #     print(f"Updating password to: {new_password}")
-
-        # Here you would add code to update the password in a database or file
+        if button_name == "btn_EditAccountPassword": # When clicked edit account password here -> switch back to user management window
+            self.root.destroy()
+            from UserManagement import UserManagementApp
+            user_root = Tk()
+            user = UserManagementApp(user_root)
+            user_root.mainloop()
+        elif button_name == "btn_AddAccount": # Switch to first add acount window
+            self.root.destroy()
+            from UserAddAccount import UserAddAccountApp
+            add_account_root = Tk()
+            add_account = UserAddAccountApp(add_account_root)
+            add_account_root.mainloop()
+        elif button_name == "btn_BackToHomepage": # switch back to Homepage
+            self.root.destroy()
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage.root.mainloop()
+        
 
     def run(self):
         """Start the application main loop"""
