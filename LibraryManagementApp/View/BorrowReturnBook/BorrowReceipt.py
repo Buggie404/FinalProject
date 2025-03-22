@@ -23,7 +23,7 @@ class BorrowReceiptApp:
             self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameBorrowReceipt")
 
         # Store image references to prevent garbage collection
-        self.images = {} 
+        self.images = {}
 
         # Setup UI components
         self.canvas = Canvas(
@@ -39,7 +39,7 @@ class BorrowReceiptApp:
 
         # Load all images
         self.load_images()
-        
+
         # Create UI elements
         self.create_sidebar()
         self.create_main_content()
@@ -59,95 +59,103 @@ class BorrowReceiptApp:
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(parent_dir)
-        
-        from Model.receipt_model import Receipt
-        
-        # Get primary receipt data
-        receipt_data = Receipt.get_receipt_by_id(self.receipt_id)
-        if not receipt_data:
-            # If receipt not found, use placeholders
-            self.create_text_fields_with_placeholders()
-            return
-        
-        # Receipt_data structure: (receipt_id, user_id, book_id, quantity, borrow_date, return_date, status)
-        receipt_id, user_id, book_id, quantity, borrow_date, return_date, status = receipt_data
-        
-        # Get all related receipts (same user, same borrow date)
-        related_receipts = []
-        if self.borrow_date:
-            related_receipts = Receipt.get_related_receipts(user_id, borrow_date)
-        
-        # If we have multiple related receipts, handle as a multi-book receipt
-        if len(related_receipts) > 1:
-            # Set book_id to "Multiple" and calculate total quantity
-            display_book_id = "Multiple"
-            total_quantity = sum(receipt[6] for receipt in related_receipts)  # Quantity is at index 6
-            
-            # Create text fields with multi-book receipt data
-            self.create_text_fields(
-                receipt_id=str(receipt_id),
-                user_id=str(user_id),
-                book_id=display_book_id,
-                quantity=str(total_quantity),
-                borrow_date=borrow_date,
-                return_date=return_date
-            )
-            
-            # Display list of all borrowed books
-            self.display_multiple_books(related_receipts)
-        else:
-            # Single book receipt - display normally
-            self.create_text_fields(
-                receipt_id=str(receipt_id),
-                user_id=str(user_id),
-                book_id=book_id,
-                quantity=str(quantity),
-                borrow_date=borrow_date,
-                return_date=return_date
-            )
 
-    def display_multiple_books(self, related_receipts):
-        """Display a list of multiple books from related receipts"""
-        # Create a header for the book list
-        y_position = 500  # Starting Y position for the list (adjust as needed)
-        
-        self.canvas.create_text(
-            400, y_position - 30,
-            text="Books Borrowed:",
-            fill="#0A66C2",
-            font=("Montserrat Bold", 14 * -1)
-        )
-        
-        # Get book titles
-        import sys
-        import os
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        parent_dir = os.path.dirname(current_dir)
-        sys.path.append(parent_dir)
-        
+        from Model.receipt_model import Receipt
         from Model.book_model import Book
-        
-        # List each book
-        for i, receipt in enumerate(related_receipts):
-            # Receipt structure: (receipt_id, user_id, book_id, quantity, borrow_date, return_date, status)
-            book_id = receipt[2]
-            quantity = receipt[3]
+
+        try:
+            # Get primary receipt data
+            receipt_data = Receipt.get_receipt_by_id(self.receipt_id)
+            print(f"Receipt data: {receipt_data}")
             
-            # Get book title
-            book_data = Book.get_book_by_id(book_id)
-            title = book_data[1] if book_data else "Unknown Book"  
+            if not receipt_data:
+                # If receipt not found, use placeholders
+                print("Receipt not found, using placeholders")
+                self.create_text_fields_with_placeholders()
+                return
             
-            # Truncate title if too long
-            display_title = title if len(title) < 25 else title[:22] + "..."
+            # Receipt_data structure: (receipt_id, user_id, book_id, borrow_date, return_date, status, borrowed_quantity)
+            receipt_id = receipt_data[0]
+            user_id = receipt_data[1]
+            book_id = receipt_data[2]
+            borrow_date = receipt_data[3]
+            return_date = receipt_data[4]
+            status = receipt_data[5]
             
-            # Create text for each book
-            self.canvas.create_text(
-                400, y_position + (i * 20),
-                text=f"{book_id} - {display_title} (Qty: {quantity})",
-                fill="#0A66C2",
-                font=("Montserrat Medium", 12 * -1)
-            )
-        
+            # Get borrowed_quantity - this might be at index 6
+            borrowed_quantity = receipt_data[6] if len(receipt_data) > 6 else 1
+            
+            print(f"Parsed receipt data: id={receipt_id}, user={user_id}, book={book_id}, qty={borrowed_quantity}")
+            
+            # Get all related receipts (same user_id, same borrow_date)
+            related_receipts = []
+            if self.borrow_date:
+                related_receipts = Receipt.get_related_receipts(user_id, borrow_date)
+            else:
+                # If borrow_date wasn't provided, get it from the receipt
+                self.borrow_date = borrow_date
+                related_receipts = Receipt.get_related_receipts(user_id, borrow_date)
+                
+            print(f"Found {len(related_receipts)} related receipts with same user_id and borrow_date")
+            
+            # Initialize display_book_id variable
+            display_book_id = book_id
+            
+            # If we have multiple related receipts, handle as a multi-book receipt
+            if len(related_receipts) > 1:
+                # For multiple books, display a comma-separated list of ISBNs
+                book_ids = [receipt[2] for receipt in related_receipts]
+                combined_book_ids = ", ".join(book_ids)
+                
+                # Truncate the combined book_ids if too long
+                if len(combined_book_ids) > 26:
+                    display_book_id = combined_book_ids[:23] + "..."
+                else:
+                    display_book_id = combined_book_ids
+                
+                # Calculate total quantity from related receipts
+                total_quantity = 0
+                for related_receipt in related_receipts:
+                    # Check if borrowed_quantity is available at index 6
+                    receipt_quantity = related_receipt[6] if len(related_receipt) > 6 else 1
+                    total_quantity += receipt_quantity
+                    print(f"Adding quantity {receipt_quantity} from receipt {related_receipt[0]}")
+                
+                # Create text fields with multi-book receipt data
+                self.create_text_fields(
+                    receipt_id=str(receipt_id),
+                    user_id=str(user_id),
+                    book_id=display_book_id,
+                    quantity=str(total_quantity),
+                    borrow_date=borrow_date,
+                    return_date=return_date
+                )
+                
+                # Display list of all borrowed books
+                self.display_multiple_books(related_receipts)
+            else:
+                # Single book receipt - display normally
+                # Truncate book_id if it's too long
+                if len(book_id) > 26:
+                    display_book_id = book_id[:23] + "..."
+                else:
+                    display_book_id = book_id
+                    
+                self.create_text_fields(
+                    receipt_id=str(receipt_id),
+                    user_id=str(user_id),
+                    book_id=display_book_id,
+                    quantity=str(borrowed_quantity),
+                    borrow_date=borrow_date,
+                    return_date=return_date
+                )
+        except Exception as e:
+            print(f"Error processing receipt data: {e}")
+            import traceback
+            traceback.print_exc()
+            # If there's an error, use placeholders
+            self.create_text_fields_with_placeholders()
+
     def relative_to_assets(self, path: str) -> Path:
         """Convert relative asset path to absolute path"""
         return self.assets_path / Path(path)
@@ -159,16 +167,14 @@ class BorrowReceiptApp:
         # Bo góc trên bên phải
         self.canvas.create_arc(x2 - 2 * radius, y1, x2, y1 + 2 * radius, start=0, extent=90, fill=color, outline=color)
         # Bo góc dưới bên trái
-        self.canvas.create_arc(x1, y2 - 2 * radius, x1 + 2 * radius, y2, start=180, extent=90, fill=color,
-                               outline=color)
+        self.canvas.create_arc(x1, y2 - 2 * radius, x1 + 2 * radius, y2, start=180, extent=90, fill=color, outline=color)
         # Bo góc dưới bên phải
-        self.canvas.create_arc(x2 - 2 * radius, y2 - 2 * radius, x2, y2, start=270, extent=90, fill=color,
-                               outline=color)
+        self.canvas.create_arc(x2 - 2 * radius, y2 - 2 * radius, x2, y2, start=270, extent=90, fill=color, outline=color)
 
         # Phần thân của hình chữ nhật
         self.canvas.create_rectangle(x1 + radius, y1, x2 - radius, y2, fill=color, outline=color)
         self.canvas.create_rectangle(x1, y1 + radius, x2, y2 - radius, fill=color, outline=color)
-    
+
     def load_images(self):
         """Load all required images"""
         image_files = [
@@ -185,14 +191,14 @@ class BorrowReceiptApp:
             "btn_BorrowBook.png",
             "btn_Back.png"
         ]
-        
+
         for image_file in image_files:
             full_path = self.relative_to_assets(image_file)
             try:
                 self.images[image_file] = PhotoImage(file=full_path)
             except Exception as e:
                 print(f"Error loading image {full_path}: {e}")
-    
+
     def create_sidebar(self):
         """Create the blue sidebar and its content"""
         self.canvas.create_rectangle(
@@ -203,7 +209,7 @@ class BorrowReceiptApp:
             fill="#0A66C2",
             outline=""
         )
-        
+
         # Add Logo
         if "image_2.png" in self.images:
             self.canvas.create_image(
@@ -211,7 +217,7 @@ class BorrowReceiptApp:
                 73.0,
                 image=self.images["image_2.png"]
             )
-    
+
     def create_main_content(self):
         """Create the main content area with the background and images"""
         # Background rectangle
@@ -223,7 +229,7 @@ class BorrowReceiptApp:
             color="#F0F0F0",
             radius=10
         )
-        
+
         # Header image
         if "image_3.png" in self.images:
             self.canvas.create_image(
@@ -231,7 +237,7 @@ class BorrowReceiptApp:
                 70.0,
                 image=self.images["image_3.png"]
             )
-        
+
         # Other images
         image_positions = [
             ("image_4.png", 403.0, 117.0),
@@ -241,73 +247,41 @@ class BorrowReceiptApp:
             ("image_8.png", 430.0, 457.0),
             ("image_9.png", 422.0, 321.0)
         ]
-        
+
         for img_name, x, y in image_positions:
             if img_name in self.images:
                 self.canvas.create_image(
-                    x, y, image=self.images[img_name]
+                    x,
+                    y,
+                    image=self.images[img_name]
                 )
-    
-    def load_and_display_receipt(self):
-        from Model.receipt_model import Receipt
-        
-        # Get receipt header data
-        receipt_data = Receipt.get_receipt_by_id(self.receipt_id)
-        if not receipt_data:
-            # If receipt not found, use placeholders
-            self.create_text_fields_with_placeholders()
-            return
-        
-        # Receipt_data structure: (receipt_id, user_id, borrow_date, return_date, status)
-        receipt_id, user_id, borrow_date, return_date, status = receipt_data
-        
-        # Get receipt items
-        receipt_items = Receipt.get_receipt_items(self.receipt_id)
-        
-        # Default values for book_id and quantity
-        book_id = "Multiple"
-        quantity = str(sum(item[2] for item in receipt_items)) if receipt_items else "0"
-        
-        # If we have only one item, use its book_id and quantity
-        if len(receipt_items) == 1:
-            book_id, _, item_quantity = receipt_items[0]
-            quantity = str(item_quantity)
-        
-        # Create text fields with actual receipt data
-        self.create_text_fields(
-            receipt_id=str(receipt_id),
-            user_id=str(user_id),
-            book_id=book_id,
-            quantity=quantity,
-            borrow_date=borrow_date,
-            return_date=return_date
-        )
-        
-        # If we have multiple items, create a list of all books
-        if len(receipt_items) > 1:
-            self.display_multiple_books(receipt_items)
 
-    def create_text_fields(self, receipt_id="", user_id="", book_id="", 
-                       quantity="", borrow_date="", return_date=""):
+    def create_text_fields(self, receipt_id="", user_id="", book_id="", quantity="", borrow_date="", return_date=""):
         """Create all text fields in the application"""
+        if len(book_id) > 26:
+            display_book_id = book_id[:23] + "..."
+        else:
+            display_book_id = book_id
+
         text_configs = [
             (579.0, 107.0, receipt_id, "lbl_ReceiptID"),
             (579.0, 175.0, user_id, "lbl_UserID"),
-            (579.0, 244.0, book_id, "lbl_ISBN"),
+            (579.0, 244.0, display_book_id, "lbl_ISBN"),
             (579.0, 312.0, quantity, "lbl_Quantity"),
             (579.0, 380.0, borrow_date, "lbl_BorrowDate"),
             (579.0, 448.0, return_date, "lbl_ReturnDate")
         ]
-        
+
         for x, y, text, field_name in text_configs:
             text_field = self.canvas.create_text(
-                x, y,
+                x,
+                y,
                 anchor="nw",
                 text=text,
                 fill="#0A66C2",
                 font=("Montserrat Medium", 18 * -1)
             )
-            
+
             # Store text field references
             setattr(self, field_name, text_field)
 
@@ -322,30 +296,63 @@ class BorrowReceiptApp:
             return_date="2025/03/25"
         )
 
-    def display_multiple_books(self, receipt_items):
-        """Display a list of multiple books"""
+    def display_multiple_books(self, related_receipts):
+        """Display a list of multiple books from related receipts"""
         # Create a header for the book list
         y_position = 500  # Starting Y position for the list (adjust as needed)
-        
-        self.canvas.create_text(
-            400, y_position - 30,
-            text="Books Borrowed:",
-            fill="#0A66C2",
-            font=("Montserrat Bold", 14 * -1)
-        )
-        
+
+        # self.canvas.create_text(
+        #     400, y_position-30,
+        #     text="Books Borrowed:",
+        #     fill="#0A66C2",
+        #     font=("Montserrat Bold", 14*-1)
+        # )
+
+        # Get book titles
+        import sys
+        import os
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        sys.path.append(parent_dir)
+        from Model.book_model import Book
+
         # List each book
-        for i, (book_id, title, quantity) in enumerate(receipt_items):
-            # Truncate title if too long
-            display_title = title if len(title) < 25 else title[:22] + "..."
-            
-            # Create text for each book
-            self.canvas.create_text(
-                400, y_position + (i * 20),
-                text=f"{book_id} - {display_title} (Qty: {quantity})",
-                fill="#0A66C2",
-                font=("Montserrat Medium", 12 * -1)
-            )
+        for i, receipt in enumerate(related_receipts):
+            try:
+                # Receipt structure: (receipt_id, user_id, book_id, borrow_date, return_date, status, borrowed_quantity)
+                if len(receipt) >= 3:
+                    book_id = receipt[2]  # book_id is at index 2
+                    
+                    # Ensure we don't display "MULTIPLE" entries
+                    if book_id.upper() == "MULTIPLE":
+                        continue
+                    
+                    if len(book_id) > 15:
+                        display_book_id = book_id[:12] + "..."
+                    else:
+                        display_book_id = book_id
+                    # Check if borrowed_quantity is available at index 6
+                    # quantity = receipt[6] if len(receipt) > 6 else 1
+                    
+                    # Get book title
+                    book_data = Book.get_book_by_id(book_id)
+                    title = book_data[1] if book_data and len(book_data) > 1 else "Unknown Book"
+                    
+                    # # Truncate title if too long
+                    # display_title = title if len(title) < 25 else title[:22] + "..."
+                    
+                    # # Create text for each book
+                    # self.canvas.create_text(
+                    #     400,
+                    #     y_position + (i * 20),
+                    #     text=f"{book_id} - {display_title} (Qty: {quantity})",
+                    #     fill="#0A66C2",
+                    #     font=("Montserrat Medium", 12 * -1)
+                    # )
+            except Exception as e:
+                print(f"Error displaying book {i}: {e}")
+                import traceback
+                traceback.print_exc()
 
     def create_buttons(self):
         """Create all buttons in the application"""
@@ -355,16 +362,16 @@ class BorrowReceiptApp:
             ("btn_BorrowBook.png", 0.0, 181.0, 262.0, 25.0, self.on_borrow_book_clicked),
             ("btn_Back.png", 424.0, 501.0, 313.0, 48.0, self.on_back_clicked)
         ]
-        
+
         for img_name, x, y, width, height, command in button_configs:
             self.create_button(img_name, x, y, width, height, command)
-    
+
     def create_button(self, image_name, x, y, width, height, command):
         """Helper method to create a button"""
         if image_name not in self.images:
             print(f"Warning: Image {image_name} not found")
             return None
-            
+
         button = Button(
             image=self.images[image_name],
             borderwidth=0,
@@ -372,36 +379,35 @@ class BorrowReceiptApp:
             command=command,
             relief="flat"
         )
-        
+
         button.place(
             x=x,
             y=y,
             width=width,
             height=height
         )
-        
+
         # Store button references
         button_name = image_name.replace(".png", "")
         setattr(self, button_name, button)
         
         return button
-    
+
     def on_back_to_homepage_clicked(self):
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
-    
+
     def on_return_book_clicked(self):
         """Handle return book button click"""
         print("btn_ReturnBook clicked")
-    
+
     def on_borrow_book_clicked(self):
         """Handle borrow book button click"""
         print("btn_BorrowBook clicked")
-    
+
     def on_back_clicked(self):
         """Handle back button click"""
         print("btn_Back clicked")
-
 
 if __name__ == "__main__":
     window = Tk()
