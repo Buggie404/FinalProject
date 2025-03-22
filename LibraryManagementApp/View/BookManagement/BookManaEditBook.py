@@ -212,9 +212,9 @@ class BookManaEditBook:
             
         isbn = self.entries['lnE_ISBN'].get().strip()
         
-        # Validate ISBN format - Sửa thành 10 ký tự theo yêu cầu của bạn
-        if not isbn.isdigit() or len(isbn) != 10:
-            messagebox.showerror("Invalid ISBN", "ISBN must be exactly 10 digits.")
+        # Validate ISBN format - Sửa thành 13 ký tự theo yêu cầu của bạn
+        if not isbn.isdigit() or len(isbn) != 13:
+            messagebox.showerror("Invalid ISBN", "ISBN must be exactly 13 digits.")
             # Đặt focus vào trường ISBN
             self.entries['lnE_ISBN'].focus_set()
             return
