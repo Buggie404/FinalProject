@@ -13,6 +13,10 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
+        # Import Model to take user data
+        from Model.user_model import User
+        self.user_data = User.get_id(self.user_id)
+
         # import controller that hndel Edit Account Information
         from Controller.account_management_controller import AccountEditInfoController 
         self.controller = AccountEditInfoController(user_id)
@@ -182,38 +186,22 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
             self.root.destroy()
             from View.AccountManagement.AccountMan import AccountManagement
             account_root = Tk()
-            account = AccountManagement(account_root)
+            account = AccountManagement(account_root, user_data=self.user_data)
             account.root.mainloop()
         elif button_name == "btn_ChangePassword": # switch to Change Password window
             self.root.destroy()
             from View.AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
-            changepass = AccountChangePwApp(changepass_root)
+            changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass.root.mainloop()
         elif button_name == "btn_BackToHomepage": # switch back to Homepage
             self.root.destroy()
             from View.Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
+            role = 'admin' if self.user_data[6] == "Admin" else 'User'
+            homepage = HomepageApp(homepage_root, role = role, user_data=self.user_data)
             homepage.root.mainloop()
         else: # For btn_Apply
-            # new_username = self.entries["lnE_NewUsername"].get()
-            # new_date_of_birth = self.entries["lnE_NewDateOfBirth"].get()
-
-            # result = self.controller.process_edit_request(new_username, new_date_of_birth)
-
-            # self.root.destroy()
-            # if result:
-            #     from View.AccountManagement.AccountEditInfo1 import AccountEditInfo1
-            #     success_root = Tk()
-            #     success = AccountEditInfo1(success_root)
-            #     success.root.mainloop()
-            # else:
-            #     from View.AccountManagement.AccountEditInfo2 import AccountEditInfo2App
-            #     failed_root = Tk()
-            #     failed = AccountEditInfo2App(failed_root)
-            #     failed.root.mainloop()
-
             self.controller.handle_apply_click(self)
 
     def run(self): # ?!?!
