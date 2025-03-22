@@ -148,8 +148,9 @@ class AccountEditInfo1:
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
             from Homepage import HomepageApp
+            role = 'admin' if self.user_data[6] == "Admin" else 'User'
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, user_data = self.user_data)
+            homepage = HomepageApp(homepage_root, role=role, user_data = self.user_data)
             homepage_root.mainloop()
         elif button_name == "btn_EditAccountInformation": # When clicked edit account in success/failed window -> go back to first AccountEditInfo window
             self.root.destroy()

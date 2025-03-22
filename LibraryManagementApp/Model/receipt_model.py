@@ -259,3 +259,9 @@ class Receipt:
         """, (return_date, status, receipt_id))
 
         db.conn.commit()
+    @staticmethod
+    def get_borrowed_quantity(receipt_id):
+        db = Database()
+        query = "SELECT borrowed_quantity FROM receipts WHERE receipt_id = ?"
+        result = db.cursor.execute(query, (receipt_id,)).fetchone()
+        return result[0] if result else 0

@@ -367,6 +367,7 @@ class AccountChangePwApp:
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp
+            role = 'admin' if self.user_data[6] == 'Admin' else 'User'
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, user_data=self.user_data)
             homepage_root.mainloop()

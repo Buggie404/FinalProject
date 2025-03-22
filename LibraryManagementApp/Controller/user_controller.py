@@ -3,7 +3,7 @@
 from Model.admin_model import Admin
 from Model.user_model import User
 from tkinter import messagebox
-from View.noti_tab_view_1 import Delete, Message_1
+from View.noti_tab_view_1 import Delete, Message_1, Invalid
 import sqlite3
 import re
 import datetime
@@ -807,12 +807,12 @@ class Delete_Users:
     def delete_selected_user(self):
         """Show delete confirmation dialog and handle deletion"""
         if not self.selected_user_id:
-            print("❌ No user selected.")
+            print(" No user selected.")
             Invalid(self.view.root, "account")
             return
 
 
-        print(f"🗑️ Attempting to delete user ID: {self.selected_user_id}")
+        print(f" Attempting to delete user ID: {self.selected_user_id}")
 
 
         # Create delete confirmation dialog
@@ -827,7 +827,7 @@ class Delete_Users:
                 from Model.admin_model import Admin
                 self.admin = Admin(None, None)
             except Exception as e:
-                print(f"❌ Failed to create admin: {e}")
+                print(f" Failed to create admin: {e}")
                 return
 
 
@@ -839,7 +839,7 @@ class Delete_Users:
 
 
         if not selected_item:
-            print("❌ No item selected in the table")
+            print("No item selected in the table")
             return
 
 
@@ -848,12 +848,12 @@ class Delete_Users:
 
 
         if success:
-            print(f"✅ Successfully deleted user ID: {user_id_to_delete}")
+            print(f"Successfully deleted user ID: {user_id_to_delete}")
             self.view.tbl_User.delete(selected_item)
             Message_1(self.view.root, "account")
             self.selected_user_id = None
         else:
-            print("❌ Failed to delete user from database")
+            print("Failed to delete user from database")
             Invalid(self.view.root, "database error")
 
 

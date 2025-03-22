@@ -390,12 +390,12 @@ class Print_Receipt():
 
         # Create new Borrow1 window
         new_window = Tk()
-
+        
         # Pass the user_id from the cart
         user_data = None
         if self.cart.user_id:
             user_data = (self.cart.user_id,)
-
+            
         app = Borrow1App(new_window, user_data=user_data)
         new_window.mainloop()
 
@@ -427,8 +427,8 @@ class Print_Receipt():
 
         # Use the controller to complete the borrowing process
         try:
-            success, receipt_id, borrow_date = BorrowController.complete_borrowing(
-                self.cart.user_id,
+            success, receipt_id, borrow_date, return_deadline = BorrowController.complete_borrowing(
+                self.cart.user_id, 
                 self.cart.items
             )
 
@@ -445,9 +445,14 @@ class Print_Receipt():
             self.print_receipt.destroy()
             self.root.destroy()
 
-            # Create new BorrowReceipt window with first receipt_id and borrow date
+            # Create new BorrowReceipt window with receipt_id, borrow date, and return deadline
             new_window = Tk()
-            app = BorrowReceiptApp(new_window, receipt_id=receipt_id, borrow_date=borrow_date)
+            app = BorrowReceiptApp(
+                new_window, 
+                receipt_id=receipt_id, 
+                borrow_date=borrow_date,
+                return_deadline=return_deadline
+            )
             new_window.mainloop()
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
@@ -470,15 +475,15 @@ class Print_Receipt():
         
         # Create new Homepage window
         from tkinter import Tk
-        homepage_root = Tk()
+        borrow_root = Tk()
         
         try:
             # Try to import BorrowReturnApp - adjust the import path if needed
             from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
-            app = BorrowReturnApp(homepage_root)
+            app = BorrowReturnApp(borrow_root)
         except ImportError:
             # Fallback to Borrow1 if BorrowReturnApp is not found
             from View.BorrowReturnBook.Borrow1 import Borrow1App
-            app = Borrow1App(homepage_root)
+            app = Borrow1App(borrow_root)
             
-        homepage_root.mainloop()
+        borrow_root.mainloop()
