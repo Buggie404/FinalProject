@@ -132,6 +132,7 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
             parent_window.destroy()
 
             # Mở màn hình UserEditAccount
+            from tkinter import Tk
             from View.UserManagement.UserEditAccount import UserEditAccountApp
             reset_pass_root = Tk()
             reset_pass = UserEditAccountApp(reset_pass_root)

@@ -8,7 +8,7 @@ class UserEditAccountApp:
         self.root = root
         self.role = role
         self.user_data = user_data
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
