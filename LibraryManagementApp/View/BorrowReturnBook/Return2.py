@@ -272,7 +272,6 @@ class Return2App:
         else:
             drop_off_window.switch_to_return()
 
-    
         # Load receipt data from database
     def load_receipt_data(self):
         """Load and display receipt data for the given receipt_id"""
