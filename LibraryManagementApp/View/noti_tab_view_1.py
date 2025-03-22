@@ -87,9 +87,10 @@ class Message_1():  # To notify message (Type 1: When clicked 'OK' button -> mes
 
 
 class Message_2():  # To notify message (Type 2: when clicked 'Return' button -> switch back to the first frame of sub-function)
-    def __init__(self, root, message_type):
+    def __init__(self, root, message_type = None):
         # Setup tab
         self.message_2 = Toplevel(root)
+        self.message_type = message_type
         self.message_2.title(" ")
         self.message_2.geometry("300x150")
         self.message_2.resizable(False, False)
@@ -112,33 +113,30 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
 
     # Switch UI to 1st sub-function window
     def back_to_subfun(self):
-        self.message_2.destroy()  # -> def từng new window xong gọi tên lại
-        # If we came from book editing
-        # if self.message_type == 'edit_book':
-        #     self.message_2.master.destroy()
-        #     from View.BookManagement.BookManaEditBook import BookManaEditBook
-        #     edit_book_root = Tk()
-        #     edit_book = BookManaEditBook(edit_book_root)
-        #     edit_book_root.mainloop()
+        self.message_2.destroy() 
         if self.message_type == 'edit_book':
             # Đóng màn hình hiện tại
             parent_window = self.message_2.master
             parent_window.destroy()
-            
+        
             # Open BookManagement screen
             from tkinter import Tk
             from View.BookManagement.BookManagement import BookManagementApp
             management_root = Tk()
             management_app = BookManagementApp(management_root)
             management_root.mainloop()
-        # import first_sub_win ở trên
-        # parent_window = self.message_2.master
-        # new_root = Tk()
-        # Lồng if cho từng message_2_type: if m2t == 'pass reset' ->
-        # app = first_sub class(new_root)
-        # app.mainloop()
-        # parent_window.destroy() (ngoài vòng)
+        
+        if self.message_type == 'pass_reset':
+            # Đóng màn hình hiện tại
+            parent_window = self.message_2.master
+            parent_window.destroy()
 
+            # Mở màn hình UserEditAccount
+            from View.UserManagement.UserEditAccount import UserEditAccountApp
+            reset_pass_root = Tk()
+            reset_pass = UserEditAccountApp(reset_pass_root)
+            reset_pass_root.mainloop()
+        
 
 class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id format
     def __init__(self, root, invalid_type):
