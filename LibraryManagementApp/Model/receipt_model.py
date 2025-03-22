@@ -249,16 +249,23 @@ class Receipt:
         print("Receipts table schema:")
         for column in columns:
             print(f"Column: {column[1]}, Type: {column[2]}")
+
     @staticmethod
     def update_return_status(receipt_id, return_date, status):
         db = Database()
-        db.cursor.execute("""
-            UPDATE receipts 
-            SET return_date = ?, status = ? 
-            WHERE receipt_id = ?
-        """, (return_date, status, receipt_id))
+        try:
+            db.cursor.execute("""
+                UPDATE receipts 
+                SET return_date = ?, status = ? 
+                WHERE receipt_id = ?
+            """, (return_date, status, receipt_id))
+            
+            db.conn.commit()
+            return True
+        except Exception as e:
+            print(f"Error updating receipt status: {e}")
+            return False
 
-        db.conn.commit()
     @staticmethod
     def get_borrowed_quantity(receipt_id):
         db = Database()

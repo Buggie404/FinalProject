@@ -15,9 +15,9 @@ from Model.book_model import Book
 class ReturnController:
     @staticmethod
     def process_return(receipt_id):
-        """
+        """ 
         Xử lý logic trả sách.
-        Trả về tuple: (success: bool, receipt_status: str, message: str)
+        Trả về tuple: (success: bool, receipt_status: str, message: str) 
         """
         if not receipt_id:
             return (False, None, "No loan code!")
@@ -27,9 +27,17 @@ class ReturnController:
         if not receipt_data:
             return (False, None, "Loan slip not found!")
 
+        # Parse borrow date
         borrow_date = receipt_data[3]
         if isinstance(borrow_date, str):
-            borrow_date = datetime.strptime(borrow_date, "%Y-%m-%d")
+            try:
+                borrow_date = datetime.strptime(borrow_date, "%Y-%m-%d")
+            except ValueError:
+                try:
+                    borrow_date = datetime.strptime(borrow_date, "%Y/%m/%d")
+                except ValueError:
+                    print(f"Could not parse date: {borrow_date}")
+                    return (False, None, f"Invalid date format: {borrow_date}")
 
         # Tính hạn trả
         return_deadline = borrow_date + timedelta(days=20)
@@ -39,7 +47,7 @@ class ReturnController:
         formatted_return_date = current_date.strftime("%Y-%m-%d")
 
         # So sánh hạn trả và ngày trả
-        if current_date <= return_deadline:
+        if current_date.date() <= return_deadline.date():
             receipt_status = "Returned"
         else:
             receipt_status = "Overdue"
@@ -49,11 +57,14 @@ class ReturnController:
         if not success:
             return (False, None, "Database update failed!")
 
-        # Cập nhật kho sách (trả về +1 quyển)
+        # Cập nhật kho sách (trả về +quantity quyển)
+        
         book_id = receipt_data[2]
         Book.update_book_quantity_after_return(book_id, 1)
 
         return (True, receipt_status, "Returned book successfully!")
+
+
 class ReturnOverdueController:
     FINE_PER_BOOK = 10000  # 10.000 VND / sách quá hạn
 
