@@ -269,7 +269,7 @@ class PasswordChangeController:
         """Initialize controller with user data"""
         self.user_data = user_data
         self.current_user = None
-        
+
         # If user_data is provided, create User object
         if user_data:
             self.current_user = User(
@@ -281,56 +281,152 @@ class PasswordChangeController:
                 date_of_birth=user_data[5],
                 role=user_data[6]
             )
-    
+        
+        # Track validation errors
+        self.validation_errors = {
+            'current_password': False,
+            'new_password': False,
+            'confirm_password': False
+        }
+
     def validate_current_password(self, current_password):
         """Validate that current password matches the user's actual password"""
         if not current_password:
             return False, "Current password cannot be empty."
-        
+
         if self.user_data and current_password != self.user_data[4]:
+            self.validation_errors['current_password'] = True
             return False, "Current password is incorrect."
-        
+
+        self.validation_errors['current_password'] = False
         return True, ""
-    
+
     def validate_new_password(self, new_password):
         """Validate new password requirements"""
         if not new_password:
             return False, "New password cannot be empty."
-        
+
         # Check length (8-15 characters)
         if len(new_password) < 8:
+            self.validation_errors['new_password'] = True
             return False, "Password must be at least 8 characters."
-        
+
         if len(new_password) > 15:
+            self.validation_errors['new_password'] = True
             return False, "Password must be less than 15 characters."
-        
+
         # Check for spaces
         if ' ' in new_password:
+            self.validation_errors['new_password'] = True
             return False, "Password cannot contain spaces."
-        
+
         # Check for valid characters
-        valid_chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*_-+=`|\\(){}[]:;'<>,.?/"
+        valid_chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*_-+=`|\\(){}[]:;'<>,. ?/"
         for char in new_password:
             if char not in valid_chars:
+                self.validation_errors['new_password'] = True
                 return False, f"Password contains invalid character: {char}"
-        
+
+        self.validation_errors['new_password'] = False
         return True, ""
-    
+
     def validate_confirm_password(self, new_password, confirm_password):
         """Validate that confirm password matches new password"""
         if not confirm_password:
             return False, "Confirm password cannot be empty."
-        
+
         if new_password != confirm_password:
+            self.validation_errors['confirm_password'] = True
             return False, "Passwords do not match."
-        
+
+        self.validation_errors['confirm_password'] = False
         return True, ""
     
+    def validate_current_password_field(self, current_password):
+        """Validate current password field - for FocusOut event
+        Returns: (is_valid, error_message, should_show_error)
+        """
+        # Skip validation if empty (will be caught when submitting)
+        if not current_password:
+            return True, "", False
+            
+        valid, message = self.validate_current_password(current_password)
+        return valid, message, not valid
+    
+    def validate_new_password_field(self, new_password):
+        """Validate new password field - for FocusOut event
+        Returns: (is_valid, error_message, should_show_error)
+        """
+        # Skip validation if empty (will be caught when submitting)
+        if not new_password:
+            return True, "", False
+            
+        valid, message = self.validate_new_password(new_password)
+        return valid, message, not valid
+    
+    def validate_confirm_password_field(self, new_password, confirm_password):
+        """Validate confirm password field - for FocusOut event
+        Returns: (is_valid, error_message, should_show_error)
+        """
+        # Skip validation if empty (will be caught when submitting)
+        if not confirm_password:
+            return True, "", False
+            
+        valid, message = self.validate_confirm_password(new_password, confirm_password)
+        return valid, message, not valid
+    
+    def process_password_change(self, current_password, new_password, confirm_password):
+        """Process password change with all validations
+        
+        Returns:
+            tuple: (success, message, redirect_to_success, field_to_focus)
+        """
+        # Check for empty fields first
+        if not current_password:
+            return False, "Current password cannot be empty.", False, "current_password"
+            
+        if not new_password:
+            return False, "New password cannot be empty.", False, "new_password"
+            
+        if not confirm_password:
+            return False, "Confirm password cannot be empty.", False, "confirm_password"
+        
+        # Validate current password
+        current_valid, current_msg = self.validate_current_password(current_password)
+        if not current_valid:
+            return False, current_msg, False, "current_password"
+            
+        # Validate new password format
+        new_valid, new_msg = self.validate_new_password(new_password)
+        if not new_valid:
+            return False, new_msg, False, "new_password"
+            
+        # Check if passwords match
+        match_valid, match_msg = self.validate_confirm_password(new_password, confirm_password)
+        if not match_valid:
+            # For confirm password mismatch, we go to failure screen
+            return False, match_msg, True, "confirm_password"
+        
+        # All validations passed, update password
+        try:
+            # Update password in database
+            if self.current_user:
+                success = self.change_password(new_password)
+                if success:
+                    return True, "Password changed successfully!", True, None
+                else:
+                    return False, "Failed to update password in database.", True, None
+            else:
+                return False, "User not found.", True, None
+        except Exception as e:
+            print(f"Error changing password: {e}")
+            return False, f"Error: {str(e)}", True, None
+
     def change_password(self, new_password):
         """Update the user's password in the database"""
         if not self.current_user:
             return False
-        
+
         try:
             self.current_user.change_pass(new_password)
             
@@ -339,11 +435,54 @@ class PasswordChangeController:
                 self.user_data = list(self.user_data)
                 self.user_data[4] = new_password
                 self.user_data = tuple(self.user_data)
-            
+                
             return True
+            
         except Exception as e:
             print(f"Error changing password: {e}")
             return False
+            
+    def get_user_data(self):
+        """Get the current user data"""
+        return self.user_data
+        
+    def handle_navigation(self, button_name, view):
+        """Handle navigation logic based on button clicks
+        
+        Args:
+            button_name: The name of the button clicked
+            view: The current view for accessing root
+            
+        Returns:
+            bool: True if navigation handled, False otherwise
+        """
+        if button_name == "btn_ChangePassword":
+            # When clicked Change Password on Change Password window -> go back to Account MainWindow
+            view.root.destroy()
+            from View.AccountManagement.AccountMan import AccountManagement
+            accountman_root = Tk()
+            accountman = AccountManagement(accountman_root, user_data=self.user_data)
+            accountman_root.mainloop()
+            return True
+            
+        elif button_name == "btn_EditAccountInformation":
+            view.root.destroy()
+            from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
+            editinfo_root = Tk()
+            editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
+            editinfo_root.mainloop()
+            return True
+            
+        elif button_name == "btn_BackToHomepage":
+            view.root.destroy()
+            from View.Homepage import HomepageApp
+            role = 'admin' if self.user_data[6] == 'Admin' else 'User'
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root, user_data=self.user_data)
+            homepage_root.mainloop()
+            return True
+            
+        return False
 
 # For testing purposes
 if __name__ == "__main__":
