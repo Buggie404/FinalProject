@@ -31,11 +31,11 @@ class BorrowController:
         """
         # Check if user_id is empty
         if not user_id:
-            return False, None, None, "No match ID!"
+            return False, None, None, "ID cannot be empty!"
 
         # Check if book_id is empty
         if not book_id:
-            return False, None, None, "No match ISBN!"
+            return False, None, None, "ISBN cannot be empty!"
 
         # Check if user exists
         user_data = User.get_id(user_id)
@@ -48,7 +48,7 @@ class BorrowController:
             return False, None, None, "No match ISBN!"
 
         # Check if book is available (quantity > 0)
-        available_quantity = book_data[5]  # Assuming quantity is at index 5
+        available_quantity = book_data[5]  
         if available_quantity <= 0:
             return False, None, None, "Book not available for borrowing"
 

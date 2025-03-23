@@ -2,10 +2,11 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Button, PhotoImage
 
 class Borrow2App:
-    def __init__(self, root, book_id=None, assets_path=None):
+    def __init__(self, root, user_data = None, book_id=None, assets_path=None):
         self.root = root
+        self.user_data = user_data
         self.book_id = book_id
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
@@ -238,17 +239,35 @@ class Borrow2App:
         setattr(self, button_name, button)
         return button
 
-    def on_back_to_homepage_clicked(self):
+    def on_back_to_homepage_clicked(self): # Switch to Homepage window, and the current borrowing section will be canceled
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
+        self.root.destroy()
+        from View.Homepage import HomepageApp
+        from Controller.test_borrowbook_controller import BorrowingCart
+        cart = BorrowingCart.get_instance()
+        cart.clear()
+        role = 'admin' if self.user_data[6] == "Admin" else "User"
+        homepage_root = Tk()
+        homepage = HomepageApp(homepage_root, role = role, user_data=self.user_data)
+        homepage_root.mainloop()
 
-    def on_return_book_clicked(self):
+    def on_return_book_clicked(self): # Cannot switch to Return Book when in borrowing section
         """Handle return book button click"""
         print("btn_ReturnBook clicked")
+        pass
 
-    def on_borrow_book_clicked(self):
+    def on_borrow_book_clicked(self): # Switch to first Borrow window, the current cart will be cancel
         """Handle borrow book button click"""
         print("btn_BorrowBook clicked")
+        self.root.destroy()
+        from View.BorrowReturnBook.Borrow1 import Borrow1App
+        from Controller.test_borrowbook_controller import BorrowingCart
+        cart = BorrowingCart.get_instance()
+        cart.clear()
+        borrow_root = Tk()
+        borrow = Borrow1App(borrow_root, user_data=self.user_data)
+        borrow_root.mainloop()
 
     def on_confirm_clicked(self):
         """Handle confirm button click"""
@@ -305,7 +324,7 @@ class Borrow2App:
         book_data = Book.get_book_by_id(self.book_id)
 
         # Show Print_Receipt with book data and quantity
-        Print_Receipt(self.root, book_data, requested_quantity)
+        Print_Receipt(self.root, self.user_data, book_data, requested_quantity)
 
 if __name__ == "__main__":
     window = Tk()

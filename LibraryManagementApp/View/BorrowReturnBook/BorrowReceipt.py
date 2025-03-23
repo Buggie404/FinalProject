@@ -8,12 +8,13 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 class BorrowReceiptApp:
-    def __init__(self, root, receipt_id=None, borrow_date=None, return_deadline=None, assets_path=None):
+    def __init__(self, root, user_data=None, receipt_id=None, borrow_date=None, return_deadline=None, assets_path=None):
         self.root = root
+        self.user_data = user_data
         self.receipt_id = receipt_id
         self.borrow_date = borrow_date
         self.return_deadline = return_deadline  # Store the return deadline
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
@@ -143,8 +144,6 @@ class BorrowReceiptApp:
                     return_date=display_return_date  # Use calculated return deadline
                 )
 
-                # Display list of all borrowed books
-                self.display_multiple_books(related_receipts)
             else:
                 # Single book receipt - display normally
                 # Truncate book_id if it's too long
@@ -322,66 +321,6 @@ class BorrowReceiptApp:
             return_date=return_deadline
         )
 
-    def display_multiple_books(self, related_receipts):
-        """Display a list of multiple books from related receipts"""
-        # Create a header for the book list
-        y_position = 500  # Starting Y position for the list (adjust as needed)
-
-        self.canvas.create_text(
-            400, 
-            y_position-30,
-            text="Books Borrowed:",
-            fill="#0A66C2",
-            font=("Montserrat Bold", 14*-1)
-        )
-
-        # Get book titles
-        import sys
-        import os
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        parent_dir = os.path.dirname(current_dir)
-        sys.path.append(parent_dir)
-        from Model.book_model import Book
-
-        # List each book
-        for i, receipt in enumerate(related_receipts):
-            try:
-                # Receipt structure: (receipt_id, user_id, book_id, borrow_date, return_date, status, borrowed_quantity)
-                if len(receipt) >= 3:
-                    book_id = receipt[2]  # book_id is at index 2
-
-                    # Ensure we don't display "MULTIPLE" entries
-                    if book_id.upper() == "MULTIPLE":
-                        continue
-
-                    if len(book_id) > 15:
-                        display_book_id = book_id[:12] + "..."
-                    else:
-                        display_book_id = book_id
-                    
-                    # Check if borrowed_quantity is available at index 6
-                    quantity = receipt[6] if len(receipt) > 6 else 1
-
-                    # Get book title
-                    book_data = Book.get_book_by_id(book_id)
-                    title = book_data[1] if book_data and len(book_data) > 1 else "Unknown Book"
-
-                    # Truncate title if too long
-                    display_title = title if len(title) < 25 else title[:22] + "..."
-
-                    # Create text for each book
-                    self.canvas.create_text(
-                        400,
-                        y_position + (i * 20),
-                        text=f"{display_book_id} - {display_title} (Qty: {quantity})",
-                        fill="#0A66C2",
-                        font=("Montserrat Medium", 12 * -1)
-                    )
-            except Exception as e:
-                print(f"Error displaying book {i}: {e}")
-                import traceback
-                traceback.print_exc()
-
     def create_buttons(self):
         """Create all buttons in the application"""
         button_configs = [
@@ -420,69 +359,43 @@ class BorrowReceiptApp:
         setattr(self, button_name, button)
         return button
 
-    def on_back_to_homepage_clicked(self):
+    def on_back_to_homepage_clicked(self): # Switch to Homepage
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
-        try:
-            self.root.destroy()
-            # Import and create the homepage window
-            from tkinter import Tk
-            from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
-            homepage_root = Tk()
-            app = BorrowReturnApp(homepage_root)
-            homepage_root.mainloop()
-        except Exception as e:
-            print(f"Error navigating to homepage: {e}")
-            import traceback
-            traceback.print_exc()
+        self.root.destroy()
+        from View.Homepage import HomepageApp
+        role = "admin" if self.user_data[6] == "Admin" else "User"
+        homepage_root = Tk()
+        homepage = HomepageApp(homepage_root, user_data = self.user_data, role = role)
+        homepage_root.mainloop()
 
-    def on_return_book_clicked(self):
+    def on_return_book_clicked(self): # Switch to Return book section
         """Handle return book button click"""
         print("btn_ReturnBook clicked")
-        try:
-            self.root.destroy()
-            # Import and create the return book window
-            from tkinter import Tk
-            from View.BorrowReturnBook.Return1 import Return1App
-            return_root = Tk()
-            app = Return1App(return_root)
-            return_root.mainloop()
-        except Exception as e:
-            print(f"Error navigating to return book: {e}")
-            import traceback
-            traceback.print_exc()
+        self.root.destroy()
+        from View.BorrowReturnBook.Return1 import Return1App
+        return_root = Tk()
+        return_1 = Return1App(return_root, user_data = self.user_data)
+        return_root.mainloop()
 
-    def on_borrow_book_clicked(self):
+    def on_borrow_book_clicked(self): # Switch to Borrow book section
         """Handle borrow book button click"""
         print("btn_BorrowBook clicked")
-        try:
-            self.root.destroy()
-            # Import and create the borrow book window
-            from tkinter import Tk
-            from View.BorrowReturnBook.Borrow1 import Borrow1App
-            borrow_root = Tk()
-            app = Borrow1App(borrow_root)
-            borrow_root.mainloop()
-        except Exception as e:
-            print(f"Error navigating to borrow book: {e}")
-            import traceback
-            traceback.print_exc()
+        self.root.destroy()
+        from View.BorrowReturnBook.Borrow1 import Borrow1App
+        borrow_root = Tk()
+        borrow = Borrow1App(borrow_root, user_data = self.user_data)
+        borrow_root.mainloop()
 
-    def on_back_clicked(self):
+
+    def on_back_clicked(self): # Switch to Borrow/Return window
         """Handle back button click"""
         print("btn_Back clicked")
-        try:
-            self.root.destroy()
-            # Import and create the previous window (likely Borrow1)
-            from tkinter import Tk
-            from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
-            back_root = Tk()
-            app = BorrowReturnApp(back_root)
-            back_root.mainloop()
-        except Exception as e:
-            print(f"Error navigating back: {e}")
-            import traceback
-            traceback.print_exc()
+        self.root.destroy()
+        from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
+        borrow_return_root = Tk()
+        borrow_return = BorrowReturnApp(borrow_return_root, user_data = self.user_data)
+        borrow_return_root.mainloop()
 
 if __name__ == "__main__":
     window = Tk()
