@@ -7,11 +7,11 @@ class BookManaEditBook:
     def __init__(self, root, assets_path=None):
         # Initialize the main window
         self.root = root
-        self.root.geometry("898x605+0+0")
+        self.root.geometry("898x605+0+0") #Set vị trí của UI
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
-        # Set up asset paths
+        # Set up asset paths 
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
         if assets_path:
@@ -51,17 +51,13 @@ class BookManaEditBook:
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Draw a rectangle with rounded corners."""
         # Top left corner
-        self.canvas.create_arc(x1, y1, x1 + 2 * radius, y1 + 2 * radius, 
-                              start=90, extent=90, fill=color, outline=color)
+        self.canvas.create_arc(x1, y1, x1 + 2 * radius, y1 + 2 * radius, start=90, extent=90, fill=color, outline=color)
         # Top right corner
-        self.canvas.create_arc(x2 - 2 * radius, y1, x2, y1 + 2 * radius, 
-                              start=0, extent=90, fill=color, outline=color)
+        self.canvas.create_arc(x2 - 2 * radius, y1, x2, y1 + 2 * radius, start=0, extent=90, fill=color, outline=color)
         # Bottom left corner
-        self.canvas.create_arc(x1, y2 - 2 * radius, x1 + 2 * radius, y2, 
-                              start=180, extent=90, fill=color, outline=color)
+        self.canvas.create_arc(x1, y2 - 2 * radius, x1 + 2 * radius, y2, start=180, extent=90, fill=color, outline=color)
         # Bottom right corner
-        self.canvas.create_arc(x2 - 2 * radius, y2 - 2 * radius, x2, y2, 
-                              start=270, extent=90, fill=color, outline=color)
+        self.canvas.create_arc(x2 - 2 * radius, y2 - 2 * radius, x2, y2, start=270, extent=90, fill=color, outline=color)
 
         # Rectangle body
         self.canvas.create_rectangle(x1 + radius, y1, x2 - radius, y2, fill=color, outline=color)
@@ -169,7 +165,6 @@ class BookManaEditBook:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
-
         if button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp

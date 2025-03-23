@@ -92,7 +92,7 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
         self.message_2 = Toplevel(root)
         self.message_type = message_type
         self.message_2.title(" ")
-        self.message_2.geometry("300x150")
+        self.message_2.geometry("350x150+0+0")
         self.message_2.resizable(False, False)
         self.message_2.config(bg='white')
 
