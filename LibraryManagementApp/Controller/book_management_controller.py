@@ -10,7 +10,7 @@ from tkinter import Tk, messagebox
 
 from Model.book_model import Book
 from Model.admin_model import Admin
-from View.noti_tab_view_1 import Delete, Message_1, Invalid
+from View.noti_tab_view_1 import Delete, Message_1, Invalid, Message_2
 
 # from View.BookManaAddBook import BookManagementAddBookApp
 # from View.BookManaAddBook1 import BookManaAddBook1App
@@ -688,27 +688,30 @@ class add_book:
             return False, "Quantity must be a number", ""
        
         return True, "", quantity_int
-    
+
 class BookEditController:
     def __init__(self, view=None):
         """Initialize the BookEdit controller."""
         self.view = view
         self.book_data = None
-        
-        # If view is provided, bind search button
-        if self.view and hasattr(self.view, 'buttons') and 'btn_Search' in self.view.buttons:
-            self.view.buttons['btn_Search'].config(command=self.search_book)
-            
-        # If view is BookManaEditBook1 and has confirm button, bind it
-        if self.view and hasattr(self.view, 'buttons') and 'btn_Confirm' in self.view.buttons:
-            self.view.buttons['btn_Confirm'].config(command=self.update_book)
 
+        # Initialize controller with this view
+        # self.controller = BookEditController(self)
+
+       # Update confirm button command
+        if view and hasattr(view, 'buttons') and 'btn_Confirm' in view.buttons:
+            view.buttons['btn_Confirm'].config(command=self.update_book)
+        
+        # Get book data from view if available
+        if view and hasattr(view, 'book_data'):
+            self.book_data = view.book_data
+    
     def search_book(self):
         """Search for a book by ISBN and navigate to edit screen if found."""
         if not hasattr(self.view, 'entries') or 'lnE_ISBN' not in self.view.entries:
             print("Error: ISBN entry field not found")
             return
-            
+        
         isbn = self.view.entries['lnE_ISBN'].get().strip()
         
         # Validate ISBN format
@@ -717,7 +720,7 @@ class BookEditController:
             # Set focus back to ISBN field
             self.view.entries['lnE_ISBN'].focus_set()
             return
-            
+        
         # Try to find the book
         book = Book.get_book_by_id(isbn)
         
@@ -726,124 +729,494 @@ class BookEditController:
             # Set focus back to ISBN field
             self.view.entries['lnE_ISBN'].focus_set()
             return
-            
+        
         print(f"Book found: {book}")  # Debug print
         
         # Book found, navigate to edit screen
         self.view.root.destroy()
         
         # Create new edit screen with book data
-        edit_root = Tk()
+        from tkinter import Tk
         from View.BookManagement.BookManaEditBook1 import BookEdit1App
+        edit_root = Tk()
         edit_app = BookEdit1App(edit_root, book_data=book)
         edit_root.mainloop()
-        
+    
     def update_book(self):
-        """Update book information in database."""
-        # This method is called from the view's update_book method
-        # The view already handles validation and data collection
-        pass
+        """Validate all fields and update book in database"""
+        print("Update book method called from controller!")
         
-    def update_book_data(self, book_id, updated_data):
-        """Update book data in the database."""
+        if not self.view or not self.book_data:
+            print("Error: View or book data not available")
+            return
+        
+        # Get all field values from view
+        field_values = self.view.get_field_values()
+        
+        # Validate Title
+        title = field_values["title"]
+        if not title or len(title) < 2 or len(title) > 255:
+            self.view.entries["lnE_Title"].focus_set()
+            messagebox.showwarning("Invalid Title", "Title must be between 2 and 255 characters.")
+            return
+        
+        # Validate Author
+        author = field_values["author"]
+        if not author or len(author) < 2 or len(author) > 100:
+            self.view.entries["lnE_Author"].focus_set()
+            messagebox.showwarning("Invalid Author", "Author must be between 2 and 100 characters.")
+            return
+        
+        if re.search(r'\d', author):
+            self.view.entries["lnE_Author"].focus_set()
+            messagebox.showwarning("Invalid Author", "Author name cannot contain numbers.")
+            return
+        
+        if not re.match(r'^[a-zA-ZÀ-ỹ\s\-\.,&]+$', author):
+            self.view.entries["lnE_Author"].focus_set()
+            messagebox.showwarning("Invalid Author", "Only letters, spaces, hyphens (-), periods (. ), commas (,), and ampersands (&) are allowed.")
+            return
+        
+        if re.search(r'[\-]{2,}|[\. ]{2,}|[,]{2,}|[&]{2,}', author):
+            self.view.entries["lnE_Author"].focus_set()
+            messagebox.showwarning("Invalid Author", "Special characters (., -, comma, &) cannot appear consecutively.")
+            return
+        
+        # Validate Published Year
+        year = field_values["published_year"]
+        if not year or not year.isdigit():
+            self.view.entries["lnE_PublishedYear"].focus_set()
+            messagebox.showwarning("Invalid Year", "Published Year must be a number.")
+            return
+        
+        year_int = int(year)
+        current_year = datetime.datetime.now().year
+        if year_int < 1440 or year_int > current_year:
+            self.view.entries["lnE_PublishedYear"].focus_set()
+            messagebox.showwarning("Invalid Year", f"Published Year must be between 1440 and {current_year}.")
+            return
+        
+        # Validate Category
+        category = field_values["category"]
+        valid_categories = [
+            "Fiction", "Non Fiction", "Mystery", "Science",
+            "Fantasy", "History", "Romance", "Biography",
+            "Thriller", "Technology"
+        ]
+        
+        if not category or category not in valid_categories:
+            self.view.entries["lnE_Category"].focus_set()
+            messagebox.showwarning("Invalid Category", f"Category must be one of: {', '.join(valid_categories)}.")
+            return
+        
+        # Validate Quantity
+        quantity = field_values["quantity"]
+        if not quantity or not quantity.isdigit():
+            self.view.entries["lnE_Quantity"].focus_set()
+            messagebox.showwarning("Invalid Quantity", "Quantity must be a positive integer.")
+            return
+        
+        quantity_int = int(quantity)
+        if quantity_int <= 0:
+            self.view.entries["lnE_Quantity"].focus_set()
+            messagebox.showwarning("Invalid Quantity", "Quantity must be greater than zero.")
+            return
+        
+        # If all fields are valid, proceed with update
         try:
-            # Create a Book object with the original book_id
-            book = Book(book_id=book_id)
+            # Format data
+            formatted_title = re.sub(r'\s+', ' ', title)
+            formatted_author = self.format_author_name(author)
             
-            # Update the book with new data
+            # Get original book ID
+            book_id = self.book_data[0]  # Original ISBN/book_id (unchanged)
+            
+            print(f"Updating book: ID={book_id}, title={formatted_title}, author={formatted_author}, year={year_int}, category={category}, quantity={quantity_int}")
+            
+            # Create dictionary with updated data
+            updated_data = {
+                'title': formatted_title,
+                'author': formatted_author,
+                'published_year': year_int,
+                'category': category,
+                'quantity': quantity_int
+            }
+            
+            # Update book in database
+            book = Book(book_id=book_id)
             success = book.update_book(updated_data)
             
-            return success
+            print(f"Database update result: {success}")
+            
+            if success:
+                # Show success message using notification system
+                from View.noti_tab_view_1 import Message_2
+                Message_2(self.view.root, 'edit_book')
+            else:
+                messagebox.showerror("Update Failed", "Failed to update book information in the database.")
+            
         except Exception as e:
             print(f"Error updating book: {e}")
-            return False
-            
-    def validate_title(self, title):
-        """Validate book title."""
-        if not title or title.strip() == "":
-            return False, "Title cannot be empty."
-            
-        # Check length
-        if len(title.strip()) < 2:
-            return False, "Title must be at least 2 characters."
-        if len(title.strip()) > 255:
-            return False, "Title must be at most 255 characters."
-            
-        return True, ""
+            import traceback
+            traceback.print_exc()
+            messagebox.showerror("Update Error", f"An error occurred: {str(e)}")
+    
+    def format_author_name(self, author):
+        """Format author name with proper capitalization"""
+        # Split by spaces
+        words = author.split()
+        result = []
         
-    def validate_author(self, author):
-        """Validate book author."""
-        if not author or author.strip() == "":
-            return False, "Author cannot be empty."
-            
+        for word in words:
+            # If word contains special characters like period or hyphen
+            if '.' in word or '-' in word or ',' in word or '&' in word:
+                # Split by special characters and keep them
+                parts = []
+                current = ""
+                for char in word:
+                    if char in '.-,&':
+                        if current:
+                            parts.append(current)
+                            current = ""
+                        parts.append(char)
+                    else:
+                        current += char
+                if current:
+                    parts.append(current)
+                
+                # Process each part
+                processed_parts = []
+                for i, part in enumerate(parts):
+                    if part in '.-,&':
+                        processed_parts.append(part)
+                    elif i == 0 or parts[i-1] in '.-':
+                        # Capitalize if it's the first part or follows a period or hyphen
+                        processed_parts.append(part[0].upper() + part[1:].lower() if part else "")
+                    else:
+                        # Otherwise lowercase
+                        processed_parts.append(part.lower())
+                
+                result.append(''.join(processed_parts))
+            else:
+                # Regular word - capitalize first letter
+                result.append(word[0].upper() + word[1:].lower() if word else "")
+        
+        # Join with spaces and standardize multiple spaces
+        formatted_author = ' '.join(result)
+        return re.sub(r'\s+', ' ', formatted_author)
+    
+    def validate_title(self, event):
+        """Validate title field"""
+        title = self.view.entries["lnE_Title"].get().strip()
+        
+        # Check if empty
+        if not title:
+            # Only show message if no skip_message flag
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Title", "Title cannot be empty.")
+                event.widget._shown_warning = True
+            return False
+        
         # Check length
-        if len(author.strip()) < 2:
-            return False, "Author must be at least 2 characters."
-        if len(author.strip()) > 100:
-            return False, "Author must be at most 100 characters."
-            
+        if len(title) < 2 or len(title) > 255:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Title", "Title must be between 2 and 255 characters.")
+                event.widget._shown_warning = True
+            return False
+        
+        # Standardize spaces
+        standardized_title = re.sub(r'\s+', ' ', title)
+        self.view.entries["lnE_Title"].delete(0, 'end')
+        self.view.entries["lnE_Title"].insert(0, standardized_title)
+        
+        return True
+    
+    def validate_author(self, event):
+        """Validate author field"""
+        author = self.view.entries["lnE_Author"].get().strip()
+        
+        # Check if empty
+        if not author:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Author", "Author cannot be empty.")
+                event.widget._shown_warning = True
+            return False
+        
+        # Check length
+        if len(author) < 2 or len(author) > 100:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Author", "Author must be between 2 and 100 characters.")
+                event.widget._shown_warning = True
+            return False
+        
         # Check for numbers
         if re.search(r'\d', author):
-            return False, "Author name cannot contain numbers."
-            
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Author", "Author name cannot contain numbers.")
+                event.widget._shown_warning = True
+            return False
+        
         # Check for allowed characters
         if not re.match(r'^[a-zA-ZÀ-ỹ\s\-\.,&]+$', author):
-            return False, "Only letters, spaces, hyphens (-), periods (.), commas (,), and ampersands (&) are allowed."
-            
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Author", "Only letters, spaces, hyphens (-), periods (. ), commas (,), and ampersands (&) are allowed.")
+                event.widget._shown_warning = True
+            return False
+        
         # Check for consecutive special characters
         if re.search(r'[\-]{2,}|[\. ]{2,}|[,]{2,}|[&]{2,}', author):
-            return False, "Special characters (., -, comma, &) cannot appear consecutively."
-            
-        return True, ""
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Author", "Special characters (., -, comma, &) cannot appear consecutively.")
+                event.widget._shown_warning = True
+            return False
         
-    def validate_published_year(self, year):
-        """Validate published year."""
-        if not year or year.strip() == "":
-            return False, "Published Year cannot be empty."
-            
+        # Format author name to title case with special handling
+        formatted_author = self.format_author_name(author)
+        self.view.entries["lnE_Author"].delete(0, 'end')
+        self.view.entries["lnE_Author"].insert(0, formatted_author)
+        
+        return True
+    
+    def validate_published_year(self, event):
+        """Validate published year field"""
+        year = self.view.entries["lnE_PublishedYear"].get().strip()
+        
+        # Check if empty
+        if not year:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Year", "Published Year cannot be empty.")
+                event.widget._shown_warning = True
+            return False
+        
         # Check if it's a number
         if not year.isdigit():
-            return False, "Published Year must be a number."
-            
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Year", "Published Year must be a number.")
+                event.widget._shown_warning = True
+            return False
+        
         # Check range
         year_int = int(year)
         current_year = datetime.datetime.now().year
         
         if year_int < 1440 or year_int > current_year:
-            return False, f"Published Year must be between 1440 and {current_year}."
-            
-        return True, ""
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Year", f"Published Year must be between 1440 and {current_year}.")
+                event.widget._shown_warning = True
+            return False
         
-    def validate_category(self, category):
-        """Validate book category."""
-        if not category or category.strip() == "":
-            return False, "Category cannot be empty."
-            
+        return True
+    
+    def validate_category(self, event):
+        """Validate category field"""
+        category = self.view.entries["lnE_Category"].get().strip()
+        
+        # Check if empty
+        if not category:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Category", "Category cannot be empty.")
+                event.widget._shown_warning = True
+            return False
+        
         # Valid categories list
         valid_categories = [
-            "Fiction", "Non-Fiction", "Mystery", "Science", 
-            "Fantasy", "History", "Romance", "Biography", 
+            "Fiction", "Non Fiction", "Mystery", "Science",
+            "Fantasy", "History", "Romance", "Biography",
             "Thriller", "Technology"
         ]
         
         # Check if category is valid
         if category not in valid_categories:
-            return False, f"Category must be one of: {', '.join(valid_categories)}."
-            
-        return True, ""
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Category", f"Category must be one of: {', '.join(valid_categories)}.")
+                event.widget._shown_warning = True
+            return False
         
-    def validate_quantity(self, quantity):
-        """Validate book quantity."""
-        if not quantity or quantity.strip() == "":
-            return False, "Quantity cannot be empty."
-            
+        return True
+    
+    def validate_quantity(self, event):
+        """Validate quantity field"""
+        quantity = self.view.entries["lnE_Quantity"].get().strip()
+        
+        # Check if empty
+        if not quantity:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Quantity", "Quantity cannot be empty.")
+                event.widget._shown_warning = True
+            return False
+        
         # Check if it's a number
         if not quantity.isdigit():
-            return False, "Quantity must be a positive integer."
-            
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Quantity", "Quantity must be a positive integer.")
+                event.widget._shown_warning = True
+            return False
+        
         # Check if it's positive
         quantity_int = int(quantity)
         if quantity_int <= 0:
-            return False, "Quantity must be greater than zero."
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Quantity", "Quantity must be greater than zero.")
+                event.widget._shown_warning = True
+            return False
+        
+        return True
+    
+# class BookEditController:
+#     def __init__(self, view=None):
+#         """Initialize the BookEdit controller."""
+#         self.view = view
+#         self.book_data = None
+        
+#         # If view is provided, bind search button
+#         if self.view and hasattr(self.view, 'buttons') and 'btn_Search' in self.view.buttons:
+#             self.view.buttons['btn_Search'].config(command=self.search_book)
             
-        return True, ""
+#         # If view is BookManaEditBook1 and has confirm button, bind it
+#         if self.view and hasattr(self.view, 'buttons') and 'btn_Confirm' in self.view.buttons:
+#             self.view.buttons['btn_Confirm'].config(command=self.update_book)
+
+#     def search_book(self):
+#         """Search for a book by ISBN and navigate to edit screen if found."""
+#         if not hasattr(self.view, 'entries') or 'lnE_ISBN' not in self.view.entries:
+#             print("Error: ISBN entry field not found")
+#             return
+            
+#         isbn = self.view.entries['lnE_ISBN'].get().strip()
+        
+#         # Validate ISBN format
+#         if not isbn.isdigit() or len(isbn) != 13:
+#             messagebox.showerror("Invalid ISBN", "ISBN must be exactly 13 digits.")
+#             # Set focus back to ISBN field
+#             self.view.entries['lnE_ISBN'].focus_set()
+#             return
+            
+#         # Try to find the book
+#         book = Book.get_book_by_id(isbn)
+        
+#         if not book:
+#             messagebox.showerror("Book Not Found", "No book found with this ISBN in the database.")
+#             # Set focus back to ISBN field
+#             self.view.entries['lnE_ISBN'].focus_set()
+#             return
+            
+#         print(f"Book found: {book}")  # Debug print
+        
+#         # Book found, navigate to edit screen
+#         self.view.root.destroy()
+        
+#         # Create new edit screen with book data
+#         edit_root = Tk()
+#         from View.BookManagement.BookManaEditBook1 import BookEdit1App
+#         edit_app = BookEdit1App(edit_root, book_data=book)
+#         edit_root.mainloop()
+        
+#     def update_book(self):
+#         """Update book information in database."""
+#         # This method is called from the view's update_book method
+#         # The view already handles validation and data collection
+#         pass
+        
+#     def update_book_data(self, book_id, updated_data):
+#         """Update book data in the database."""
+#         try:
+#             # Create a Book object with the original book_id
+#             book = Book(book_id=book_id)
+            
+#             # Update the book with new data
+#             success = book.update_book(updated_data)
+            
+#             return success
+#         except Exception as e:
+#             print(f"Error updating book: {e}")
+#             return False
+            
+#     def validate_title(self, title):
+#         """Validate book title."""
+#         if not title or title.strip() == "":
+#             return False, "Title cannot be empty."
+            
+#         # Check length
+#         if len(title.strip()) < 2:
+#             return False, "Title must be at least 2 characters."
+#         if len(title.strip()) > 255:
+#             return False, "Title must be at most 255 characters."
+            
+#         return True, ""
+        
+#     def validate_author(self, author):
+#         """Validate book author."""
+#         if not author or author.strip() == "":
+#             return False, "Author cannot be empty."
+            
+#         # Check length
+#         if len(author.strip()) < 2:
+#             return False, "Author must be at least 2 characters."
+#         if len(author.strip()) > 100:
+#             return False, "Author must be at most 100 characters."
+            
+#         # Check for numbers
+#         if re.search(r'\d', author):
+#             return False, "Author name cannot contain numbers."
+            
+#         # Check for allowed characters
+#         if not re.match(r'^[a-zA-ZÀ-ỹ\s\-\.,&]+$', author):
+#             return False, "Only letters, spaces, hyphens (-), periods (.), commas (,), and ampersands (&) are allowed."
+            
+#         # Check for consecutive special characters
+#         if re.search(r'[\-]{2,}|[\. ]{2,}|[,]{2,}|[&]{2,}', author):
+#             return False, "Special characters (., -, comma, &) cannot appear consecutively."
+            
+#         return True, ""
+        
+#     def validate_published_year(self, year):
+#         """Validate published year."""
+#         if not year or year.strip() == "":
+#             return False, "Published Year cannot be empty."
+            
+#         # Check if it's a number
+#         if not year.isdigit():
+#             return False, "Published Year must be a number."
+            
+#         # Check range
+#         year_int = int(year)
+#         current_year = datetime.datetime.now().year
+        
+#         if year_int < 1440 or year_int > current_year:
+#             return False, f"Published Year must be between 1440 and {current_year}."
+            
+#         return True, ""
+        
+#     def validate_category(self, category):
+#         """Validate book category."""
+#         if not category or category.strip() == "":
+#             return False, "Category cannot be empty."
+            
+#         # Valid categories list
+#         valid_categories = [
+#             "Fiction", "Non-Fiction", "Mystery", "Science", 
+#             "Fantasy", "History", "Romance", "Biography", 
+#             "Thriller", "Technology"
+#         ]
+        
+#         # Check if category is valid
+#         if category not in valid_categories:
+#             return False, f"Category must be one of: {', '.join(valid_categories)}."
+            
+#         return True, ""
+        
+#     def validate_quantity(self, quantity):
+#         """Validate book quantity."""
+#         if not quantity or quantity.strip() == "":
+#             return False, "Quantity cannot be empty."
+            
+#         # Check if it's a number
+#         if not quantity.isdigit():
+#             return False, "Quantity must be a positive integer."
+            
+#         # Check if it's positive
+#         quantity_int = int(quantity)
+#         if quantity_int <= 0:
+#             return False, "Quantity must be greater than zero."
+            
+#         return True, ""
