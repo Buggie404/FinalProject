@@ -13,7 +13,7 @@ sys.path.append(base_dir)
 
 # Import models and controllers
 from Model.user_model import User
-from Controller.password_change_controller import PasswordChangeController
+from Controller.account_management_controller import PasswordChangeController
 
 class AccountChangePwApp:
     def __init__(self, root, user_data=None, assets_path=None):
@@ -31,7 +31,7 @@ class AccountChangePwApp:
         self.root.resizable(False, False)
 
         # Initialize the controller first, before using it
-        from Controller.password_change_controller import PasswordChangeController
+        from Controller.account_management_controller import PasswordChangeController
         self.controller = PasswordChangeController(user_data)
 
         # Set up asset paths

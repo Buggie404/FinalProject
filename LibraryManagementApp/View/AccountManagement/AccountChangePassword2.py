@@ -78,20 +78,6 @@ class AccountChangePw2App:
         # Hình chữ nhật lớn nằm ngang (bo góc)
         self.create_rounded_rectangle(285.0, 80.0, 871.0, 525.0, radius=10, color="#F1F1F1")
 
-    # def create_background(self):
-    #     """Create the main background elements"""
-    #     # Left sidebar background
-    #     self.canvas.create_rectangle(
-    #         0.0, 0.0, 262.0, 605.0,
-    #         fill="#0A66C2", outline=""
-    #     )
-    #
-    #     # Main content area
-    #     self.canvas.create_rectangle(
-    #         285.0, 80.0, 871.0, 525.0,
-    #         fill="#F0F0F0", outline=""
-    #     )
-
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
         # Load and place logo
