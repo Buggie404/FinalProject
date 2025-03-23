@@ -220,20 +220,21 @@ class Return1App:
         if not receipt_id:
             messagebox.showwarning("Warning", "Please enter a Receipt ID")
             return
-    
-    # Kiểm tra receipt trong database
-        from Model.receipt_model import Receipt
-        receipt_data = Receipt.get_single_receipt_by_id(receipt_id)
+        
+        # Use the controller to validate the receipt
+        from Controller.return_controller import ReturnController
 
-        if not receipt_data:
-            messagebox.showerror("Error", "Receipt not found!")
-            return
-    # Verify the receipt belongs to the current user
-        if self.user_data and receipt_data[1] != self.user_data[0]:  # Check if user_id matches
-            messagebox.showerror("Error", "This receipt doesn't belong to your account!")
+        # Extract user_id from self.user_data if available
+        user_id = self.user_data[0] if self.user_data else None
+
+        # Validate receipt access through controller
+        is_valid, message = ReturnController.validate_receipt_access(receipt_id, user_id)
+
+        if not is_valid:
+            messagebox.showerror("Error", message)
             return
         
-    # Nếu tìm thấy, đóng cửa sổ Return1 và mở Return2, truyền receipt_id qua
+         # Nếu tìm thấy, đóng cửa sổ Return1 và mở Return2, truyền receipt_id qua
         self.root.destroy()
         from View.BorrowReturnBook.Return2 import Return2App 
         return2_root = Tk()

@@ -251,8 +251,11 @@ class Return2App:
 
         print("btn_DropOff clicked")
         try:
+            # Extract user_id from self.user_data if available
+            user_id = self.user_data[0] if self.user_data else None
+
         # Process the return through the controller
-            success, receipt_status, message = ReturnController.process_return(self.receipt_id)
+            success, receipt_status, message = ReturnController.process_return(self.receipt_id,user_id)
         
             if not success:
                 messagebox.showerror("Error", message)
@@ -317,14 +320,21 @@ class Return2App:
             print("No receipt ID provided")
             return
 
+        # Validate receipt access using controller
+        from Controller.return_controller import ReturnController
+        
+         # Extract user_id from self.user_data if available
+        user_id = self.user_data[0] if self.user_data else None
+
+         # Validate receipt access
+        is_valid, message = ReturnController.validate_receipt_access(self.receipt_id, user_id)
+
+        if not is_valid:
+            print(message)
+            messagebox.showerror("Error", message)
         from Model.receipt_model import Receipt
         # Get receipt data from database
         receipt_data = Receipt.get_single_receipt_by_id(self.receipt_id)
-
-        if not receipt_data:
-            print(f"No receipt found with ID: {self.receipt_id}")
-            messagebox.showerror("Error", f"No receipt found with ID: {self.receipt_id}")
-            return
 
         print(f"Loaded receipt data: {receipt_data}")
 
