@@ -469,7 +469,8 @@ class PasswordChangeController:
             view.root.destroy()
             from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
             editinfo_root = Tk()
-            editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
+            user_id = self.user_data[0] if self.user_data else None
+            editinfo = AccountEditInfoApp(editinfo_root, user_id=user_id)
             editinfo_root.mainloop()
             return True
             
