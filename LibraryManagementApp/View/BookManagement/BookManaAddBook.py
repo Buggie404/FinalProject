@@ -336,9 +336,10 @@ class BookManagementAddBookApp:
                 return
            
             # Process the form if all validations pass
-            success, message, book_data = add_book.process_book_form(
-                isbn, title, author, published_year, category, quantity
-            )
+            parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            sys.path.append(parent_dir)
+            from Controller.book_management_controller import add_book
+            success, message, book_data = add_book.process_book_form(isbn, title, author, published_year, category, quantity)
            
             if success:
                 # Transition to the confirmation screen
@@ -362,29 +363,27 @@ class BookManagementAddBookApp:
                 messagebox.showerror("Error", message)
        
         elif button_name == "btn_AddBook":
-            # Refresh the current page
             self.root.destroy()
-            root = Tk()
-            app = BookManagementAddBookApp(root)
-            root.mainloop()
-       
+            from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
+            add_book_root = Tk()
+            add_book = BookManagementAddBookApp(add_book_root)
+            add_book_root.mainloop()
+
         elif button_name == 'btn_EditBookInformation':
-            # Navigate to Edit Book Information screen
             self.root.destroy()
-            # Import and open the edit book screen
-            # This would need to be implemented based on your application structure
-       
-        elif button_name == 'btn_BackToHomepage':
-            # Navigate back to homepage
+            from BookManaEditBook import BookManaEditBook
+            edit_book_root = Tk()
+            edit_book = BookManaEditBook(edit_book_root)
+            edit_book_root.mainloop()
+        
+        elif button_name == "btn_BackToHomepage":
             self.root.destroy()
-            # Import and open the homepage
             parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             sys.path.append(parent_dir)
             from Homepage import HomepageApp
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root)
             homepage_root.mainloop()
-   
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()

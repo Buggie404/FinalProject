@@ -1,7 +1,20 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
+import os
+import sys
+# Get the absolute path to the current file's directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
+# Go up two levels to reach the project root
+# If BookManaAddBook.py is in View/BookManagement, this goes up to the project root
+project_root = os.path.dirname(os.path.dirname(current_dir))
+
+# Add the project root to the Python path
+sys.path.append(project_root)
+
+# Now import from the Controller module
+from Controller.book_management_controller import add_book
 class BookManaAddBook1App:
     def __init__(self, root, assets_path=None):
         # Initialize the main window
@@ -186,6 +199,29 @@ class BookManaAddBook1App:
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
+
+        if button_name == "btn_AddBook":
+            self.root.destroy()
+            from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
+            add_book_root = Tk()
+            add_book = BookManagementAddBookApp(add_book_root)
+            add_book_root.mainloop()
+
+        elif button_name == 'btn_EditBookInformation':
+            self.root.destroy()
+            from BookManaEditBook import BookManaEditBook
+            edit_book_root = Tk()
+            edit_book = BookManaEditBook(edit_book_root)
+            edit_book_root.mainloop()
+        
+        else:  # btn_BackToHomepage
+            self.root.destroy()
+            parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            sys.path.append(parent_dir)
+            from Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root)
+            homepage_root.mainloop()
 
     def set_book_details(self, book_data):
         """Set the book details in the confirmation screen"""
