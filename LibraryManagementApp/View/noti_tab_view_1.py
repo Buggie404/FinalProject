@@ -254,10 +254,9 @@ class Sign_Out():  # To Sign out, when clicked "Yes" -> switch to Log_In window
 class Print_Receipt():
     """To manage the borrowing cart and finalize the transaction"""
 
-    def __init__(self, root, user_data=None, book_data=None, quantity=None):
+    def __init__(self, root, book_data=None, quantity=None):
         # Setup tab
         self.root = root
-        self.user_data = user_data
         self.print_receipt = Toplevel(root)
         self.print_receipt.title("Borrowing Cart")
 
@@ -454,7 +453,6 @@ class Print_Receipt():
             new_window = Tk()
             app = BorrowReceiptApp(
                 new_window, 
-                user_data = self.user_data,
                 receipt_id=receipt_id, 
                 borrow_date=borrow_date,
                 return_deadline=return_deadline

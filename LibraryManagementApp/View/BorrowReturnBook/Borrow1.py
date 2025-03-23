@@ -289,7 +289,7 @@ class Borrow1App:
         # If valid, switch to Borrow2 window
         self.root.destroy()
         borrowing_root = Tk()
-        borrowing = Borrow2App(borrowing_root, book_id)
+        borrowing = Borrow2App(borrowing_root, self.user_data, book_id)
 
         # Set values in Borrow2
         borrowing.canvas.itemconfig(borrowing.lbl_ID, text=user_id)

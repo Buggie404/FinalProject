@@ -1,12 +1,13 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Button, PhotoImage
+from Model.user_model import User 
 
 class Borrow2App:
     def __init__(self, root, user_data = None, book_id=None, assets_path=None):
         self.root = root
         self.user_data = user_data
         self.book_id = book_id
-        self.root.geometry("898x605+0+0")
+        self.root.geometry("898x605")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
@@ -239,7 +240,7 @@ class Borrow2App:
         setattr(self, button_name, button)
         return button
 
-    def on_back_to_homepage_clicked(self): # Switch to Homepage window, and the current borrowing section will be canceled
+    def on_back_to_homepage_clicked(self): #Switch to Homepage
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
         self.root.destroy()
@@ -252,7 +253,8 @@ class Borrow2App:
         homepage = HomepageApp(homepage_root, role = role, user_data=self.user_data)
         homepage_root.mainloop()
 
-    def on_return_book_clicked(self): # Cannot switch to Return Book when in borrowing section
+
+    def on_return_book_clicked(self): # Cannot switch to Return Book while in Borrowing Section
         """Handle return book button click"""
         print("btn_ReturnBook clicked")
         pass
@@ -272,6 +274,7 @@ class Borrow2App:
     def on_confirm_clicked(self):
         """Handle confirm button click"""
         print("btn_Confirm clicked")
+        global user_id
 
         # Get requested quantity
         requested_quantity_str = self.lnE_BorrowedNumber.get().strip()
@@ -324,7 +327,7 @@ class Borrow2App:
         book_data = Book.get_book_by_id(self.book_id)
 
         # Show Print_Receipt with book data and quantity
-        Print_Receipt(self.root, self.user_data, book_data, requested_quantity)
+        Print_Receipt(self.root, book_data, requested_quantity)
 
 if __name__ == "__main__":
     window = Tk()
