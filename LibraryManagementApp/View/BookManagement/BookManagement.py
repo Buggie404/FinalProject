@@ -20,15 +20,20 @@ sys.path.append(project_root)
 from Controller.book_management_controller import DeleteBook, SearchBooks 
 
 class BookManagementApp:
-    def __init__(self, root, assets_path=None, admin_user=None, role=None):
+    def __init__(self, root, assets_path=None, user_data=None, admin_user=None, role=None):
         # Initialize the main window
         self.root = root
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.admin_user = admin_user
+        self.user_data = user_data or []
         self.role = role
-
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = role or "user"
+            
         # Track active category filter
         self.active_category = None
 
@@ -78,7 +83,9 @@ class BookManagementApp:
         self.controller = DeleteBook(self)
         
         # Set admin user in the controller
-        if self.admin_user:
+        if self.role == "admin":
+            from Model.admin_model import Admin
+            self.admin_user = admin_user or Admin()
             self.controller.set_admin(self.admin_user)
 
     def setup_search_and_filter(self):
@@ -254,8 +261,12 @@ class BookManagementApp:
         if button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp
+            if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+                homepage_role = "admin"
+            else:
+                homepage_role = self.role
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, role = self.admin_user)
+            homepage = HomepageApp(homepage_root, role=homepage_role, user_data=self.user_data)
             homepage.mainloop()
             
     def toggle_category_filter(self, category):

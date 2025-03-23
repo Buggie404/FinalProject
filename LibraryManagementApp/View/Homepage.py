@@ -123,7 +123,7 @@ class HomepageApp:
         from BookManagement.BookManagement import BookManagementApp
         bookmgmt_root = Tk()
         #Truyền role vào BookManagement
-        bookmgmt = BookManagementApp(bookmgmt_root, role=self.role)
+        bookmgmt = BookManagementApp(bookmgmt_root, role=self.role, user_data=self.user_data)
         bookmgmt_root.mainloop()
 
 if __name__ == "__main__":
