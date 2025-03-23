@@ -222,6 +222,9 @@ class Borrow1App:
     def on_back_to_homepage_clicked(self): # Switch back to Hokmepage window
         """Handle Back to Homepage button click event"""
         print("btn_BackToHomepage clicked")
+        if IndexError:
+            messagebox.showerror("Error", "Cannot go to Homepage while Borrowing Book!")
+
         self.root.destroy()
         from View.Homepage import HomepageApp
         role = "admin" if self.user_data[6] == "Admin" else "User"
@@ -257,7 +260,7 @@ class Borrow1App:
         user_id = self.lnE_ID.get().strip()
         if hasattr(self, 'user_id') and self.user_id:
             if str(user_id) != str(self.user_id):
-                messagebox.showwarning("Warning", "Cannot user other ID to borrow books!")
+                messagebox.showerror("Error", "Cannot user other ID to borrow books!")
             user_id = self.user_id
 
         # Import View and Controller
