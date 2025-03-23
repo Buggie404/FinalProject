@@ -216,12 +216,10 @@ class Return2App:
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
         self.root.destroy()
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        sys.path.append(os.path.join(base_dir, "View"))
-        sys.path.append(base_dir)
+        role = 'admin' if self.user_data[6] == "Admin" else "User"
         from View.Homepage import HomepageApp
         homepage_root = Tk()
-        homepage = HomepageApp(homepage_root)
+        homepage = HomepageApp(homepage_root, role = role, user_data = self.user_data)
         homepage_root.mainloop()
 
     def on_return_book_clicked(self):
@@ -230,7 +228,7 @@ class Return2App:
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return1_root = Tk()
-        return1 = Return1App(return1_root)
+        return1 = Return1App(return1_root, user_data=self.user_data)
         return1_root.mainloop()
 
     def on_borrow_book_clicked(self):
@@ -239,7 +237,7 @@ class Return2App:
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow1_root = Tk()
-        borrow1 = Borrow1App(borrow1_root)
+        borrow1 = Borrow1App(borrow1_root, user_data = self.user_data)
         borrow1_root.mainloop()
 
     def on_drop_off_clicked(self):
