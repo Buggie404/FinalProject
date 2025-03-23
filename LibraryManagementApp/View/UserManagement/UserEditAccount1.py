@@ -3,12 +3,17 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
 class UserEditAccountApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -194,19 +199,20 @@ class UserEditAccountApp:
             pass
         elif button_name == "btn_EditAccountPassword":
             # Switch back to first Edit Account Password
-            from tkinter import Tk
             from View.UserManagement.UserEditAccount import UserEditAccountApp
             self.root.destroy()
             reset_root = Tk()
-            reset = UserEditAccountApp(reset_root)
+            reset = UserEditAccountApp(reset_root, user_data=self.user_data)
             reset_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             # Switch back to Homepage
             self.root.destroy()
-            # Import and create Homepage window here
+            from View.Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root, role = self.role, user_data=self.user_data)
+            homepage_root.mainloop()
         elif button_name == "btn_ResetPassword":
-            # This will be handled by the controller via the command we set
-            # when switching to this window
+            # This will be handled by the controller via the command 
             pass
 
     def run(self):

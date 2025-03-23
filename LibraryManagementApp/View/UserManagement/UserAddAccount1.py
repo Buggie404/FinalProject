@@ -4,12 +4,18 @@ import sys
 import os
 
 class UserAddAccount1App:
-    def __init__(self, root, user_id=None, assets_path=None):
+    def __init__(self, root, user_id=None, user_data = None, assets_path=None):
         self.root = root
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.user_id = user_id  # Store the user ID
+        from Model.user_model import User
+        self.user_data = User.get_id(self.user_id)
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -182,11 +188,9 @@ class UserAddAccount1App:
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
         self.root.destroy()
-        parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        sys.path.append(parent_dir)
         from Homepage import HomepageApp
         homepage_root = Tk()
-        homepage = HomepageApp(homepage_root)
+        homepage = HomepageApp(homepage_root, role = self.role, user_data=self.user_data)
         homepage_root.mainloop()
     
     def on_add_account_clicked(self):
@@ -195,28 +199,21 @@ class UserAddAccount1App:
         self.root.destroy()
         from UserAddAccount import UserAddAccountApp
         add_user_root = Tk()
-        add_user = UserAddAccountApp(add_user_root)
+        add_user = UserAddAccountApp(add_user_root, user_data=self.user_data)
         add_user_root.mainloop()
     
-    def on_edit_account_password_clicked(self):
+    def on_edit_account_password_clicked(self): # Cannot switch to Edit Account while Adding Account
         """Handle edit account password button click"""
         print("btn_EditAccountPassword clicked")
-        self.root.destroy()
-        from UserEditAccount import UserEditAccountApp
-        edit_pass_root = Tk()
-        edit_pass = UserEditAccountApp(edit_pass_root)
-        edit_pass_root.mainloop()
+        pass
     
     def on_return_clicked(self):
         """Handle return button click"""
         print("btn_Return clicked")
         self.root.destroy()
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        sys.path.append(os.path.join(base_dir, "View"))
-        sys.path.append(base_dir)
         from View.UserManagement.UserManagement import UserManagementApp
         add_user_root = Tk()
-        add_user = UserManagementApp(add_user_root)
+        add_user = UserManagementApp(add_user_root, user_data=self.user_data)
         add_user_root.mainloop()
     
     def load_user_data(self):

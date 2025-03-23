@@ -11,6 +11,10 @@ class UserEditAccountApp:
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -165,13 +169,25 @@ class UserEditAccountApp:
         print(f"{button_name} clicked")
         if button_name == "btn_AddAccount":
         # Switch to Add Account
-            pass
+            self.root.destroy()
+            from View.UserManagement.UserAddAccount import UserAddAccountApp
+            add_root = Tk()
+            add = UserAddAccountApp(add_root, user_data = self.user_data)
+            add_root.mainloop()
         if button_name == "btn_EditAccountPassword":
             # Switch back to User Management
-            pass
+            self.root.destroy()
+            from View.UserManagement.UserManagement import UserManagementApp
+            user_root = Tk()
+            user = UserManagementApp(user_root, user_data = self.user_data)
+            user_root.mainloop()
         if button_name == "btn_BackToHomepage":
             # Switch to Homepage
-            pass
+            self.root.destroy()
+            from View.Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root, role= self.role, user_data= self.user_data)
+            homepage_root.mainloop()
         elif button_name == "btn_Search":
             # Get user ID from input field
             user_id = self.entries["lnE_InputID"].get().strip()

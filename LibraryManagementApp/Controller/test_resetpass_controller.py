@@ -177,7 +177,7 @@ class ResetPasswordController:
                 
                 # Create new window with user data
                 reset_1_root = Tk()
-                reset_1 = UserEditAccount1App(reset_1_root)
+                reset_1 = UserEditAccount1App(reset_1_root, user_data=user_data)
                 
                 # Update the labels with user data
                 # We need to wait for the canvas to be created
