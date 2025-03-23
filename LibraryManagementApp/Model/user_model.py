@@ -49,7 +49,8 @@ class User:
         self.db.conn.commit()
 
     def edit_account_info(self, new_username, new_date_of_birth): # Edit user account info
-        if User.get_username(new_username):
+        current_user = User.get_username(new_username)
+        if current_user and current_user[0] != self.user_id:
             return False  # Username already taken
         self.db.cursor.execute("UPDATE Users SET username = ?, date_of_birth = ? WHERE user_id = ?", (new_username, new_date_of_birth, self.user_id))
         self.db.conn.commit()

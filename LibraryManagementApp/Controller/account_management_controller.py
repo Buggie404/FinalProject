@@ -43,37 +43,40 @@ class AccountEditInfoController: # For Edit Account Information
     def validate_username(self, username):
         """
         Validate if the username is in an acceptable format and not already taken
-        
+
         Parameters:
-        username (str): The username to validate
-        
+            username (str): The username to validate
+
         Returns:
-        bool: True if valid, False otherwise
+            tuple: (is_valid, error_message, is_username_taken)
         """
         # Check if username is empty
         if not username or username.strip() == "":
             return (False, "Username cannot be empty!", False)
-            
+
         # Check if username is the same as current (no change)
+        # This allows users to keep their current username
         if self.current_user and self.current_user.username == username:
-            return (True, "", False)
-            
+            return (True, "", False)  # Valid, no error, not taken by someone else
+
         # Check for new_username format
         if len(username) > 15:
             return (False, "Username must be maximum 15 characters!", False)
-        
+
         if " " in username:
             return (False, "Username must not contain space", False)
-        
+
         valids_chars_pattern = re.compile(r'^[a-zA-Z0-9\W_]+$')
         if not valids_chars_pattern.match(username):
             return (False, "Invalid username format", False)
-        
-        # Check if username is already taken
+
+        # Check if username is already taken by another user
         existing_user = User.get_username(username)
         if existing_user:
-            return (False, "Username is already taken", True)
-            
+            # Check if the existing user is not the current user
+            if existing_user[0] != self.user_id:
+                return (False, "Username is already taken", True)
+
         return (True, "", False)
     
     def validate_date_of_birth(self, date_str):
@@ -179,20 +182,27 @@ class AccountEditInfoController: # For Edit Account Information
         app.run()
     
     def handle_apply_click(self, app):
-        """
-        Handler for the Apply button click in the edit info view
+        """Handler for the Apply button click in the edit info view
         
         Parameters:
-        app (AccountEditInfoApp): The current view instance
+            app (AccountEditInfoApp): The current view instance
         """
         # Get values from entry fields
         new_username = app.entries["lnE_NewUsername"].get()
         new_date_of_birth = app.entries["lnE_NewDateOfBirth"].get()
         
-        # First check for format errors before checking if username is taken
+        # Get current username for comparison
+        current_username = self.current_user.username if self.current_user else None
         
-        # Validate username format first (without checking if taken)
-        username_valid, username_error, username_taken = self.validate_username(new_username)
+        # Check if username is unchanged (user wants to keep their current username)
+        if current_username and new_username == current_username:
+            # Skip username validation if unchanged
+            username_valid = True
+            username_error = ""
+            username_taken = False
+        else:
+            # Validate username format and check if taken
+            username_valid, username_error, username_taken = self.validate_username(new_username)
         
         # If there's a format error with username (not related to it being taken)
         if not username_valid and not username_taken:
@@ -227,6 +237,7 @@ class AccountEditInfoController: # For Edit Account Information
         else:
             # This should only occur if there's a database error or other issue
             messagebox.showerror("Error", "An unexpected error occurred while updating your information.")
+
     
     def show_success_view(self):
         """Display the success view"""

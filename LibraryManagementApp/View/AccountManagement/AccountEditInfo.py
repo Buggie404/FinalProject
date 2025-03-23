@@ -50,6 +50,7 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
         self.create_background()
         self.create_sidebar()
         self.create_main_panel()
+        self.prefill_user_data()
 
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
@@ -141,14 +142,16 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
 
     def prefill_user_data(self):
         """Prefill user data in the form entries with current data"""
-        if self.controller.current_user:
-            if self.controller.current_user.username:
+        if self.user_data:
+            # Prefill username
+            if self.user_data[2]:  # Username is at index 2
                 self.entries["lnE_NewUsername"].delete(0, 'end')
-                self.entries["lnE_NewUsername"].insert(0, self.controller.current_user.username)
-
-            if self.controller.current_user.date_of_birth:
+                self.entries["lnE_NewUsername"].insert(0, self.user_data[2])
+            
+            # Prefill date of birth
+            if self.user_data[5]:  # Date of birth is at index 5
                 self.entries["lnE_NewDateOfBirth"].delete(0, 'end')
-                self.entries["lnE_NewDateOfBirth"].insert(0, self.controller.current_user.date_of_birth)
+                self.entries["lnE_NewDateOfBirth"].insert(0, self.user_data[5])
 
     def create_entry_with_icon(self, entry_name, icon_name, entry_dimensions, bg_position, icon_position):
         """Create an entry field with background and icon"""
@@ -204,7 +207,7 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
         else: # For btn_Apply
             self.controller.handle_apply_click(self)
 
-    def run(self): # ?!?!
+    def run(self): 
         """Start the application main loop"""
         self.root.mainloop()
 
