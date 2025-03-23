@@ -489,3 +489,24 @@ class Print_Receipt():
             app = Borrow1App(borrow_root)
             
         borrow_root.mainloop()
+    
+class AlreadyReturnedNotification():
+    def __init__(self, root, message="This book has already been returned!"):
+        # Setup tab
+        self.root = root
+        self.notification = Toplevel(root)
+        self.notification.title(" ")
+        self.notification.geometry("400x200")
+        self.notification.resizable(False, False)
+        self.notification.config(bg='white')
+        invalid_map = {
+             'return_status_error': ("Already Returned", "This book has already been returned or marked as overdue. You cannot return it again.")}
+        # Title Label
+        Label(self.notification, text="Already Returned", font=('Montserrat', 18, 'bold'), bg='white', fg='black').pack(pady=(20, 10))
+        
+        # Message Label
+        Label(self.notification, text=message, font=("Montserrat", 12), bg='white', fg='black').pack(pady=(10, 10))
+
+        # OK Button
+        Button(self.notification, width=13, text="OK", highlightbackground='white', highlightthickness=1, 
+               command=self.notification.destroy).pack(pady=10)

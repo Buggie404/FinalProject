@@ -234,6 +234,13 @@ class Return1App:
             messagebox.showerror("Error", message)
             return
         
+        is_valid_status, status_message = ReturnController.validate_receipt_status(receipt_id)
+        if not is_valid_status:
+            from View.noti_tab_view_1 import AlreadyReturnedNotification
+            AlreadyReturnedNotification(self.root, status_message)
+            return
+    
+
          # Nếu tìm thấy, đóng cửa sổ Return1 và mở Return2, truyền receipt_id qua
         self.root.destroy()
         from View.BorrowReturnBook.Return2 import Return2App 

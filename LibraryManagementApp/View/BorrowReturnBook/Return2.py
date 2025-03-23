@@ -244,6 +244,7 @@ class Return2App:
 
     def on_drop_off_clicked(self):
         from Controller.return_controller import ReturnController
+        from View.noti_tab_view_1 import Drop_Off, AlreadyReturnedNotification  
         from View.noti_tab_view_1 import Drop_Off
         from tkinter import messagebox
         from datetime import datetime, timedelta
@@ -258,8 +259,12 @@ class Return2App:
             success, receipt_status, message = ReturnController.process_return(self.receipt_id,user_id)
         
             if not success:
-                messagebox.showerror("Error", message)
+                if "already been returned" in message or "marked as overdue" in message:
+                    AlreadyReturnedNotification(self.root, message)
+                else:
+                    messagebox.showerror("Error", message)
                 return
+
             
             # Display Drop Off notification
             drop_off_window = Drop_Off(self.root, receipt_status, self.receipt_id)
@@ -297,6 +302,11 @@ class Return2App:
         if not is_valid:
             print(message)
             messagebox.showerror("Error", message)
+            return
+        # Check if the receipt is already returned or overdue
+        is_valid_status, status_message = ReturnController.validate_receipt_status(self.receipt_id)
+
+
         from Model.receipt_model import Receipt
         # Get receipt data from database
         receipt_data = Receipt.get_single_receipt_by_id(self.receipt_id)
@@ -339,6 +349,23 @@ class Return2App:
             # Hiển thị deadline vào lbl_ReturnDate
             self.canvas.itemconfigure(self.lbl_ReturnDate, text=return_deadline_str)
 
+        if not is_valid_status:
+        # Find the button by name
+            for widget in self.root.winfo_children():
+                if isinstance(widget, Button) and widget.cget('text') == "Drop Off":
+                    widget.config(state="disabled")
+                    break
+
+            # Add visual indication that the book is already returned
+            from tkinter import Label
+            status_label = Label(
+                self.root,
+                text=f"Status: {receipt_data[5]}",
+                font=("Montserrat", 12, 'bold'),
+                bg='#F1F1F1',
+                fg='red'
+            )
+            status_label.place(x=440, y=470)
 
 
 if __name__ == "__main__":

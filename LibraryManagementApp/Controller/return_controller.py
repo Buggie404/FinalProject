@@ -29,10 +29,35 @@ class ReturnController:
             
         return (True, "Valid receipt")
     @staticmethod
+    def validate_receipt_status(receipt_id):
+        # Extract status from receipt data (status is at index 5)
+        # Check if receipt exists
+        receipt_data = Receipt.get_receipt_by_id(receipt_id)
+        if not receipt_data:
+            return (False, "Loan slip not found!")
+        
+        status = receipt_data[5].lower() if receipt_data[5] else ""
+        
+        # Check if already returned or overdue
+        if status == "Returned":
+            return (False, "This book has already been returned!")
+        elif status == "overdue":
+            return (False, "This book is marked as overdue and  has already been returned!")
+        
+        return (True, "Valid for return")
+
+
+    @staticmethod
     def process_return(receipt_id, user_id=None):
         is_valid, message = ReturnController.validate_receipt_access(receipt_id, user_id)   
         if not is_valid:
             return (False, None, message)
+
+            # validate status - ADD THIS BLOCK
+        is_valid_status, status_message = ReturnController.validate_receipt_status(receipt_id)
+        if not is_valid_status:
+            return (False, None, status_message)
+
 
         # Lấy dữ liệu phiếu mượn
         receipt_data = Receipt.get_receipt_by_id(receipt_id)

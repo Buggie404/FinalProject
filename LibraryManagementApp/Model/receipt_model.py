@@ -272,3 +272,26 @@ class Receipt:
         query = "SELECT borrowed_quantity FROM receipts WHERE receipt_id = ?"
         result = db.cursor.execute(query, (receipt_id,)).fetchone()
         return result[0] if result else 0
+    def is_already_returned(receipt_id):
+    
+        db = Database()
+        
+        # Get the receipt status
+        db.cursor.execute(
+            "SELECT status FROM receipts WHERE receipt_id = ? ",
+            (receipt_id,)
+        )
+        result = db.cursor.fetchone()
+        
+        if not result:
+            return False, "Receipt not found"  # Receipt not found
+        
+        status = result[0].lower() if result[0] else ""
+        
+        # Return True if already returned or overdue
+        if status == "Returned":
+            return True, "This book has already been returned!"
+        elif status == "OOverdue":
+            return True, "This book is marked as overdue and has already been returned!"
+        
+        return False, "Book is available for return"
