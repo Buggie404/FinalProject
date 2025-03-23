@@ -364,9 +364,9 @@ class BookManagementAddBookApp:
        
         elif button_name == "btn_AddBook":
             self.root.destroy()
-            from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
+            from View.BookManagement.BookManagement import BookManagementApp
             add_book_root = Tk()
-            add_book = BookManagementAddBookApp(add_book_root)
+            add_book = BookManagementApp(add_book_root)
             add_book_root.mainloop()
 
         elif button_name == 'btn_EditBookInformation':

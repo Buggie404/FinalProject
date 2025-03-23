@@ -171,6 +171,12 @@ class BookManaEditBook:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root)
             homepage_root.mainloop()
+        elif button_name == "btn_EditBookInformation":
+            self.root.destroy()
+            from View.BookManagement.BookManagement import BookManagementApp
+            edit_book_root = Tk()
+            edit_book = BookManagementApp(edit_book_root)
+            edit_book_root.mainloop()
         elif button_name == "btn_Search":
             self.search_book()
         elif button_name == "btn_AddBook":
