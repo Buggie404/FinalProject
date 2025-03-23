@@ -60,7 +60,8 @@ class ReturnController:
         # Cập nhật kho sách (trả về +quantity quyển)
         
         book_id = receipt_data[2]
-        Book.update_book_quantity_after_return(book_id, 1)
+        borrowed_quantity = Receipt.get_borrowed_quantity(receipt_id)
+        Book.update_book_quantity_after_return(book_id, borrowed_quantity)
 
         return (True, receipt_status, "Returned book successfully!")
 
