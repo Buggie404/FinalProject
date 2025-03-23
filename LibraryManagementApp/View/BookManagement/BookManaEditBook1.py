@@ -286,19 +286,6 @@ class BookEdit1App:
             return "break"  # Prevent default focus behavior
         
         return None
-
-    
-    # def on_field_focus_out(self, event, validate_func):
-    #     """Handle field focus out event with validation"""
-    #     # Call the validation function
-    #     is_valid = validate_func(event)
-        
-    #     if not is_valid:
-    #         # If validation fails, set focus back to this field
-    #         self.root.after(10, lambda: event.widget.focus_set())
-    #         return "break"  # Prevent default focus behavior
-        
-    #     return None
     
     def button_click(self, button_name):
         """Handle button click events"""

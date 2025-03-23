@@ -9,7 +9,7 @@ sys.path.append(project_root)
 class ReturnOverdueApp:
     def __init__(self, root, receipt_id=None, assets_path=None):
         self.root = root
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.receipt_id = receipt_id

@@ -10,7 +10,7 @@ from View.noti_tab_view_1 import Drop_Off
 class Return2App:
     def __init__(self, root, receipt_id=None, user_data=None, assets_path=None):
         self.root = root
-        self.root.geometry("898x605")
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.receipt_id = receipt_id
