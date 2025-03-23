@@ -7,12 +7,17 @@ import os
 from Controller.book_management_controller import BookEditController
 
 class BookEdit1App:
-    def __init__(self, root, book_data=None, assets_path=None):
+    def __init__(self, root, user_data = None, book_data=None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
         
         # Store the book data
         self.book_data = book_data
@@ -295,19 +300,15 @@ class BookEdit1App:
             self.root.destroy()
             from View.Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
+            homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
             homepage_root.mainloop()
-        elif button_name == "btn_AddBook":
-            self.root.destroy()
-            from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
-            add_book_root = Tk()
-            add_book = BookManagementAddBookApp(add_book_root)
-            add_book_root.mainloop()
+        elif button_name == "btn_AddBook": #Cannot Add Book while Edditing Book
+            pass
         elif button_name == "btn_EditBookInformation":
             self.root.destroy()
             from View.BookManagement.BookManaEditBook import BookManaEditBook
             edit_book_root = Tk()
-            edit_book = BookManaEditBook(edit_book_root)
+            edit_book = BookManaEditBook(edit_book_root, user_data=self.user_data)
             edit_book_root.mainloop()
     
     def get_field_values(self):

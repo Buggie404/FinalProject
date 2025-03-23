@@ -221,7 +221,7 @@ class BookManaEditBook:
         # Create new edit screen
         edit_root = Tk()
         from View.BookManagement.BookManaEditBook1 import BookEdit1App
-        edit_app = BookEdit1App(edit_root, book_data=book)
+        edit_app = BookEdit1App(edit_root, book_data=book, user_data = self.user_data)
         edit_root.mainloop()
 
 if __name__ == "__main__":
