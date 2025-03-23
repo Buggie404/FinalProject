@@ -101,7 +101,7 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
 
         message_2_map = {'pass_reset': "Password Reset Successfully!",
                          'edit_book': "Updated Successfully!",
-                         'pay fine': "Fine Paid"}
+                         'pay_fine': "Fine Paid"}
 
         # Title Label
         Label(self.message_2, text=message_2_map[message_type], font=("Montserrat", 18, 'bold'), bg='white',

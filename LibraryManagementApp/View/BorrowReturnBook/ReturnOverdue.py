@@ -208,7 +208,7 @@ class ReturnOverdueApp:
         message = Message_2(self.root, 'pay_fine')
         def custom_switch_to_borrowreturn():
             ReturnController.update_after_payment(self.receipt_id)
-            self.root.destoy()
+            self.root.destroy()
             from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
             borrow_return_root = Tk()
             borrow_return = BorrowReturnApp(borrow_return_root)
