@@ -14,18 +14,28 @@ from Model.book_model import Book
 
 class ReturnController:
     @staticmethod
-    def process_return(receipt_id):
-        """ 
-        Xử lý logic trả sách.
-        Trả về tuple: (success: bool, receipt_status: str, message: str) 
-        """
+    def validate_receipt_access(receipt_id, user_id=None):
         if not receipt_id:
-            return (False, None, "No loan code!")
+            return (False, "No loan code provided")
+            
+        # Check if receipt exists
+        receipt_data = Receipt.get_receipt_by_id(receipt_id)
+        if not receipt_data:
+            return (False, "Loan slip not found!")
+            
+        # If user_id is provided, verify ownership
+        if user_id is not None and receipt_data[1] != user_id:
+            return (False, "This receipt doesn't belong to your account!")
+            
+        return (True, "Valid receipt")
+    @staticmethod
+    def process_return(receipt_id, user_id=None):
+        is_valid, message = ReturnController.validate_receipt_access(receipt_id, user_id)   
+        if not is_valid:
+            return (False, None, message)
 
         # Lấy dữ liệu phiếu mượn
         receipt_data = Receipt.get_receipt_by_id(receipt_id)
-        if not receipt_data:
-            return (False, None, "Loan slip not found!")
 
         # Parse borrow date
         borrow_date = receipt_data[3]
@@ -60,7 +70,8 @@ class ReturnController:
         # Cập nhật kho sách (trả về +quantity quyển)
         
         book_id = receipt_data[2]
-        Book.update_book_quantity_after_return(book_id, 1)
+        borrowed_quantity = Receipt.get_borrowed_quantity(receipt_id)
+        Book.update_book_quantity_after_return(book_id, borrowed_quantity)
 
         return (True, receipt_status, "Returned book successfully!")
 

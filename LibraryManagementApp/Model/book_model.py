@@ -105,18 +105,18 @@ class Book:
         else:
             return None  # Handle case where book_id does not exist
     @staticmethod
-    def update_book_quantity_after_return(book_id, quantity_returned=1):
+    def update_book_quantity_after_return(book_id, quantity):
         db = Database()
         # Lấy số lượng hiện tại
         db.cursor.execute("SELECT quantity FROM Books WHERE book_id = ?", (book_id,))
         result = db.cursor.fetchone()
 
         if not result:
-            print(f"[Book] Không tìm thấy sách có ID {book_id}")
+            print(f"Book with ID {book_id} not found")
             return False
 
         current_quantity = result[0]
-        new_quantity = current_quantity + quantity_returned
+        new_quantity = current_quantity + quantity
         db.cursor.execute("UPDATE Books SET quantity = ? WHERE book_id = ?", (new_quantity, book_id))
         db.conn.commit()
  

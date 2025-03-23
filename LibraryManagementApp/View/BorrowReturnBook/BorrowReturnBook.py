@@ -109,7 +109,7 @@ class BorrowReturnApp:
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return1_root = Tk()
-        return1 = Return1App(return1_root)
+        return1 = Return1App(return1_root, user_data=self.user_data)
         return1_root.mainloop()
 
 if __name__ == "__main__":
