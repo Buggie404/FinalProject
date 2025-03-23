@@ -18,12 +18,12 @@ class Delete():  # To confirm delection
         self.yes_callback = yes_callback
 
         # Dynamic Title and Messages
-        delete_map = {'book': ('Delete Book', "Are you sure you want to delete this book?"),
-                      'account': ('Delete Account', "Are you sure you want to delete this account?")}
+        delete_map = {'book': ('Delete Book', "Are you sure you want to \n delete this book?"),
+                      'account': ('Delete Account', "Are you sure you want to \n delete this account?")}
 
         # Setup tab
         self.delete_noti.title(" ")
-        self.delete_noti.geometry("400x200")
+        self.delete_noti.geometry("400x250")
         self.delete_noti.resizable(False, False)
         self.delete_noti.config(bg='white')
 
@@ -148,17 +148,17 @@ class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id forma
         self.invalid_type = invalid_type
         self.invalid = Toplevel(root)
         self.invalid.title(" ")
-        self.invalid.geometry("400x200")
+        self.invalid.geometry("400x250")
         self.invalid.resizable(False, False)
         self.invalid.config(bg='white')
 
         # Dynamic Title and Message
         invalid_map = {
     'account': ("Invalid Account", "Please double-check your email and password! "),
-    'quantity': ('Invalid Quantities', "No. of books borrow need to be larger than zero and lower or equal to Available quantities"),
+    'quantity': ('Invalid Quantities', "No. of books borrow need to be larger than zero \n and lower or equal to Available quantities"),
     'Input': ("Invalid input", "Please double-check your input"),
-    'search_book': ("Book Not Found", "No books match your search criteria. Please try a different search term."),
-    'borrowing_limit': ("Borrowing Limit Exceeded", "You have reached your borrowing limit. Please return some books before borrowing more.")
+    'search_book': ("Book Not Found", "No books match your search criteria.\n Please try a different search term."),
+    'borrowing_limit': ("Borrowing Limit Exceeded", "You have reached your borrowing limit.\n Please return some books before borrowing more.")
 }
 
         # Title Label
@@ -180,7 +180,7 @@ class Drop_Off():
         self.status = receipt_status
         self.delete_noti = Toplevel(root)
         self.delete_noti.title(" ")
-        self.delete_noti.geometry("400x200")
+        self.delete_noti.geometry("400x250")
         self.delete_noti.resizable(False, False)
         self.delete_noti.config(bg='white')
         self.receipt_id = receipt_id 
@@ -222,7 +222,7 @@ class Sign_Out():  # To Sign out, when clicked "Yes" -> switch to Log_In window
         self.root = root
         self.sign_out = Toplevel(root)
         self.sign_out.title(" ")
-        self.sign_out.geometry("400x200")
+        self.sign_out.geometry("400x250")
         self.sign_out.resizable(False, False)
         self.sign_out.config(bg='white')
 
@@ -498,11 +498,11 @@ class AlreadyReturnedNotification():
         self.root = root
         self.notification = Toplevel(root)
         self.notification.title(" ")
-        self.notification.geometry("400x200")
+        self.notification.geometry("400x250")
         self.notification.resizable(False, False)
         self.notification.config(bg='white')
         invalid_map = {
-             'return_status_error': ("Already Returned", "This book has already been returned or marked as overdue. You cannot return it again.")}
+             'return_status_error': ("Already Returned", "This book has already been returned. \n You cannot return it again.")}
         # Title Label
         Label(self.notification, text="Already Returned", font=('Montserrat', 18, 'bold'), bg='white', fg='black').pack(pady=(20, 10))
         # Message Label
