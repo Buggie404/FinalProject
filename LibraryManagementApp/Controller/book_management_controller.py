@@ -741,61 +741,83 @@ class BookEditController:
         edit_root = Tk()
         edit_app = BookEdit1App(edit_root, book_data=book)
         edit_root.mainloop()
-    
+
     def update_book(self):
         """Validate all fields and update book in database"""
         print("Update book method called from controller!")
-        
+
         if not self.view or not self.book_data:
             print("Error: View or book data not available")
             return
-        
+
+        # Temporarily disable FocusOut validation to avoid duplicate triggers
+        for field_name in ["lnE_Title", "lnE_Author", "lnE_PublishedYear", "lnE_Category", "lnE_Quantity"]:
+            if field_name in self.view.entries:
+                self.view.entries[field_name].unbind("<FocusOut>")
+
+        # Allow safe focus change without triggering validation
+        self.view.root.focus_set()
+
         # Get all field values from view
         field_values = self.view.get_field_values()
-        
+
         # Validate Title
         title = field_values["title"]
         if not title or len(title) < 2 or len(title) > 255:
             self.view.entries["lnE_Title"].focus_set()
             messagebox.showwarning("Invalid Title", "Title must be between 2 and 255 characters.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         # Validate Author
         author = field_values["author"]
         if not author or len(author) < 2 or len(author) > 100:
             self.view.entries["lnE_Author"].focus_set()
             messagebox.showwarning("Invalid Author", "Author must be between 2 and 100 characters.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         if re.search(r'\d', author):
             self.view.entries["lnE_Author"].focus_set()
             messagebox.showwarning("Invalid Author", "Author name cannot contain numbers.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         if not re.match(r'^[a-zA-ZÀ-ỹ\s\-\.,&]+$', author):
             self.view.entries["lnE_Author"].focus_set()
             messagebox.showwarning("Invalid Author", "Only letters, spaces, hyphens (-), periods (. ), commas (,), and ampersands (&) are allowed.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         if re.search(r'[\-]{2,}|[\. ]{2,}|[,]{2,}|[&]{2,}', author):
             self.view.entries["lnE_Author"].focus_set()
             messagebox.showwarning("Invalid Author", "Special characters (., -, comma, &) cannot appear consecutively.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         # Validate Published Year
         year = field_values["published_year"]
         if not year or not year.isdigit():
             self.view.entries["lnE_PublishedYear"].focus_set()
             messagebox.showwarning("Invalid Year", "Published Year must be a number.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         year_int = int(year)
         current_year = datetime.datetime.now().year
         if year_int < 1440 or year_int > current_year:
             self.view.entries["lnE_PublishedYear"].focus_set()
             messagebox.showwarning("Invalid Year", f"Published Year must be between 1440 and {current_year}.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         # Validate Category
         category = field_values["category"]
         valid_categories = [
@@ -803,36 +825,42 @@ class BookEditController:
             "Fantasy", "History", "Romance", "Biography",
             "Thriller", "Technology"
         ]
-        
+
         if not category or category not in valid_categories:
             self.view.entries["lnE_Category"].focus_set()
             messagebox.showwarning("Invalid Category", f"Category must be one of: {', '.join(valid_categories)}.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         # Validate Quantity
         quantity = field_values["quantity"]
         if not quantity or not quantity.isdigit():
             self.view.entries["lnE_Quantity"].focus_set()
             messagebox.showwarning("Invalid Quantity", "Quantity must be a positive integer.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         quantity_int = int(quantity)
         if quantity_int <= 0:
             self.view.entries["lnE_Quantity"].focus_set()
             messagebox.showwarning("Invalid Quantity", "Quantity must be greater than zero.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
             return
-        
+
         # If all fields are valid, proceed with update
         try:
             # Format data
             formatted_title = re.sub(r'\s+', ' ', title)
             formatted_author = self.format_author_name(author)
-            
+
             # Get original book ID
             book_id = self.book_data[0]  # Original ISBN/book_id (unchanged)
-            
+
             print(f"Updating book: ID={book_id}, title={formatted_title}, author={formatted_author}, year={year_int}, category={category}, quantity={quantity_int}")
-            
+
             # Create dictionary with updated data
             updated_data = {
                 'title': formatted_title,
@@ -841,25 +869,163 @@ class BookEditController:
                 'category': category,
                 'quantity': quantity_int
             }
-            
+
             # Update book in database
             book = Book(book_id=book_id)
             success = book.update_book(updated_data)
-            
+
             print(f"Database update result: {success}")
-            
+
             if success:
                 # Show success message using notification system
                 from View.noti_tab_view_1 import Message_2
                 Message_2(self.view.root, 'edit_book')
             else:
                 messagebox.showerror("Update Failed", "Failed to update book information in the database.")
-            
+
         except Exception as e:
             print(f"Error updating book: {e}")
             import traceback
             traceback.print_exc()
             messagebox.showerror("Update Error", f"An error occurred: {str(e)}")
+
+        # Restore FocusOut bindings
+        self.restore_field_bindings()
+
+    def restore_field_bindings(self):
+        """Restore focus-out bindings for all entry fields"""
+        field_validations = {
+            "lnE_Title": self.validate_title,
+            "lnE_Author": self.validate_author,
+            "lnE_PublishedYear": self.validate_published_year,
+            "lnE_Category": self.validate_category,
+            "lnE_Quantity": self.validate_quantity
+        }
+
+        for field_name, validate_func in field_validations.items():
+            if field_name in self.view.entries:
+                self.view.entries[field_name].bind("<FocusOut>", 
+                    lambda event, func=validate_func: self.view.on_field_focus_out(event, func))
+
+    
+    # def update_book(self):
+    #     """Validate all fields and update book in database"""
+    #     print("Update book method called from controller!")
+        
+    #     if not self.view or not self.book_data:
+    #         print("Error: View or book data not available")
+    #         return
+        
+    #     # Get all field values from view
+    #     field_values = self.view.get_field_values()
+        
+    #     # Validate Title
+    #     title = field_values["title"]
+    #     if not title or len(title) < 2 or len(title) > 255:
+    #         self.view.entries["lnE_Title"].focus_set()
+    #         messagebox.showwarning("Invalid Title", "Title must be between 2 and 255 characters.")
+    #         return
+        
+    #     # Validate Author
+    #     author = field_values["author"]
+    #     if not author or len(author) < 2 or len(author) > 100:
+    #         self.view.entries["lnE_Author"].focus_set()
+    #         messagebox.showwarning("Invalid Author", "Author must be between 2 and 100 characters.")
+    #         return
+        
+    #     if re.search(r'\d', author):
+    #         self.view.entries["lnE_Author"].focus_set()
+    #         messagebox.showwarning("Invalid Author", "Author name cannot contain numbers.")
+    #         return
+        
+    #     if not re.match(r'^[a-zA-ZÀ-ỹ\s\-\.,&]+$', author):
+    #         self.view.entries["lnE_Author"].focus_set()
+    #         messagebox.showwarning("Invalid Author", "Only letters, spaces, hyphens (-), periods (. ), commas (,), and ampersands (&) are allowed.")
+    #         return
+        
+    #     if re.search(r'[\-]{2,}|[\. ]{2,}|[,]{2,}|[&]{2,}', author):
+    #         self.view.entries["lnE_Author"].focus_set()
+    #         messagebox.showwarning("Invalid Author", "Special characters (., -, comma, &) cannot appear consecutively.")
+    #         return
+        
+    #     # Validate Published Year
+    #     year = field_values["published_year"]
+    #     if not year or not year.isdigit():
+    #         self.view.entries["lnE_PublishedYear"].focus_set()
+    #         messagebox.showwarning("Invalid Year", "Published Year must be a number.")
+    #         return
+        
+    #     year_int = int(year)
+    #     current_year = datetime.datetime.now().year
+    #     if year_int < 1440 or year_int > current_year:
+    #         self.view.entries["lnE_PublishedYear"].focus_set()
+    #         messagebox.showwarning("Invalid Year", f"Published Year must be between 1440 and {current_year}.")
+    #         return
+        
+    #     # Validate Category
+    #     category = field_values["category"]
+    #     valid_categories = [
+    #         "Fiction", "Non-Fiction", "Mystery", "Science",
+    #         "Fantasy", "History", "Romance", "Biography",
+    #         "Thriller", "Technology"
+    #     ]
+        
+    #     if not category or category not in valid_categories:
+    #         self.view.entries["lnE_Category"].focus_set()
+    #         messagebox.showwarning("Invalid Category", f"Category must be one of: {', '.join(valid_categories)}.")
+    #         return
+        
+    #     # Validate Quantity
+    #     quantity = field_values["quantity"]
+    #     if not quantity or not quantity.isdigit():
+    #         self.view.entries["lnE_Quantity"].focus_set()
+    #         messagebox.showwarning("Invalid Quantity", "Quantity must be a positive integer.")
+    #         return
+        
+    #     quantity_int = int(quantity)
+    #     if quantity_int <= 0:
+    #         self.view.entries["lnE_Quantity"].focus_set()
+    #         messagebox.showwarning("Invalid Quantity", "Quantity must be greater than zero.")
+    #         return
+        
+    #     # If all fields are valid, proceed with update
+    #     try:
+    #         # Format data
+    #         formatted_title = re.sub(r'\s+', ' ', title)
+    #         formatted_author = self.format_author_name(author)
+            
+    #         # Get original book ID
+    #         book_id = self.book_data[0]  # Original ISBN/book_id (unchanged)
+            
+    #         print(f"Updating book: ID={book_id}, title={formatted_title}, author={formatted_author}, year={year_int}, category={category}, quantity={quantity_int}")
+            
+    #         # Create dictionary with updated data
+    #         updated_data = {
+    #             'title': formatted_title,
+    #             'author': formatted_author,
+    #             'published_year': year_int,
+    #             'category': category,
+    #             'quantity': quantity_int
+    #         }
+            
+    #         # Update book in database
+    #         book = Book(book_id=book_id)
+    #         success = book.update_book(updated_data)
+            
+    #         print(f"Database update result: {success}")
+            
+    #         if success:
+    #             # Show success message using notification system
+    #             from View.noti_tab_view_1 import Message_2
+    #             Message_2(self.view.root, 'edit_book')
+    #         else:
+    #             messagebox.showerror("Update Failed", "Failed to update book information in the database.")
+            
+    #     except Exception as e:
+    #         print(f"Error updating book: {e}")
+    #         import traceback
+    #         traceback.print_exc()
+            # messagebox.showerror("Update Error", f"An error occurred: {str(e)}")
     
     def format_author_name(self, author):
         """Format author name with proper capitalization"""
