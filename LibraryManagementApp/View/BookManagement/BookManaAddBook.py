@@ -17,12 +17,18 @@ sys.path.append(project_root)
 from Controller.book_management_controller import add_book
 
 class BookManagementAddBookApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data = None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
+
         # Set font that supports Vietnamese characters
         self.vietnamese_font = ("Arial Unicode MS", 10)  # or another Unicode font
         # Set up asset paths
@@ -366,23 +372,20 @@ class BookManagementAddBookApp:
             self.root.destroy()
             from View.BookManagement.BookManagement import BookManagementApp
             add_book_root = Tk()
-            add_book = BookManagementApp(add_book_root)
+            add_book = BookManagementApp(add_book_root, user_data = self.user_data)
             add_book_root.mainloop()
 
         elif button_name == 'btn_EditBookInformation':
             self.root.destroy()
             from BookManaEditBook import BookManaEditBook
             edit_book_root = Tk()
-            edit_book = BookManaEditBook(edit_book_root)
+            edit_book = BookManaEditBook(edit_book_root, user_data=self.user_data)
             edit_book_root.mainloop()
         
         elif button_name == "btn_BackToHomepage":
-            self.root.destroy()
-            parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            sys.path.append(parent_dir)
             from Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
+            homepage = HomepageApp(homepage_root, role = self.role, user_data=self.user_data)
             homepage_root.mainloop()
     def run(self):
         """Start the application main loop"""

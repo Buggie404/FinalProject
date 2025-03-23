@@ -248,26 +248,26 @@ class BookManagementApp:
             self.root.destroy()
             from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
             add_book_root = Tk()
-            add_book = BookManagementAddBookApp(add_book_root)
+            add_book = BookManagementAddBookApp(add_book_root, user_data = self.user_data)
             add_book.root.mainloop()
 
         if button_name == "btn_EditBookInformation":
             self.root.destroy()
             from View.BookManagement.BookManaEditBook import BookManaEditBook
             edit_book_root = Tk()
-            edit_book = BookManaEditBook(edit_book_root)
+            edit_book = BookManaEditBook(edit_book_root, user_data = self.user_data)
             edit_book_root.mainloop()
         
         if button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp
-            if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
-                homepage_role = "admin"
-            else:
-                homepage_role = self.role
+            # if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            #     homepage_role = "admin"
+            # else:
+            #     homepage_role = self.role
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, role=homepage_role, user_data=self.user_data)
-            homepage.mainloop()
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
+            homepage_root.mainloop()
             
     def toggle_category_filter(self, category):
         """Toggle filter by category - if same category clicked twice, show all books"""

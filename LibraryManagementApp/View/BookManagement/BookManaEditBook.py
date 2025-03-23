@@ -4,12 +4,17 @@ from Controller.book_management_controller import BookEditController
 from Model.book_model import Book
 
 class BookManaEditBook:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data = None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605+0+0") #Set vị trí của UI
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         # Set up asset paths 
         self.output_path = Path(__file__).parent
@@ -169,13 +174,13 @@ class BookManaEditBook:
             self.root.destroy()
             from View.Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
         elif button_name == "btn_EditBookInformation":
             self.root.destroy()
             from View.BookManagement.BookManagement import BookManagementApp
             edit_book_root = Tk()
-            edit_book = BookManagementApp(edit_book_root)
+            edit_book = BookManagementApp(edit_book_root, user_data=self.user_data)
             edit_book_root.mainloop()
         elif button_name == "btn_Search":
             self.search_book()
@@ -183,7 +188,7 @@ class BookManaEditBook:
             self.root.destroy()
             from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
             add_book_root = Tk()
-            add_book = BookManagementAddBookApp(add_book_root)
+            add_book = BookManagementAddBookApp(add_book_root, user_data=self.user_data)
             add_book_root.mainloop()
 
     def search_book(self):
