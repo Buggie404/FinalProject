@@ -138,7 +138,7 @@ class AccountChangePw2App:
             self.root.destroy()
             from View.AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
-            changeoass = AccountChangePwApp(changepass_root, user_data=self.user_data)
+            changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass_root.mainloop()
         elif button_name == "btn_Return": # Return to Account MainWindow
             self.root.destroy()
@@ -149,8 +149,9 @@ class AccountChangePw2App:
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp
+            role = "admin" if self.user_data[6] == "Admin" else "User"
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, user_data=self.user_data)
+            homepage = HomepageApp(homepage_root, role = role, user_data=self.user_data)
             homepage_root.mainloop()
         else: # If clicked edit account information here, nothing happends
             pass
