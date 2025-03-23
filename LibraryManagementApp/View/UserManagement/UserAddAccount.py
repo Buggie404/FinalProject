@@ -15,12 +15,17 @@ from Controller.user_controller import add_account
 from Model.user_model import User
 
 class UserAddAccountApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -327,14 +332,14 @@ class UserAddAccountApp:
             self.root.destroy()
             from UserManagement import UserManagementApp
             add_user_root = Tk()
-            add_user = UserManagementApp(add_user_root)
+            add_user = UserManagementApp(add_user_root, user_data=self.user_data)
             add_user_root.mainloop()
         
         elif button_name == 'btn_EditAccountPassword':
             self.root.destroy()
             from UserEditAccount import UserEditAccountApp
             edit_pass_root = Tk()
-            edit_pass = UserEditAccountApp(edit_pass_root)
+            edit_pass = UserEditAccountApp(edit_pass_root, user_data=self.user_data)
             edit_pass_root.mainloop()
         
         else:  # btn_BackToHomepage
@@ -343,7 +348,7 @@ class UserAddAccountApp:
             sys.path.append(parent_dir)
             from Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
 
     def run(self):

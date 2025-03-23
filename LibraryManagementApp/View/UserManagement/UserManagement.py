@@ -6,12 +6,17 @@ import os
 import sys
 
 class UserManagementApp:
-    def __init__(self, root, assets_path=None):
+    def __init__(self, root, user_data = None, assets_path=None):
         # Initialize the main window
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -345,26 +350,23 @@ class UserManagementApp:
             delete_dialog = Delete(self.root, "account")
             delete_dialog.set_yes_callback(confirm_delete_callback) 
 
-
-
-
         elif button_name == "btn_AddAccount":
             self.root.destroy()
             from UserAddAccount import UserAddAccountApp
             add_user_root = Tk()
-            add_user = UserAddAccountApp(add_user_root)
+            add_user = UserAddAccountApp(add_user_root, user_data = self.user_data)
             add_user_root.mainloop()
         elif button_name == 'btn_EditAccountPassword':
             self.root.destroy()
             from UserEditAccount import UserEditAccountApp
             edit_pass_root = Tk()
-            edit_pass = UserEditAccountApp(edit_pass_root)
+            edit_pass = UserEditAccountApp(edit_pass_root, user_data = self.user_data)
             edit_pass_root.mainloop()
         else:
             self.root.destroy()
             from Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root)
+            homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
             homepage_root.mainloop()
 
 

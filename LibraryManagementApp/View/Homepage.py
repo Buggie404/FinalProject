@@ -106,7 +106,7 @@ class HomepageApp:
         self.root.destroy()
         from UserManagement.UserManagement import UserManagementApp
         usermgmt_root = Tk()
-        usermgmt = UserManagementApp(usermgmt_root)
+        usermgmt = UserManagementApp(usermgmt_root, user_data = self.user_data)
         usermgmt_root.mainloop()
     
     def on_borrow_return_clicked(self):
