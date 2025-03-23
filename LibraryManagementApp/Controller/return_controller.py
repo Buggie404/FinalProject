@@ -97,7 +97,13 @@ class ReturnController:
         Book.update_book_quantity_after_return(book_id, borrowed_quantity)
 
         return (True, receipt_status, "Returned book successfully!")
-
+    
+    @staticmethod
+    def update_after_payment(receipt_id):
+        """UPdate receipt status from Overdue to Returned after payment"""
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        success = Receipt.update_return_status(receipt_id, current_date, "Returned")
+        return success
 
 class ReturnOverdueController:
     FINE_PER_BOOK = 10000  # 10.000 VND / sách quá hạn

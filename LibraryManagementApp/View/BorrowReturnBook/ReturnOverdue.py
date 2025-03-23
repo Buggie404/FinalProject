@@ -1,6 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 import os, sys
+import datetime
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 project_root = os.path.dirname(parent_dir)
@@ -202,12 +203,18 @@ class ReturnOverdueApp:
     def on_pay_fine_clicked(self):
         """Handle pay fine button click"""
         print("btn_PayFine clicked")
-        messagebox.showinfo("Payment", "Payment Successful!")
-        self.root.destroy()
-        from View.Homepage import HomepageApp
-        homepage_root = Tk()
-        homepage = HomepageApp(homepage_root)
-        homepage_root.mainloop()
+        from View.noti_tab_view_1 import Message_2
+        from Controller.return_controller import ReturnController
+        message = Message_2(self.root, 'pay_fine')
+        def custom_switch_to_borrowreturn():
+            ReturnController.update_after_payment(self.receipt_id)
+            self.root.destoy()
+            from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
+            borrow_return_root = Tk()
+            borrow_return = BorrowReturnApp(borrow_return_root)
+            borrow_return_root.mainloop()
+        message.back_to_subfun = custom_switch_to_borrowreturn
+
         
     def load_due_and_fine_data(self):
         from Controller.return_controller import ReturnOverdueController

@@ -120,7 +120,6 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
             parent_window.destroy()
         
             # Open BookManagement screen
-            from tkinter import Tk
             from View.BookManagement.BookManagement import BookManagementApp
             management_root = Tk()
             management_app = BookManagementApp(management_root)
@@ -132,11 +131,14 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
             parent_window.destroy()
 
             # Mở màn hình UserEditAccount
-            from tkinter import Tk
             from View.UserManagement.UserEditAccount import UserEditAccountApp
             reset_pass_root = Tk()
             reset_pass = UserEditAccountApp(reset_pass_root)
             reset_pass_root.mainloop()
+
+        else: # pay_fine
+            # Will be handle by ReturnOverdue
+            pass    
         
 
 class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id format
