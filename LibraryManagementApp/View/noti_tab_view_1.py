@@ -278,7 +278,7 @@ class Print_Receipt():
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(parent_dir)
 
-        from Controller.test_borrowbook_controller import BorrowingCart
+        from Controller.borrow_return_controller import BorrowingCart
 
         self.cart = BorrowingCart.get_instance()
 
@@ -417,7 +417,7 @@ class Print_Receipt():
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(parent_dir)
-        from Controller.test_borrowbook_controller import BorrowController
+        from Controller.borrow_return_controller import BorrowController
         from View.BorrowReturnBook.BorrowReceipt import BorrowReceiptApp
         from tkinter import Tk, messagebox
 

@@ -204,7 +204,7 @@ class ReturnOverdueApp:
         """Handle pay fine button click"""
         print("btn_PayFine clicked")
         from View.noti_tab_view_1 import Message_2
-        from Controller.return_controller import ReturnController
+        from Controller.borrow_return_controller import ReturnController
         message = Message_2(self.root, 'pay_fine')
         def custom_switch_to_borrowreturn():
             ReturnController.update_after_payment(self.receipt_id)
@@ -217,7 +217,7 @@ class ReturnOverdueApp:
 
         
     def load_due_and_fine_data(self):
-        from Controller.return_controller import ReturnOverdueController
+        from Controller.borrow_return_controller import ReturnOverdueController
         if not self.receipt_id:
             print("Không có receipt_id!")
             return

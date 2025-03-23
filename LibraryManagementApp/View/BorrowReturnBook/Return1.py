@@ -222,7 +222,7 @@ class Return1App:
             return
         
         # Use the controller to validate the receipt
-        from Controller.return_controller import ReturnController
+        from Controller.borrow_return_controller import ReturnController
 
         # Extract user_id from self.user_data if available
         user_id = self.user_data[0] if self.user_data else None

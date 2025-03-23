@@ -241,7 +241,7 @@ class Return2App:
         borrow1_root.mainloop()
 
     def on_drop_off_clicked(self):
-        from Controller.return_controller import ReturnController
+        from Controller.borrow_return_controller import ReturnController
         from View.noti_tab_view_1 import Drop_Off, AlreadyReturnedNotification  
         from tkinter import messagebox
 
@@ -275,7 +275,7 @@ class Return2App:
             return
 
         # Validate receipt access using controller
-        from Controller.return_controller import ReturnController
+        from Controller.borrow_return_controller import ReturnController
         
          # Extract user_id from self.user_data if available
         user_id = self.user_data[0] if self.user_data else None

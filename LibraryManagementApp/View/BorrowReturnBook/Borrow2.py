@@ -245,7 +245,7 @@ class Borrow2App:
         print("btn_BackToHomepage clicked")
         self.root.destroy()
         from View.Homepage import HomepageApp
-        from Controller.test_borrowbook_controller import BorrowingCart
+        from Controller.borrow_return_controller import BorrowingCart
         cart = BorrowingCart.get_instance()
         cart.clear()
         role = 'admin' if self.user_data[6] == "Admin" else "User"
@@ -264,7 +264,7 @@ class Borrow2App:
         print("btn_BorrowBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
-        from Controller.test_borrowbook_controller import BorrowingCart
+        from Controller.borrow_return_controller import BorrowingCart
         cart = BorrowingCart.get_instance()
         cart.clear()
         borrow_root = Tk()
@@ -288,7 +288,7 @@ class Borrow2App:
         parent_dir = os.path.dirname(current_dir)
         sys.path.append(parent_dir)
 
-        from Controller.test_borrowbook_controller import BorrowController, BorrowingCart
+        from Controller.borrow_return_controller import BorrowController, BorrowingCart
         from View.noti_tab_view_1 import Invalid, Print_Receipt
         from Model.book_model import Book
 

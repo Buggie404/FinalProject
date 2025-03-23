@@ -193,7 +193,7 @@ class UserEditAccountApp:
             user_id = self.entries["lnE_InputID"].get().strip()
             
             # Create controller instance
-            from Controller.test_resetpass_controller import ResetPasswordController
+            from Controller.user_controller import ResetPasswordController
             controller = ResetPasswordController()
             
             # The controller will handle validation and notifications
