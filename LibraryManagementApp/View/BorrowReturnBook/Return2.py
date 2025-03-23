@@ -245,10 +245,7 @@ class Return2App:
     def on_drop_off_clicked(self):
         from Controller.return_controller import ReturnController
         from View.noti_tab_view_1 import Drop_Off, AlreadyReturnedNotification  
-        from View.noti_tab_view_1 import Drop_Off
         from tkinter import messagebox
-        from datetime import datetime, timedelta
-        import traceback
 
         print("btn_DropOff clicked")
         try:
@@ -268,19 +265,9 @@ class Return2App:
    
             # Display Drop Off notification
             Drop_Off(self.root, receipt_status, self.receipt_id)
-            
-            # Handle next steps based on receipt status
-            # if receipt_status == "Overdue":
-            #     drop_off_window.pay_overdue_fine()
-            # else:
-            #     drop_off_window.switch_to_return()
-                
         except Exception as e:
             print(f"Error in on_drop_off_clicked: {e}")
-            traceback.print_exc()
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
-
-
 
         # Load receipt data from database
     def load_receipt_data(self):

@@ -38,7 +38,7 @@ class ReturnController:
         status = receipt_data[5].lower() if receipt_data[5] else ""
         
         # Check if already returned or overdue
-        if status == "Returned":
+        if status == "returned":
             return (False, "This book has already been returned!")
         elif status == "overdue":
             return (False, "This book is marked as overdue and  has already been returned!")
@@ -100,7 +100,7 @@ class ReturnController:
     
     @staticmethod
     def update_after_payment(receipt_id):
-        """UPdate receipt status from Overdue to Returned after payment"""
+        """Update receipt status from Overdue to Returned after payment"""
         current_date = datetime.now().strftime("%Y-%m-%d")
         success = Receipt.update_return_status(receipt_id, current_date, "Returned")
         return success
