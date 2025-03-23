@@ -354,7 +354,7 @@ class BookManagementAddBookApp:
                 confirm_root = Tk()
                
                 # Create instance of confirmation screen and pass book data
-                confirm_app = BookManaAddBook1App(confirm_root)
+                confirm_app = BookManaAddBook1App(confirm_root,user_data=self.user_data)
                
                 # Set the book details in the confirmation screen
                 confirm_app.canvas.itemconfig(confirm_app.lbl_ISBN, text=book_data['book_id'])
