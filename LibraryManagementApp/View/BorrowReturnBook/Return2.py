@@ -261,39 +261,6 @@ class Return2App:
                 messagebox.showerror("Error", message)
                 return
             
-        # try:
-        #     # Get the current date for database update
-        #     current_date = datetime.now()
-        #     formatted_return_date = current_date.strftime("%Y-%m-%d")
-            
-        #     # Get the book_id from the UI
-        #     book_id = self.canvas.itemcget(self.lbl_ISBN, "text")
-            
-        #     # Compare current date with return deadline to determine status
-        #     if hasattr(self, 'return_deadline'):
-        #         if current_date.date() <= self.return_deadline.date():
-        #             receipt_status = "Returned"
-        #         else:
-        #             receipt_status = "Overdue"
-        #     else:
-        #         # Fallback if return_deadline is not set
-        #         receipt_status = "Returned"
-            
-        #     # Update return_date and status in database ONLY
-        #     from Model.receipt_model import Receipt
-        #     success = Receipt.update_return_status(self.receipt_id, formatted_return_date, receipt_status)
-            
-        #     if not success:
-        #         messagebox.showerror("Error", "Database update failed!")
-        #         return
-            
-        #     # Update book quantity in database
-        #     from Model.book_model import Book
-        #     Book.update_book_quantity_after_return(book_id, 1)
-            
-        #     # IMPORTANT: Do NOT update the UI display for return_date
-        #     # The UI should continue showing the original return deadline
-            
             # Display Drop Off notification
             drop_off_window = Drop_Off(self.root, receipt_status, self.receipt_id)
             
