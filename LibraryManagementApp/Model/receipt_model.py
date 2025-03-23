@@ -291,7 +291,7 @@ class Receipt:
         # Return True if already returned or overdue
         if status == "Returned":
             return True, "This book has already been returned!"
-        elif status == "OOverdue":
+        elif status == "Overdue":
             return True, "This book is marked as overdue and has already been returned!"
         
         return False, "Book is available for return"

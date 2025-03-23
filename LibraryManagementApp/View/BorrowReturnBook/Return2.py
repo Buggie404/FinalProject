@@ -255,7 +255,7 @@ class Return2App:
             # Extract user_id from self.user_data if available
             user_id = self.user_data[0] if self.user_data else None
 
-        # Process the return through the controller
+
             success, receipt_status, message = ReturnController.process_return(self.receipt_id,user_id)
         
             if not success:
@@ -265,16 +265,15 @@ class Return2App:
                     messagebox.showerror("Error", message)
                 return
 
-            
+   
             # Display Drop Off notification
-            drop_off_window = Drop_Off(self.root, receipt_status, self.receipt_id)
+            Drop_Off(self.root, receipt_status, self.receipt_id)
             
-
             # Handle next steps based on receipt status
-            if receipt_status == "Overdue":
-                drop_off_window.pay_overdue_fine()
-            else:
-                drop_off_window.switch_to_return()
+            # if receipt_status == "Overdue":
+            #     drop_off_window.pay_overdue_fine()
+            # else:
+            #     drop_off_window.switch_to_return()
                 
         except Exception as e:
             print(f"Error in on_drop_off_clicked: {e}")

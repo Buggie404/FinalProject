@@ -503,7 +503,6 @@ class AlreadyReturnedNotification():
              'return_status_error': ("Already Returned", "This book has already been returned or marked as overdue. You cannot return it again.")}
         # Title Label
         Label(self.notification, text="Already Returned", font=('Montserrat', 18, 'bold'), bg='white', fg='black').pack(pady=(20, 10))
-        
         # Message Label
         Label(self.notification, text=message, font=("Montserrat", 12), bg='white', fg='black').pack(pady=(10, 10))
 
