@@ -41,15 +41,6 @@ class BookEdit1App:
         self.entries = {}
         self.buttons = {}
         
-        # Track validation errors
-        self.field_errors = {
-            'title': False,
-            'author': False,
-            'published_year': False,
-            'category': False,
-            'quantity': False
-        }
-
         # Build UI components
         self.create_background()
         self.create_sidebar()
@@ -168,69 +159,78 @@ class BookEdit1App:
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
-        self.images[image_name] = PhotoImage(
-            file=self.relative_to_assets(f"{image_name}.png")
-        )
-        self.canvas.create_image(
-            position[0], position[1],
-            image=self.images[image_name]
-        )
+        try:
+            self.images[image_name] = PhotoImage(
+                file=self.relative_to_assets(f"{image_name}.png")
+            )
+            self.canvas.create_image(
+                position[0], position[1],
+                image=self.images[image_name]
+            )
+        except Exception as e:
+            print(f"Error loading image {image_name}: {e}")
 
     def create_button(self, button_name, dimensions):
         """Create a button with the given name and dimensions"""
-        self.images[button_name] = PhotoImage(
-            file=self.relative_to_assets(f"{button_name}.png")
-        )
+        try:
+            self.images[button_name] = PhotoImage(
+                file=self.relative_to_assets(f"{button_name}.png")
+            )
 
-        button = Button(
-            image=self.images[button_name],
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda b=button_name: self.button_click(b),
-            relief="flat"
-        )
+            button = Button(
+                image=self.images[button_name],
+                borderwidth=0,
+                highlightthickness=0,
+                command=lambda b=button_name: self.button_click(b),
+                relief="flat"
+            )
 
-        button.place(
-            x=dimensions[0],
-            y=dimensions[1],
-            width=dimensions[2],
-            height=dimensions[3]
-        )
+            button.place(
+                x=dimensions[0],
+                y=dimensions[1],
+                width=dimensions[2],
+                height=dimensions[3]
+            )
 
-        # Store button widget in dictionary
-        self.buttons[button_name] = button
+            # Store button widget in dictionary
+            self.buttons[button_name] = button
+        except Exception as e:
+            print(f"Error creating button {button_name}: {e}")
 
     def create_entry_field(self, entry_name, bg_position, dimensions):
         """Create an entry field with background image"""
-        # Create entry background image
-        self.images[f"{entry_name}_bg"] = PhotoImage(
-            file=self.relative_to_assets(f"{entry_name}.png")
-        )
-        self.canvas.create_image(
-            bg_position[0], bg_position[1],
-            image=self.images[f"{entry_name}_bg"]
-        )
+        try:
+            # Create entry background image
+            self.images[f"{entry_name}_bg"] = PhotoImage(
+                file=self.relative_to_assets(f"{entry_name}.png")
+            )
+            self.canvas.create_image(
+                bg_position[0], bg_position[1],
+                image=self.images[f"{entry_name}_bg"]
+            )
 
-        # Create entry widget
-        entry = Entry(
-            bd=0,
-            bg="#E7DCDC",
-            fg="#000716",
-            highlightthickness=0
-        )
-        
-        entry.place(
-            x=dimensions[0],
-            y=dimensions[1],
-            width=dimensions[2],
-            height=dimensions[3]
-        )
+            # Create entry widget
+            entry = Entry(
+                bd=0,
+                bg="#E7DCDC",
+                fg="#000716",
+                highlightthickness=0
+            )
+            
+            entry.place(
+                x=dimensions[0],
+                y=dimensions[1],
+                width=dimensions[2],
+                height=dimensions[3]
+            )
 
-        # Store entry widget in dictionary
-        self.entries[entry_name] = entry
-        
-        # Add validation flag attribute
-        entry._shown_warning = False
+            # Store entry widget in dictionary
+            self.entries[entry_name] = entry
+            
+            # Add validation flag attribute
+            entry._shown_warning = False
+        except Exception as e:
+            print(f"Error creating entry field {entry_name}: {e}")
 
     def populate_fields(self):
         """Fill entry fields with book data"""
@@ -246,20 +246,39 @@ class BookEdit1App:
 
     def setup_field_events(self):
         """Set up validation events for entry fields"""
-        # Bind validation to FocusOut events
-        self.entries["lnE_Title"].bind("<FocusOut>", self.validate_title)
-        self.entries["lnE_Author"].bind("<FocusOut>", self.validate_author)
-        self.entries["lnE_PublishedYear"].bind("<FocusOut>", self.validate_published_year)
-        self.entries["lnE_Category"].bind("<FocusOut>", self.validate_category)
-        self.entries["lnE_Quantity"].bind("<FocusOut>", self.validate_quantity)
+        # Define field validation mapping
+        field_validations = {
+            "lnE_Title": self.validate_title,
+            "lnE_Author": self.validate_author,
+            "lnE_PublishedYear": self.validate_published_year,
+            "lnE_Category": self.validate_category,
+            "lnE_Quantity": self.validate_quantity
+        }
         
-        # Reset warning flag on key release
-        for field in self.entries.values():
-            field.bind("<KeyRelease>", self.reset_warning_flag)
+        # Bind validation to FocusOut events
+        for field_name, validate_func in field_validations.items():
+            self.entries[field_name].bind("<FocusOut>", 
+                                        lambda event, func=validate_func: 
+                                        self.on_field_focus_out(event, func))
+            
+            # Reset warning flag on key release
+            self.entries[field_name].bind("<KeyRelease>", self.reset_warning_flag)
 
     def reset_warning_flag(self, event):
         """Reset the warning flag when field content changes"""
         event.widget._shown_warning = False
+
+    def on_field_focus_out(self, event, validate_func):
+        """Handle field focus out event with validation"""
+        # Call the validation function
+        is_valid = validate_func(event)
+        
+        if not is_valid:
+            # If validation fails, set focus back to this field
+            self.root.after(10, lambda: event.widget.focus_set())
+            return "break"  # Prevent default focus behavior
+        
+        return None
 
     def validate_title(self, event):
         """Validate title field"""
@@ -267,28 +286,24 @@ class BookEdit1App:
         
         # Check if empty
         if not title:
-            if not event.widget._shown_warning:
+            # Chỉ hiển thị thông báo nếu không có skip_message
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
                 messagebox.showwarning("Invalid Title", "Title cannot be empty.")
                 event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Title"].focus_set())
-            self.field_errors['title'] = True
             return False
-            
+                
         # Check length
         if len(title) < 2 or len(title) > 255:
-            if not event.widget._shown_warning:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
                 messagebox.showwarning("Invalid Title", "Title must be between 2 and 255 characters.")
                 event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Title"].focus_set())
-            self.field_errors['title'] = True
             return False
-            
+                
         # Standardize spaces
         standardized_title = re.sub(r'\s+', ' ', title)
         self.entries["lnE_Title"].delete(0, 'end')
         self.entries["lnE_Title"].insert(0, standardized_title)
         
-        self.field_errors['title'] = False
         return True
 
     def validate_author(self, event):
@@ -297,49 +312,39 @@ class BookEdit1App:
         
         # Check if empty
         if not author:
-            if not event.widget._shown_warning:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
                 messagebox.showwarning("Invalid Author", "Author cannot be empty.")
                 event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Author"].focus_set())
-            self.field_errors['author'] = True
             return False
             
         # Check length
         if len(author) < 2 or len(author) > 100:
-            if not event.widget._shown_warning:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
                 messagebox.showwarning("Invalid Author", "Author must be between 2 and 100 characters.")
                 event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Author"].focus_set())
-            self.field_errors['author'] = True
             return False
             
         # Check for numbers
         if re.search(r'\d', author):
-            if not event.widget._shown_warning:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
                 messagebox.showwarning("Invalid Author", "Author name cannot contain numbers.")
                 event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Author"].focus_set())
-            self.field_errors['author'] = True
             return False
             
         # Check for allowed characters
         if not re.match(r'^[a-zA-ZÀ-ỹ\s\-\.,&]+$', author):
-            if not event.widget._shown_warning:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
                 messagebox.showwarning("Invalid Author", 
-                                      "Only letters, spaces, hyphens (-), periods (.), commas (,), and ampersands (&) are allowed.")
+                                    "Only letters, spaces, hyphens (-), periods (.), commas (,), and ampersands (&) are allowed.")
                 event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Author"].focus_set())
-            self.field_errors['author'] = True
             return False
             
         # Check for consecutive special characters
         if re.search(r'[\-]{2,}|[\. ]{2,}|[,]{2,}|[&]{2,}', author):
-            if not event.widget._shown_warning:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
                 messagebox.showwarning("Invalid Author", 
-                                      "Special characters (., -, comma, &) cannot appear consecutively.")
+                                    "Special characters (., -, comma, &) cannot appear consecutively.")
                 event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Author"].focus_set())
-            self.field_errors['author'] = True
             return False
             
         # Format author name to title case with special handling
@@ -347,9 +352,95 @@ class BookEdit1App:
         self.entries["lnE_Author"].delete(0, 'end')
         self.entries["lnE_Author"].insert(0, formatted_author)
         
-        self.field_errors['author'] = False
         return True
+
+    def validate_published_year(self, event):
+        """Validate published year field"""
+        year = self.entries["lnE_PublishedYear"].get().strip()
         
+        # Check if empty
+        if not year:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Year", "Published Year cannot be empty.")
+                event.widget._shown_warning = True
+            return False
+            
+        # Check if it's a number
+        if not year.isdigit():
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Year", "Published Year must be a number.")
+                event.widget._shown_warning = True
+            return False
+            
+        # Check range
+        year_int = int(year)
+        current_year = datetime.datetime.now().year
+        
+        if year_int < 1440 or year_int > current_year:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Year", 
+                                    f"Published Year must be between 1440 and {current_year}.")
+                event.widget._shown_warning = True
+            return False
+            
+        return True
+
+    def validate_category(self, event):
+        """Validate category field"""
+        category = self.entries["lnE_Category"].get().strip()
+        
+        # Check if empty
+        if not category:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Category", "Category cannot be empty.")
+                event.widget._shown_warning = True
+            return False
+            
+        # Valid categories list
+        valid_categories = [
+            "Fiction", "Non-Fiction", "Mystery", "Science", 
+            "Fantasy", "History", "Romance", "Biography", 
+            "Thriller", "Technology"
+        ]
+        
+        # Check if category is valid
+        if category not in valid_categories:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Category", 
+                                    f"Category must be one of: {', '.join(valid_categories)}.")
+                event.widget._shown_warning = True
+            return False
+            
+        return True
+
+    def validate_quantity(self, event):
+        """Validate quantity field"""
+        quantity = self.entries["lnE_Quantity"].get().strip()
+        
+        # Check if empty
+        if not quantity:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Quantity", "Quantity cannot be empty.")
+                event.widget._shown_warning = True
+            return False
+            
+        # Check if it's a number
+        if not quantity.isdigit():
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Quantity", "Quantity must be a positive integer.")
+                event.widget._shown_warning = True
+            return False
+            
+        # Check if it's positive
+        quantity_int = int(quantity)
+        if quantity_int <= 0:
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Quantity", "Quantity must be greater than zero.")
+                event.widget._shown_warning = True
+            return False
+            
+        return True
+    
     def format_author_name(self, author):
         """Format author name with proper capitalization"""
         # Split by spaces
@@ -394,112 +485,6 @@ class BookEdit1App:
         formatted_author = ' '.join(result)
         return re.sub(r'\s+', ' ', formatted_author)
 
-    def validate_published_year(self, event):
-        """Validate published year field"""
-        year = self.entries["lnE_PublishedYear"].get().strip()
-        
-        # Check if empty
-        if not year:
-            if not event.widget._shown_warning:
-                messagebox.showwarning("Invalid Year", "Published Year cannot be empty.")
-                event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_PublishedYear"].focus_set())
-            self.field_errors['published_year'] = True
-            return False
-            
-        # Check if it's a number
-        if not year.isdigit():
-            if not event.widget._shown_warning:
-                messagebox.showwarning("Invalid Year", "Published Year must be a number.")
-                event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_PublishedYear"].focus_set())
-            self.field_errors['published_year'] = True
-            return False
-            
-        # Check range
-        year_int = int(year)
-        current_year = datetime.datetime.now().year
-        
-        if year_int < 1440 or year_int > current_year:
-            if not event.widget._shown_warning:
-                messagebox.showwarning("Invalid Year", 
-                                      f"Published Year must be between 1440 and {current_year}.")
-                event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_PublishedYear"].focus_set())
-            self.field_errors['published_year'] = True
-            return False
-            
-        self.field_errors['published_year'] = False
-        return True
-
-    def validate_category(self, event):
-        """Validate category field"""
-        category = self.entries["lnE_Category"].get().strip()
-        
-        # Check if empty
-        if not category:
-            if not event.widget._shown_warning:
-                messagebox.showwarning("Invalid Category", "Category cannot be empty.")
-                event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Category"].focus_set())
-            self.field_errors['category'] = True
-            return False
-            
-        # Valid categories list
-        valid_categories = [
-            "Fiction", "Non-Fiction", "Mystery", "Science", 
-            "Fantasy", "History", "Romance", "Biography", 
-            "Thriller", "Technology"
-        ]
-        
-        # Check if category is valid
-        if category not in valid_categories:
-            if not event.widget._shown_warning:
-                messagebox.showwarning("Invalid Category", 
-                                      f"Category must be one of: {', '.join(valid_categories)}.")
-                event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Category"].focus_set())
-            self.field_errors['category'] = True
-            return False
-            
-        self.field_errors['category'] = False
-        return True
-
-    def validate_quantity(self, event):
-        """Validate quantity field"""
-        quantity = self.entries["lnE_Quantity"].get().strip()
-        
-        # Check if empty
-        if not quantity:
-            if not event.widget._shown_warning:
-                messagebox.showwarning("Invalid Quantity", "Quantity cannot be empty.")
-                event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Quantity"].focus_set())
-            self.field_errors['quantity'] = True
-            return False
-            
-        # Check if it's a number
-        if not quantity.isdigit():
-            if not event.widget._shown_warning:
-                messagebox.showwarning("Invalid Quantity", "Quantity must be a positive integer.")
-                event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Quantity"].focus_set())
-            self.field_errors['quantity'] = True
-            return False
-            
-        # Check if it's positive
-        quantity_int = int(quantity)
-        if quantity_int <= 0:
-            if not event.widget._shown_warning:
-                messagebox.showwarning("Invalid Quantity", "Quantity must be greater than zero.")
-                event.widget._shown_warning = True
-                self.root.after(100, lambda: self.entries["lnE_Quantity"].focus_set())
-            self.field_errors['quantity'] = True
-            return False
-            
-        self.field_errors['quantity'] = False
-        return True
-
     def button_click(self, button_name):
         """Handle button click events"""
         print(f"{button_name} clicked")
@@ -523,92 +508,137 @@ class BookEdit1App:
             edit_book = BookManaEditBook(edit_book_root)
             edit_book_root.mainloop()
 
+    def show_success_message(self):
+        """Hiển thị thông báo thành công và quay lại màn hình BookManaEditBook"""
+        try:
+            # Hiển thị thông báo thành công
+            messagebox.showinfo("Success", "Book updated successfully!")
+            
+            # Đóng cửa sổ hiện tại
+            self.root.destroy()
+            
+            # Mở màn hình BookManaEditBook mới
+            from View.BookManagement.BookManaEditBook import BookManaEditBook
+            edit_book_root = Tk()
+            edit_book = BookManaEditBook(edit_book_root)
+            edit_book_root.mainloop()
+        except Exception as e:
+            print(f"Error in show_success_message: {e}")
+            import traceback
+            traceback.print_exc()
+
     def update_book(self):
         """Validate all fields and update book in database"""
         print("Update book method called!")
         
-        # Create dummy event objects for validation
-        dummy_event = lambda widget: type('obj', (object,), {'widget': widget, '_shown_warning': False})
+        # Kiểm tra từng trường một và đặt focus vào trường đầu tiên có lỗi
         
-        # Force validation on all fields
-        title_valid = self.validate_title(dummy_event(self.entries["lnE_Title"]))
-        author_valid = self.validate_author(dummy_event(self.entries["lnE_Author"]))
-        year_valid = self.validate_published_year(dummy_event(self.entries["lnE_PublishedYear"]))
-        category_valid = self.validate_category(dummy_event(self.entries["lnE_Category"]))
-        quantity_valid = self.validate_quantity(dummy_event(self.entries["lnE_Quantity"]))
-        
-        print(f"Validation results: title={title_valid}, author={author_valid}, year={year_valid}, category={category_valid}, quantity={quantity_valid}")
-        
-        # Check if any validation failed
-        if not all([title_valid, author_valid, year_valid, category_valid, quantity_valid]):
-            # Focus on the first field with an error
-            for field_name, is_error in self.field_errors.items():
-                if is_error:
-                    field_map = {
-                        'title': 'lnE_Title',
-                        'author': 'lnE_Author',
-                        'published_year': 'lnE_PublishedYear',
-                        'category': 'lnE_Category',
-                        'quantity': 'lnE_Quantity'
-                    }
-                    self.entries[field_map[field_name]].focus_set()
-                    return
-            return
-            
-        # Collect book data
-        book_id = self.book_data[0]  # Original ISBN/book_id (unchanged)
+        # Kiểm tra Title
         title = self.entries["lnE_Title"].get().strip()
+        if not title or len(title) < 2 or len(title) > 255:
+            self.entries["lnE_Title"].focus_set()
+            messagebox.showwarning("Invalid Title", "Title must be between 2 and 255 characters.")
+            return
+        
+        # Kiểm tra Author
         author = self.entries["lnE_Author"].get().strip()
-        published_year = int(self.entries["lnE_PublishedYear"].get().strip())
+        if not author or len(author) < 2 or len(author) > 100:
+            self.entries["lnE_Author"].focus_set()
+            messagebox.showwarning("Invalid Author", "Author must be between 2 and 100 characters.")
+            return
+        
+        if re.search(r'\d', author):
+            self.entries["lnE_Author"].focus_set()
+            messagebox.showwarning("Invalid Author", "Author name cannot contain numbers.")
+            return
+        
+        if not re.match(r'^[a-zA-ZÀ-ỹ\s\-\.,&]+$', author):
+            self.entries["lnE_Author"].focus_set()
+            messagebox.showwarning("Invalid Author", 
+                                "Only letters, spaces, hyphens (-), periods (.), commas (,), and ampersands (&) are allowed.")
+            return
+        
+        if re.search(r'[\-]{2,}|[\. ]{2,}|[,]{2,}|[&]{2,}', author):
+            self.entries["lnE_Author"].focus_set()
+            messagebox.showwarning("Invalid Author", 
+                                "Special characters (., -, comma, &) cannot appear consecutively.")
+            return
+        
+        # Kiểm tra Published Year
+        year = self.entries["lnE_PublishedYear"].get().strip()
+        if not year or not year.isdigit():
+            self.entries["lnE_PublishedYear"].focus_set()
+            messagebox.showwarning("Invalid Year", "Published Year must be a number.")
+            return
+        
+        year_int = int(year)
+        current_year = datetime.datetime.now().year
+        if year_int < 1440 or year_int > current_year:
+            self.entries["lnE_PublishedYear"].focus_set()
+            messagebox.showwarning("Invalid Year", 
+                                f"Published Year must be between 1440 and {current_year}.")
+            return
+        
+        # Kiểm tra Category
         category = self.entries["lnE_Category"].get().strip()
-        quantity = int(self.entries["lnE_Quantity"].get().strip())
+        valid_categories = [
+            "Fiction", "Non-Fiction", "Mystery", "Science", 
+            "Fantasy", "History", "Romance", "Biography", 
+            "Thriller", "Technology"
+        ]
         
-        print(f"Updating book: ID={book_id}, title={title}, author={author}, year={published_year}, category={category}, quantity={quantity}")
+        if not category or category not in valid_categories:
+            self.entries["lnE_Category"].focus_set()
+            messagebox.showwarning("Invalid Category", 
+                                f"Category must be one of: {', '.join(valid_categories)}.")
+            return
         
-        # Create updated book data dictionary
-        updated_data = {
-            'title': title,
-            'author': author,
-            'published_year': published_year,
-            'category': category,
-            'quantity': quantity
-        }
+        # Kiểm tra Quantity
+        quantity = self.entries["lnE_Quantity"].get().strip()
+        if not quantity or not quantity.isdigit():
+            self.entries["lnE_Quantity"].focus_set()
+            messagebox.showwarning("Invalid Quantity", "Quantity must be a positive integer.")
+            return
         
-        # Update the book in the database
+        quantity_int = int(quantity)
+        if quantity_int <= 0:
+            self.entries["lnE_Quantity"].focus_set()
+            messagebox.showwarning("Invalid Quantity", "Quantity must be greater than zero.")
+            return
+        
+        # Nếu tất cả các trường đều hợp lệ, tiến hành cập nhật sách
         try:
-            # Import Book model
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            parent_dir = os.path.dirname(current_dir)
-            grandparent_dir = os.path.dirname(parent_dir)
+            # Format dữ liệu
+            formatted_title = re.sub(r'\s+', ' ', title)
+            formatted_author = self.format_author_name(author)
             
-            # Add possible paths to sys.path
-            possible_paths = [
-                grandparent_dir,
-                os.path.join(grandparent_dir, "LibraryManagementApp"),
-                parent_dir,
-                current_dir
-            ]
+            # Lấy giá trị đã được validate từ các trường
+            book_id = self.book_data[0]  # Original ISBN/book_id (unchanged)
             
-            for path in possible_paths:
-                if path not in sys.path:
-                    sys.path.append(path)
-                    
+            print(f"Updating book: ID={book_id}, title={formatted_title}, author={formatted_author}, year={year_int}, category={category}, quantity={quantity_int}")
+            
+            # Tạo dictionary chứa dữ liệu cập nhật
+            updated_data = {
+                'title': formatted_title,
+                'author': formatted_author,
+                'published_year': year_int,
+                'category': category,
+                'quantity': quantity_int
+            }
+            
+            # Import Book model và cập nhật
             from Model.book_model import Book
-            
-            # Create a Book object with the book_id
             book = Book(book_id=book_id)
-            
-            # Update the book with the new data
             success = book.update_book(updated_data)
             
             print(f"Database update result: {success}")
             
             if success:
-                # Show success message using Message_2
+                # Hiển thị thông báo thành công bằng Message_2
                 from View.noti_tab_view_1 import Message_2
                 Message_2(self.root, 'edit_book')
             else:
-                messagebox.showerror("Update Failed", "Failed to update book information.")
+                messagebox.showerror("Update Failed", "Failed to update book information in the database.")
                 
         except Exception as e:
             print(f"Error updating book: {e}")
