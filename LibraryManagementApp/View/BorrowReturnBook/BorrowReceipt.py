@@ -17,6 +17,10 @@ class BorrowReceiptApp:
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -364,9 +368,8 @@ class BorrowReceiptApp:
         print("btn_BackToHomepage clicked")
         self.root.destroy()
         from View.Homepage import HomepageApp
-        role = "admin" if self.user_data[6] == "Admin" else "User"
         homepage_root = Tk()
-        homepage = HomepageApp(homepage_root, user_data = self.user_data, role = role)
+        homepage = HomepageApp(homepage_root, user_data = self.user_data, role = self.role)
         homepage_root.mainloop()
 
     def on_return_book_clicked(self): # Switch to Return book section

@@ -6,6 +6,12 @@ class Borrow1App:
         self.root = root
         self.user_data = user_data
         
+        # Get user_role from user_data
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
+        
         # Extract user_id from user_data if available
         if self.user_data:
             self.user_id = self.user_data[0]  # get user id from user data
@@ -227,9 +233,8 @@ class Borrow1App:
 
         self.root.destroy()
         from View.Homepage import HomepageApp
-        role = "admin" if self.user_data[6] == "Admin" else "User"
         homepage_root = Tk()
-        homepage = HomepageApp(homepage_root, role = role, user_data = self.user_data)
+        homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
         homepage_root.mainloop()
 
     def on_return_book_clicked(self): # Switch to Return Book window
@@ -238,7 +243,7 @@ class Borrow1App:
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return_root = Tk()
-        return_1 = Return1App(return_root)
+        return_1 = Return1App(return_root, user_data=self.user_data)
         return_root.mainloop()
 
     def on_borrow_book_clicked(self): # Switch back to Borrow/Return window

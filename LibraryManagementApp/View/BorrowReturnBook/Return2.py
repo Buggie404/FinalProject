@@ -10,11 +10,16 @@ from View.noti_tab_view_1 import Drop_Off
 class Return2App:
     def __init__(self, root, receipt_id=None, user_data=None, assets_path=None):
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.receipt_id = receipt_id
         self.user_data = user_data
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
         
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -216,10 +221,9 @@ class Return2App:
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
         self.root.destroy()
-        role = 'admin' if self.user_data[6] == "Admin" else "User"
         from View.Homepage import HomepageApp
         homepage_root = Tk()
-        homepage = HomepageApp(homepage_root, role = role, user_data = self.user_data)
+        homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
         homepage_root.mainloop()
 
     def on_return_book_clicked(self):

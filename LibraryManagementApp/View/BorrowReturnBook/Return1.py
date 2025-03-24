@@ -16,6 +16,10 @@ class Return1App:
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.user_data = user_data
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -192,7 +196,7 @@ class Return1App:
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow1_root = Tk()
-        borrow1 = Borrow1App(borrow1_root)
+        borrow1 = Borrow1App(borrow1_root,user_data=self.user_data)
         borrow1_root.mainloop()
         
     def on_return_book_click(self):
@@ -200,7 +204,7 @@ class Return1App:
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return1_root = Tk()
-        return1 = Return1App(return1_root)
+        return1 = Return1App(return1_root, user_data=self.user_data)
         return1_root.mainloop()
     
     def on_back_to_homepage_click(self):
@@ -211,7 +215,7 @@ class Return1App:
         sys.path.append(base_dir)
         from View.Homepage import HomepageApp
         homepage_root = Tk()
-        homepage = HomepageApp(homepage_root)
+        homepage = HomepageApp(homepage_root,role=self.role, user_data=self.user_data)
         homepage_root.mainloop()
 
     def on_search_click(self):

@@ -7,12 +7,17 @@ parent_dir = os.path.dirname(current_dir)
 project_root = os.path.dirname(parent_dir)
 sys.path.append(project_root)
 class ReturnOverdueApp:
-    def __init__(self, root, receipt_id=None, assets_path=None):
+    def __init__(self, root, user_data = None, receipt_id=None, assets_path=None):
         self.root = root
+        self.user_data = user_data
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.receipt_id = receipt_id
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -174,12 +179,9 @@ class ReturnOverdueApp:
         """Handle back to homepage button click"""
         print("btn_BackToHomepage clicked")
         self.root.destroy()
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        sys.path.append(os.path.join(base_dir, "View"))
-        sys.path.append(base_dir)
         from View.Homepage import HomepageApp
         homepage_root = Tk()
-        homepage = HomepageApp(homepage_root)
+        homepage = HomepageApp(homepage_root,role=self.role, user_data=self.user_data)
         homepage_root.mainloop()
 
     def on_return_book_clicked(self):
@@ -188,7 +190,7 @@ class ReturnOverdueApp:
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return1_root = Tk()
-        return1 = Return1App(return1_root)
+        return1 = Return1App(return1_root,user_data=self.user_data)
         return1_root.mainloop()
 
     def on_borrow_book_clicked(self):
@@ -197,7 +199,7 @@ class ReturnOverdueApp:
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow1_root = Tk()
-        borrow1 = Borrow1App(borrow1_root)
+        borrow1 = Borrow1App(borrow1_root,user_data=self.user_data)
         borrow1_root.mainloop()
     
     def on_pay_fine_clicked(self):
@@ -211,7 +213,7 @@ class ReturnOverdueApp:
             self.root.destroy()
             from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
             borrow_return_root = Tk()
-            borrow_return = BorrowReturnApp(borrow_return_root)
+            borrow_return = BorrowReturnApp(borrow_return_root,user_data=self.user_data)
             borrow_return_root.mainloop()
         message.back_to_subfun = custom_switch_to_borrowreturn
 

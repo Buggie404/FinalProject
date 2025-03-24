@@ -10,6 +10,10 @@ class BorrowReturnApp:
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.user_data = user_data
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -93,7 +97,7 @@ class BorrowReturnApp:
         sys.path.append(base_dir)
         from View.Homepage import HomepageApp
         homepage_root = Tk()
-        homepage = HomepageApp(homepage_root)
+        homepage = HomepageApp(homepage_root,role=self.role, user_data=self.user_data)
         homepage_root.mainloop()
 
     def on_borrow_book_clicked(self):
