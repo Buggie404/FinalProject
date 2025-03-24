@@ -3,10 +3,11 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
 class UserEditAccountApp:
-    def __init__(self, root, user_data=None, assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None, role = None):
         # Initialize the main window
         self.root = root
         self.user_data = user_data
+        self.role = role
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
@@ -202,7 +203,7 @@ class UserEditAccountApp:
             from View.UserManagement.UserEditAccount import UserEditAccountApp
             self.root.destroy()
             reset_root = Tk()
-            reset = UserEditAccountApp(reset_root, user_data=self.user_data)
+            reset = UserEditAccountApp(reset_root, user_data=self.user_data, role=self.role)
             reset_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             # Switch back to Homepage

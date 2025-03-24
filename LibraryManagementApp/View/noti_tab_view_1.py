@@ -87,7 +87,7 @@ class Message_1():  # To notify message (Type 1: When clicked 'OK' button -> mes
 
 
 class Message_2():  # To notify message (Type 2: when clicked 'Return' button -> switch back to the first frame of sub-function)
-    def __init__(self, root, message_type = None):
+    def __init__(self, root, message_type = None, user_data=None, role=None):
         # Setup tab
         self.message_2 = Toplevel(root)
         self.message_type = message_type
@@ -95,6 +95,15 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
         self.message_2.geometry("350x150+0+0")
         self.message_2.resizable(False, False)
         self.message_2.config(bg='white')
+
+        # Lưu user_data và xác định role
+        self.user_data = user_data
+        
+        # Xác định role từ user_data nếu có, nếu không thì dùng role được truyền vào
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = role or "user"
 
         # Lưu message_type vào biến instance
         self.message_type = message_type
@@ -122,10 +131,10 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
             # Open BookManagement screen
             from View.BookManagement.BookManagement import BookManagementApp
             management_root = Tk()
-            management_app = BookManagementApp(management_root)
+            management_app = BookManagementApp(management_root, role=self.role, user_data=self.user_data)
             management_root.mainloop()
         
-        if self.message_type == 'pass_reset':
+        elif self.message_type == 'pass_reset':
             # Đóng màn hình hiện tại
             parent_window = self.message_2.master
             parent_window.destroy()
@@ -133,7 +142,7 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
             # Mở màn hình UserEditAccount
             from View.UserManagement.UserEditAccount import UserEditAccountApp
             reset_pass_root = Tk()
-            reset_pass = UserEditAccountApp(reset_pass_root)
+            reset_pass = UserEditAccountApp(reset_pass_root, role=self.role, user_data=self.user_data)
             reset_pass_root.mainloop()
 
         else: # pay_fine

@@ -879,7 +879,7 @@ class BookEditController:
             if success:
                 # Show success message using notification system
                 from View.noti_tab_view_1 import Message_2
-                Message_2(self.view.root, 'edit_book')
+                Message_2(self.view.root, 'edit_book', user_data=self.view.user_data, role=self.view.role)
             else:
                 messagebox.showerror("Update Failed", "Failed to update book information in the database.")
 

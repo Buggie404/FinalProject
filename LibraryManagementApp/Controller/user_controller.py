@@ -952,7 +952,10 @@ class ResetPasswordController:
             
             if success:
                 # Display success message
-                Message_2(root_window, 'pass_reset')
+                current_role = getattr(root_window, 'role', 'user')
+                current_user_data = getattr(root_window, 'user_data', None)
+                # Display success message với role và user_data
+                Message_2(root_window, 'pass_reset', user_data=current_user_data, role=current_role)
                 return True
             else:
                 # Display error message
@@ -961,6 +964,8 @@ class ResetPasswordController:
                 
         except Exception as e:
             print(f"Error resetting password: {e}")
+            import traceback
+            traceback.print_exc()
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
             return False
     
@@ -1034,28 +1039,33 @@ class ResetPasswordController:
             from View.UserManagement.UserEditAccount1 import UserEditAccountApp as UserEditAccount1App
             
             # Get user details
-            user_data = self.get_user_details(user_id)
+            user_details = self.get_user_details(user_id)
             
-            if user_data:
+            if user_details:
+                # Lấy thông tin role và user_data từ root_window nếu có
+                current_role = getattr(root_window, 'role', 'user')
+                current_user_data = getattr(root_window, 'user_data', None)
+
                 # Close current window
                 root_window.destroy()
                 
                 # Create new window with user data
                 reset_1_root = Tk()
-                reset_1 = UserEditAccount1App(reset_1_root, user_data=user_data)
-                
+                # Truyền cả role và user_data
+                reset_1 = UserEditAccount1App(reset_1_root, user_data=current_user_data, role=current_role)
+
                 # Update the labels with user data
                 # We need to wait for the canvas to be created
                 reset_1_root.update()
                 
                 # Now update the text of the labels
-                reset_1.canvas.itemconfig(reset_1.lbl_ID, text=str(user_data['user_id']))
-                reset_1.canvas.itemconfig(reset_1.lbl_Name, text=user_data['name'])
-                reset_1.canvas.itemconfig(reset_1.lbl_EmailAddress, text=user_data['email'])
-                reset_1.canvas.itemconfig(reset_1.lbl_Username, text=user_data['username'])
+                reset_1.canvas.itemconfig(reset_1.lbl_ID, text=str(user_details['user_id']))
+                reset_1.canvas.itemconfig(reset_1.lbl_Name, text=user_details['name'])
+                reset_1.canvas.itemconfig(reset_1.lbl_EmailAddress, text=user_details['email'])
+                reset_1.canvas.itemconfig(reset_1.lbl_Username, text=user_details['username'])
                 
                 # Store the user_id for later use when resetting password
-                reset_1.current_user_id = user_data['user_id']
+                reset_1.current_user_id = user_details['user_id']
                 
                 # Add command to reset password button
                 reset_1.buttons["btn_ResetPassword"].config(
@@ -1067,5 +1077,7 @@ class ResetPasswordController:
                 
         except Exception as e:
             print(f"Error switching to UserEditAccount1: {e}")
+            import traceback
+            traceback.print_exc()
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
             return False

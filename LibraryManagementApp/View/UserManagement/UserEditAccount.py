@@ -179,7 +179,7 @@ class UserEditAccountApp:
             self.root.destroy()
             from View.UserManagement.UserManagement import UserManagementApp
             user_root = Tk()
-            user = UserManagementApp(user_root, user_data = self.user_data)
+            user = UserManagementApp(user_root, user_data = self.user_data, role=self.role)
             user_root.mainloop()
         if button_name == "btn_BackToHomepage":
             # Switch to Homepage
