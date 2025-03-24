@@ -7,14 +7,25 @@ class UserEditAccountApp:
         # Initialize the main window
         self.root = root
         self.user_data = user_data
+        self.role = role
+
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
-        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
-            self.role = "admin"
-        else:
-            self.role = None or "user"
+        # Store these directly on the root window so they can be accessed
+        self.root.role = role
+        self.root.user_data = user_data
+        
+        # Debugging
+        # print(f"UserEditAccount1 initialized with role: {role}")
+
+        # Only determine role if not explicitly provided
+        if self.role is None:
+            if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+                self.role = "admin"
+            else:
+                self.role = "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -206,14 +217,16 @@ class UserEditAccountApp:
             from View.UserManagement.UserEditAccount import UserEditAccountApp
             self.root.destroy()
             reset_root = Tk()
-            reset = UserEditAccountApp(reset_root, user_data=self.user_data)
+            reset = UserEditAccountApp(reset_root, user_data=self.user_data, role=self.role)
             reset_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             # Switch back to Homepage
             self.root.destroy()
             from View.Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, role = self.role, user_data=self.user_data)
+            # Make sure role is being printed for debugging
+            # print(f"Returning to homepage with role: {self.role}")
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
         elif button_name == "btn_ResetPassword":
             # This will be handled by the controller via the command 

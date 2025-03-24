@@ -1042,18 +1042,41 @@ class ResetPasswordController:
             user_details = self.get_user_details(user_id)
             
             if user_details:
-                # Lấy thông tin role và user_data từ root_window nếu có
-                current_role = getattr(root_window, 'role', 'user')
+                # Get the current role and user_data - first check on root_window directly
+                current_role = getattr(root_window, 'role', None)
                 current_user_data = getattr(root_window, 'user_data', None)
-
+                
+                # If not found, try accessing through the app instance
+                if current_role is None and hasattr(root_window, '_nametowidget'):
+                    for widgetname in root_window.winfo_children():
+                        widget = root_window.nametowidget(str(widgetname))
+                        if hasattr(widget, 'role'):
+                            current_role = widget.role
+                        if hasattr(widget, 'user_data'):
+                            current_user_data = widget.user_data
+                
+                # print(f"Current role: {current_role}, User data: {current_user_data}")
+                
+                # If we still don't have a role but have user_data, check if user is admin
+                if current_role is None and current_user_data and len(current_user_data) > 6:
+                    if current_user_data[6] == "Admin":
+                        current_role = "admin"
+                    else:
+                        current_role = "user"
+                
                 # Close current window
                 root_window.destroy()
                 
                 # Create new window with user data
                 reset_1_root = Tk()
-                # Truyền cả role và user_data
+                
+                # Pass the role and user_data explicitly
                 reset_1 = UserEditAccount1App(reset_1_root, user_data=current_user_data, role=current_role)
-
+                
+                # Force the role value if we know it's an admin
+                if current_user_data and len(current_user_data) > 6 and current_user_data[6] == "Admin":
+                    reset_1.role = "admin"
+                
                 # Update the labels with user data
                 # We need to wait for the canvas to be created
                 reset_1_root.update()

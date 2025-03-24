@@ -8,13 +8,22 @@ class UserEditAccountApp:
         self.root = root
         self.role = role
         self.user_data = user_data
+
+        # Store these directly on the root window so the controller can access them
+        self.root.role = role
+        self.root.user_data = user_data
+
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
-        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
-            self.role = "admin"
-        else:
-            self.role = None or "user"
+
+
+        # Only determine role if not explicitly provided
+        if self.role is None:
+            if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+                self.role = "admin"
+            else:
+                self.role = "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -172,21 +181,21 @@ class UserEditAccountApp:
             self.root.destroy()
             from View.UserManagement.UserAddAccount import UserAddAccountApp
             add_root = Tk()
-            add = UserAddAccountApp(add_root, user_data = self.user_data)
+            add = UserAddAccountApp(add_root, user_data = self.user_data, role=self.role)
             add_root.mainloop()
         elif button_name == "btn_EditAccountPassword":
             # Switch back to User Management
             self.root.destroy()
             from View.UserManagement.UserManagement import UserManagementApp
             user_root = Tk()
-            user = UserManagementApp(user_root, user_data = self.user_data)
+            user = UserManagementApp(user_root, user_data = self.user_data, role = self.role)
             user_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             # Switch to Homepage
             self.root.destroy()
             from View.Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, role= self.role, user_data= self.user_data)
+            homepage = HomepageApp(homepage_root, role = self.role, user_data= self.user_data)
             homepage_root.mainloop()
         elif button_name == "btn_Search":
             # Get user ID from input field

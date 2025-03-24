@@ -14,6 +14,11 @@ class HomepageApp:
         self.root = root
         # self.role = "user"  # Default role
         self.role = role
+
+        # Store on root window for consistency
+        self.root.role = role 
+        self.root.user_data = user_data
+        
         self.user_data = user_data
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
@@ -66,7 +71,7 @@ class HomepageApp:
     
     def update_ui_based_on_role(self):
         """Hide and show buttons based on admin role"""
-        if hasattr(self, "btn_BookManagement"):
+        if hasattr(self, "btn_BookManagement") and hasattr(self, "btn_UserManagement"):
             if self.role == "admin":
                 self.btn_BorrowReturnBook.place(x=348.0, y=315.0, width=228.0, height=203.0)
                 self.btn_UserManagement.place(x=613.0, y=315.0, width=228.0, height=203.0)
