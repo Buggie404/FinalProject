@@ -253,20 +253,6 @@ class LogInApp:
 
         success, user_data = Authen.check_account_login(email, password)
 
-        # if success:  # if account is valid -> cho chuyển sang Homepage
-        #     self.root.destroy()
-        #     if Authen.check_account_role(email) == 'admin':
-        #         homepage_root = Tk()
-        #         homepage = HomepageApp(homepage_root, role = "admin")
-        #         homepage_root.mainloop()
-        #     else:
-        #         homepage_root = Tk()
-        #         homepage = HomepageApp(homepage_root, role = "user")
-        #         homepage_root.mainloop()
-        # else:  # else -> cho hiện Invalid(self.root, 'account')
-        #     from noti_tab_view_1 import Invalid
-        #     Invalid(self.root, 'account')
-
         if success:  # if account is valid -> cho chuyển sang Homepage
             self.root.destroy()
             role = Authen.check_account_role(email)

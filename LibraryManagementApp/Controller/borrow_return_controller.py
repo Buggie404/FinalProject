@@ -41,7 +41,7 @@ class ReturnController:
         if status == "returned":
             return (False, "This book has already been returned!")
         elif status == "overdue":
-            return (False, "This book is marked as overdue and  has already been returned!")
+            return (False, "This book is marked as overdue!")
         
         return (True, "Valid for return")   
 

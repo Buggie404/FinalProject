@@ -219,30 +219,17 @@ class Return2App:
     
     def on_back_to_homepage_clicked(self):
         """Handle back to homepage button click"""
-        print("btn_BackToHomepage clicked")
-        self.root.destroy()
-        from View.Homepage import HomepageApp
-        homepage_root = Tk()
-        homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
-        homepage_root.mainloop()
+        messagebox.showerror("Error", "Cannot go to other tab while Returning Books!")
 
     def on_return_book_clicked(self):
         """Handle return book button click"""
-        print("btn_ReturnBook clicked")
-        self.root.destroy()
-        from View.BorrowReturnBook.Return1 import Return1App
-        return1_root = Tk()
-        return1 = Return1App(return1_root, user_data=self.user_data)
-        return1_root.mainloop()
+        messagebox.showerror("Error", "Cannot go to other tab while Returning Books!")
+
 
     def on_borrow_book_clicked(self):
         """Handle borrow book button click"""
-        print("btn_BorrowBook clicked")
-        self.root.destroy()
-        from View.BorrowReturnBook.Borrow1 import Borrow1App
-        borrow1_root = Tk()
-        borrow1 = Borrow1App(borrow1_root, user_data = self.user_data)
-        borrow1_root.mainloop()
+        messagebox.showerror("Error", "Cannot go to other tab while Returning Books!")
+
 
     def on_drop_off_clicked(self):
         from Controller.borrow_return_controller import ReturnController
@@ -258,15 +245,17 @@ class Return2App:
             success, receipt_status, message = ReturnController.process_return(self.receipt_id,user_id)
         
             if not success:
-                if "already been returned" in message or "marked as overdue" in message:
+                if "already been returned" in message:
                     AlreadyReturnedNotification(self.root, message)
+                elif "marked as overdue" in message:
+                    Drop_Off(self.root, user_data=self.user_data, receipt_status="Overdue")
                 else:
                     messagebox.showerror("Error", message)
                 return
 
    
             # Display Drop Off notification
-            Drop_Off(self.root, receipt_status, self.receipt_id)
+            Drop_Off(self.root, receipt_status, self.receipt_id, self.user_data)
         except Exception as e:
             print(f"Error in on_drop_off_clicked: {e}")
             messagebox.showerror("Error", f"An error occurred: {str(e)}")

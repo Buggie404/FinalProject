@@ -183,7 +183,7 @@ class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id forma
 
 
 class Drop_Off():
-    def __init__(self, root, receipt_status, receipt_id=None):
+    def __init__(self, root, receipt_status, receipt_id=None, user_data=None):
         # Config Notification tab
         self.root = root
         self.status = receipt_status
@@ -193,6 +193,11 @@ class Drop_Off():
         self.delete_noti.resizable(False, False)
         self.delete_noti.config(bg='white')
         self.receipt_id = receipt_id 
+        self.user_data = user_data
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = "user" or None
 
         # Title Label
         Label(self.delete_noti, text="Drop Off Successfully!", font=('Montserrat', 18, 'bold'), bg='white',
@@ -212,7 +217,7 @@ class Drop_Off():
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return_1_root = Tk()
-        return_1 = Return1App(return_1_root)
+        return_1 = Return1App(return_1_root, user_data = self.user_data)
         return_1_root.mainloop()
         
     # Switch to Overdue Window
@@ -221,7 +226,7 @@ class Drop_Off():
         self.root.destroy()
         from View.BorrowReturnBook.ReturnOverdue import ReturnOverdueApp
         overdue_root = Tk()
-        overdue = ReturnOverdueApp(overdue_root, receipt_id = self.receipt_id)
+        overdue = ReturnOverdueApp(overdue_root, receipt_id = self.receipt_id, user_data = self.user_data)
         overdue_root.mainloop()
 
 
@@ -263,7 +268,7 @@ class Sign_Out():  # To Sign out, when clicked "Yes" -> switch to Log_In window
 class Print_Receipt():
     """To manage the borrowing cart and finalize the transaction"""
 
-    def __init__(self, root, book_data=None, quantity=None):
+    def __init__(self, root, book_data=None, quantity=None, user_data = None):
         # Setup tab
         self.root = root
         self.print_receipt = Toplevel(root)
@@ -277,6 +282,12 @@ class Print_Receipt():
         # Ensure print_receipt window stays on top
         self.print_receipt.transient(root)
         self.print_receipt.grab_set()
+
+        self.user_data = user_data
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
 
         # Import cart
         import sys
@@ -403,13 +414,8 @@ class Print_Receipt():
 
         # Create new Borrow1 window
         new_window = Tk()
-        
-        # Pass the user_id from the cart
-        user_data = None
-        if self.cart.user_id:
-            user_data = (self.cart.user_id,)
             
-        app = Borrow1App(new_window, user_data=user_data)
+        app = Borrow1App(new_window, user_data=self.user_data)
         new_window.mainloop()
 
     def complete_borrowing(self):
@@ -464,7 +470,8 @@ class Print_Receipt():
                 new_window, 
                 receipt_id=receipt_id, 
                 borrow_date=borrow_date,
-                return_deadline=return_deadline
+                return_deadline=return_deadline,
+                user_data=self.user_data
             )
             new_window.mainloop()
         except Exception as e:
@@ -493,11 +500,11 @@ class Print_Receipt():
         try:
             # Try to import BorrowReturnApp - adjust the import path if needed
             from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
-            app = BorrowReturnApp(borrow_root)
+            app = BorrowReturnApp(borrow_root,user_data=self.user_data)
         except ImportError:
             # Fallback to Borrow1 if BorrowReturnApp is not found
             from View.BorrowReturnBook.Borrow1 import Borrow1App
-            app = Borrow1App(borrow_root)
+            app = Borrow1App(borrow_root,user_data=self.user_data)
             
         borrow_root.mainloop()
     
