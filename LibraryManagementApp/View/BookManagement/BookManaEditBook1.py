@@ -302,8 +302,12 @@ class BookEdit1App:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
             homepage_root.mainloop()
-        elif button_name == "btn_AddBook": #Cannot Add Book while Edditing Book
-            pass
+        elif button_name == "btn_AddBook": 
+            self.root.destroy()
+            from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
+            add_book_root = Tk()
+            add_book = BookManagementAddBookApp(add_book_root, user_data=self.user_data)
+            add_book_root.mainloop()
         elif button_name == "btn_EditBookInformation":
             self.root.destroy()
             from View.BookManagement.BookManaEditBook import BookManaEditBook
