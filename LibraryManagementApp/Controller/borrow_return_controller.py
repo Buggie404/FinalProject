@@ -1,7 +1,6 @@
 # Import Lib
 import sys
 import os
-import datetime
 from tkinter import Tk, messagebox
 
 # Ensure Model path is in sys.path
@@ -244,12 +243,11 @@ class BorrowController:
             print(f"  Item {i+1}: {item}")
 
         # Calculate borrow date (today) and return deadline (20 days from today)
-        today = datetime.datetime.now()
+        today = datetime.now()
         today_str = today.strftime('%Y-%m-%d')
-        return_deadline_str = (today + datetime.timedelta(days=20)).strftime('%Y-%m-%d')
+        return_deadline_str = (today + timedelta(days=20)).strftime('%Y-%m-%d')
 
-        # Create receipt object - without return_deadline parameter
-        # Note: return_date is left as default (None) since books haven't been returned yet
+        # Create receipt object
         receipt = Receipt(
             user_id=user_id,
             borrow_date=today_str,
