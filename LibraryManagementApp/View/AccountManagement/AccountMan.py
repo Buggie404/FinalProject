@@ -10,13 +10,19 @@ sys.path.append(os.path.join(base_dir, "View"))
 sys.path.append(base_dir)
 
 class AccountManagement:
-    def __init__(self, root, user_data=None, assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None, role=None):
         # Initialize the main window
         self.root = root
-        self.user_data = user_data
+        self.user_data = user_data or []
+        self.role=role
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = role or "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -241,9 +247,9 @@ class AccountManagement:
         elif button_name == "btn_EditAccountInformation":
             self.root.destroy()
             from AccountManagement.AccountEditInfo import AccountEditInfoApp
-            user_id = self.user_data[0]
+            # user_id = self.user_data[0]
             editinfo_root = Tk()
-            editinfo = AccountEditInfoApp(editinfo_root, user_id = user_id)
+            editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
             editinfo_root.mainloop()
         elif button_name == "btn_SignOut":
             from noti_tab_view_1 import Sign_Out
@@ -251,9 +257,8 @@ class AccountManagement:
         else:
             self.root.destroy()
             from Homepage import HomepageApp
-            role = 'admin' if self.user_data[6] == "Admin" else "User"
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, role=role, user_data=self.user_data)
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
 
 

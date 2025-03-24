@@ -5,21 +5,28 @@ import os
 import sys
 
 class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (lấy input của lnE) -> thêm để bên Controller xử lý tiếp phần này nha
-    def __init__(self, root, user_id = None, assets_path=None):
+    def __init__(self, root, user_data=None, user_id = None, assets_path=None, role=None):
         # Initialize the main window
         self.root = root
-        self.user_id = user_id
+        self.user_data=user_data
+        self.role=role
+        # self.user_id = user_id
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = role or "user"
+
         # Import Model to take user data
-        from Model.user_model import User
-        self.user_data = User.get_id(self.user_id)
+        # from Model.user_model import User
+        # self.user_data = User.get_id(self.user_id)
 
         # import controller that hndel Edit Account Information
         from Controller.account_management_controller import AccountEditInfoController 
-        self.controller = AccountEditInfoController(user_id)
+        self.controller = AccountEditInfoController(user_data)
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -201,8 +208,7 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
             self.root.destroy()
             from View.Homepage import HomepageApp
             homepage_root = Tk()
-            role = 'admin' if self.user_data[6] == "Admin" else 'User'
-            homepage = HomepageApp(homepage_root, role = role, user_data=self.user_data)
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage.root.mainloop()
         else: # For btn_Apply
             self.controller.handle_apply_click(self)

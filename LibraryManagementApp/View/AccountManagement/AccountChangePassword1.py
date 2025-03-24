@@ -144,8 +144,8 @@ class AccountChangePw1App:
             self.root.destroy()
             from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
             editinfo_root = Tk()
-            user_id = self.user_data[0] if self.user_data else None
-            editinfo = AccountEditInfoApp(editinfo_root, user_id=user_id)
+            # user_id = self.user_data[0] if self.user_data else None
+            editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
             editinfo_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()

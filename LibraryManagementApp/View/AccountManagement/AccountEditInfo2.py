@@ -10,18 +10,24 @@ sys.path.append(os.path.join(base_dir, "View"))
 sys.path.append(base_dir)
 
 class AccountEditInfo2App:
-    def __init__(self, root, user_id=None, user_data=None, assets_path=None):
+    def __init__(self, root, user_id=None, user_data=None, assets_path=None, role=None):
         # Initialize the main window
         self.root = root
-        self.user_id = user_id
-        self.user_data = user_data
+        # self.user_id = user_id
+        self.user_data = user_data or []
+        self.role=role
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = None or "user"
+
         # Import Model to fetch user_data for account tracking
         from Model.user_model import User
-        user_data = User.get_id(self.user_id)
+        # user_data = User.get_id(self.user_id)
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -148,21 +154,26 @@ class AccountEditInfo2App:
             self.root.destroy()
             from AccountEditInfo import AccountEditInfoApp
             changepass_root = Tk()
-            changeoass = AccountEditInfoApp(changepass_root, user_id = self.user_id)
+            changepass = AccountEditInfoApp(changepass_root, user_data=self.user_data)
             changepass_root.mainloop()
         elif button_name == "btn_Return": # Return to Account MainWindow
             self.root.destroy()
             from AccountMan import AccountManagement
             account_root = Tk()
-            account = AccountManagement(account_root, user_data = self.user_data)
+            account = AccountManagement(account_root, user_data=self.user_data)
             account_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
             from Homepage import HomepageApp
-            role = 'admin' if self.user_data[6] == "Admin" else "User"
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, role = role, user_data = self.user_data)
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
+        elif button_name == "btn_ChangePassword":
+            self.root.destroy()
+            from AccountChangePassword import AccountChangePwApp
+            changepass_root = Tk()
+            changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
+            changepass_root.mainloop()
         else: # If clicked edit account information here, nothing happends
             pass
 

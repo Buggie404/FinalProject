@@ -16,29 +16,29 @@ sys.path.append(os.path.join(base_dir, "View", "AccountManagement"))
 from Model.user_model import User
 
 class AccountEditInfoController: # For Edit Account Information
-    def __init__(self, user_id=None):
+    def __init__(self, user_data=None):
         """
         Initialize the controller for editing account information
         
         Parameters:
         user_id (int): The ID of the user being edited
         """
-        self.user_id = user_id
+        self.user_data = user_data
         self.current_user = None
         
         # If user_id is provided, load the user
-        if user_id:
-            user_data = User.get_id(user_id)
-            if user_data:
-                self.current_user = User(
-                    user_id=user_data[0],
-                    name=user_data[1],
-                    username=user_data[2],
-                    email=user_data[3],
-                    password=user_data[4],
-                    date_of_birth=user_data[5],
-                    role=user_data[6]
-                )
+        # if user_data:
+        #     user_data = User.get_id(user_data)
+        if user_data:
+            self.current_user = User(
+                user_id=user_data[0],
+                name=user_data[1],
+                username=user_data[2],
+                email=user_data[3],
+                password=user_data[4],
+                date_of_birth=user_data[5],
+                role=user_data[6]
+            )
     
     def validate_username(self, username):
         """
@@ -74,7 +74,7 @@ class AccountEditInfoController: # For Edit Account Information
         existing_user = User.get_username(username)
         if existing_user:
             # Check if the existing user is not the current user
-            if existing_user[0] != self.user_id:
+            if existing_user[0] != self.user_data:
                 return (False, "Username is already taken", True)
 
         return (True, "", False)
@@ -243,25 +243,25 @@ class AccountEditInfoController: # For Edit Account Information
         """Display the success view"""
         from View.AccountManagement.AccountEditInfo1 import AccountEditInfo1
         root = Tk()
-        app = AccountEditInfo1(root, user_id=self.user_id)
+        app = AccountEditInfo1(root, user_data=self.user_data)
         app.run()
     
     def show_failure_view(self):
         """Display the failure view"""
         from View.AccountManagement.AccountEditInfo2 import AccountEditInfo2App
         root = Tk()
-        app = AccountEditInfo2App(root)
+        app = AccountEditInfo2App(root, user_data=self.user_data)
         app.run()
 
 # Function to initialize the controller with a user ID
-def edit_account_info(user_id):
+def edit_account_info(user_data):
     """
     Initialize and start the account edit info workflow
     
     Parameters:
     user_id (int): The ID of the user to edit
     """
-    controller = AccountEditInfoController(user_id)
+    controller = AccountEditInfoController(user_data)
     controller.start_edit_view()
 
 class PasswordChangeController:
@@ -469,8 +469,8 @@ class PasswordChangeController:
             view.root.destroy()
             from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
             editinfo_root = Tk()
-            user_id = self.user_data[0] if self.user_data else None
-            editinfo = AccountEditInfoApp(editinfo_root, user_id=user_id)
+            # user_id = self.user_data[0] if self.user_data else None
+            editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
             editinfo_root.mainloop()
             return True
             

@@ -11,18 +11,24 @@ sys.path.append(base_dir)
 
 
 class AccountEditInfo1:
-    def __init__(self, root, user_id = None, user_data = None, assets_path=None):
+    def __init__(self, root, user_id = None, user_data = None, assets_path=None, role=None):
         # Initialize the main window
         self.root = root
-        self.user_id = user_id
-        self.user_data = user_data
+        # self.user_id = user_id
+        self.user_data = user_data or []
+        self.role=role
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
+        if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
+            self.role = "admin"
+        else:
+            self.role = role or "user"
+
         # Import Model to take user_data
         from Model.admin_model import User
-        self.user_data = User.get_id(self.user_id)
+        # self.user_data = User.get_id(self.user_id)
         # Set up asset paths
         self.output_path = Path(__file__).parent
         # Allow assets_path to be configurable
@@ -143,20 +149,25 @@ class AccountEditInfo1:
             self.root.destroy()
             from AccountMan import AccountManagement
             accountman_root = Tk()
-            accountman = AccountManagement(accountman_root, user_data = self.user_data)
+            accountman = AccountManagement(accountman_root, user_data=self.user_data)
             accountman_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
             from Homepage import HomepageApp
-            role = 'admin' if self.user_data[6] == "Admin" else 'User'
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, role=role, user_data = self.user_data)
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
         elif button_name == "btn_EditAccountInformation": # When clicked edit account in success/failed window -> go back to first AccountEditInfo window
             self.root.destroy()
             from AccountEditInfo import AccountEditInfoApp
             changepass_root = Tk()
-            changepass = AccountEditInfoApp(changepass_root, user_id = self.user_id)
+            changepass = AccountEditInfoApp(changepass_root, user_data=self.user_data)
+            changepass_root.mainloop()
+        elif button_name == "btn_ChangePassword":
+            self.root.destroy()
+            from AccountChangePassword import AccountChangePwApp
+            changepass_root = Tk()
+            changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass_root.mainloop()
         else: # If clicked on Change Password, nothing happends 
             pass
