@@ -34,9 +34,23 @@ class Receipt:
         try:
             print(f"Starting save_multi_receipt with {len(cart_items)} items")
             
+            # If there's only one book in the cart, process it normally
+            if len(cart_items) == 1:
+                book_id = cart_items[0]['book_id']
+                quantity = cart_items[0]['quantity']
+                
+                self.db.cursor.execute(
+                    "INSERT INTO receipts (user_id, book_id, borrowed_quantity, borrow_date, return_date, status) VALUES (?, ?, ?, ?, ?, ?)",
+                    (self.user_id, book_id, quantity, self.borrow_date, self.return_date, self.status)
+                )
+                self.db.conn.commit()
+                self.receipt_id = self.db.cursor.lastrowid
+                print(f"Created single receipt with ID: {self.receipt_id} for book {book_id}")
+                return True
+            
             # For multiple books, create separate receipts for each book
-            # Always return a new receipt_id for this transaction
-            self.receipt_id = None
+            # but track the first receipt_id to return to the caller
+            first_receipt_id = None
             
             for i, item in enumerate(cart_items):
                 book_id = item['book_id']
@@ -54,8 +68,11 @@ class Receipt:
                     )
                     self.db.conn.commit()
                     
-                    # Get the new receipt_id
+                    # Store the first receipt_id to return
                     receipt_id = self.db.cursor.lastrowid
+                    if i == 0:
+                        first_receipt_id = receipt_id
+                        self.receipt_id = first_receipt_id
                     
                     # Store the first receipt_id to return
                     if i == 0:
@@ -172,21 +189,13 @@ class Receipt:
         # Get receipt by ID
         db = Database()
         
-        # Convert receipt_id to integer if it's a string
-        if isinstance(receipt_id, str) and receipt_id.isdigit():
-            receipt_id = int(receipt_id)
-        
-        print(f"Retrieving receipt with ID: {receipt_id} (type: {type(receipt_id)})")
-        
         db.cursor.execute("""
-            SELECT receipt_id, user_id, book_id, borrow_date, return_date, status, borrowed_quantity
-            FROM receipts
-            WHERE receipt_id = ?
+            SELECT r.receipt_id, r.user_id, r.book_id, r.borrow_date, r.return_date, r.status, r.borrowed_quantity
+            FROM receipts r
+            WHERE r.receipt_id = ?
         """, (receipt_id,))
-        
-        result = db.cursor.fetchone()
-        print(f"Query result: {result}")
-        return result
+
+        return db.cursor.fetchone()
 
     @staticmethod
     def check_overdue(receipt_id):
@@ -269,7 +278,6 @@ class Receipt:
         result = db.cursor.execute(query, (receipt_id,)).fetchone()
         return result[0] if result else 0
         
-    @staticmethod
     def is_already_returned(receipt_id):
         db = Database()
         
