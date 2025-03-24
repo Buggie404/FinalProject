@@ -220,6 +220,7 @@ class BookManaAddBook1App:
             edit_book_root.mainloop()
         
         else:  # btn_BackToHomepage
+            self.root.destroy()
             from Homepage import HomepageApp
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role = self.role, user_data=self.user_data)

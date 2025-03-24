@@ -3,17 +3,6 @@ import sys
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 
-# Get the absolute path to the current file's directory
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Go up two levels to reach the project root
-# If BookManaAddBook.py is in View/BookManagement, this goes up to the project root
-project_root = os.path.dirname(os.path.dirname(current_dir))
-
-# Add the project root to the Python path
-sys.path.append(project_root)
-
-# Now import from the Controller module
 from Controller.book_management_controller import add_book
 
 class BookManagementAddBookApp:
@@ -372,7 +361,7 @@ class BookManagementAddBookApp:
             self.root.destroy()
             from View.BookManagement.BookManagement import BookManagementApp
             add_book_root = Tk()
-            add_book = BookManagementApp(add_book_root, user_data = self.user_data)
+            addbook = BookManagementApp(add_book_root, user_data = self.user_data)
             add_book_root.mainloop()
 
         elif button_name == 'btn_EditBookInformation':
@@ -383,9 +372,10 @@ class BookManagementAddBookApp:
             edit_book_root.mainloop()
         
         elif button_name == "btn_BackToHomepage":
-            from Homepage import HomepageApp
+            self.root.destroy()
+            from View.Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, role = self.role, user_data=self.user_data)
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
     def run(self):
         """Start the application main loop"""
