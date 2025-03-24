@@ -134,7 +134,7 @@ class Message_2():  # To notify message (Type 2: when clicked 'Return' button ->
             management_app = BookManagementApp(management_root, role=self.role, user_data=self.user_data)
             management_root.mainloop()
         
-        elif self.message_type == 'pass_reset':
+        if self.message_type == 'pass_reset':
             # Đóng màn hình hiện tại
             parent_window = self.message_2.master
             parent_window.destroy()

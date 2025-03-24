@@ -14,7 +14,7 @@ class UserEditAccountApp:
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
-            self.role = role if role is not None else "user"
+            self.role = None or "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
