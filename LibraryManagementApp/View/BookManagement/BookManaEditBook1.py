@@ -333,7 +333,7 @@ class BookEdit1App:
             # Mở màn hình BookManaEditBook mới
             from View.BookManagement.BookManaEditBook import BookManaEditBook
             edit_book_root = Tk()
-            edit_book = BookManaEditBook(edit_book_root)
+            edit_book = BookManaEditBook(edit_book_root,user_data=self.user_data)
             edit_book_root.mainloop()
         except Exception as e:
             print(f"Error in show_success_message: {e}")

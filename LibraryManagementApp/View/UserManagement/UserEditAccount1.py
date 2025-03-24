@@ -17,9 +17,6 @@ class UserEditAccountApp:
         self.root.role = role
         self.root.user_data = user_data
         
-        # Debugging
-        # print(f"UserEditAccount1 initialized with role: {role}")
-
         # Only determine role if not explicitly provided
         if self.role is None:
             if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
