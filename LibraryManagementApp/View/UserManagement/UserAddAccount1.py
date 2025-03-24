@@ -195,6 +195,15 @@ class UserAddAccount1App:
         homepage = HomepageApp(homepage_root, role = self.role, user_data=self.user_data)
         homepage_root.mainloop()
     
+    def on_edit_account_password_clicked(self):
+        """Handle edit account password click"""
+        print("btn_EditAccountPassword clicked")
+        self.root.destroy()
+        from UserEditAccount import UserEditAccountApp
+        edit_pass_root = Tk()
+        edit_pass = UserEditAccountApp(edit_pass_root, user_data=self.user_data)
+        edit_pass_root.mainloop()
+    
     def on_add_account_clicked(self):
         """Handle add account button click"""
         print("btn_AddAccount clicked")
@@ -204,10 +213,10 @@ class UserAddAccount1App:
         add_user = UserAddAccountApp(add_user_root, user_data=self.user_data)
         add_user_root.mainloop()
     
-    def on_edit_account_password_clicked(self): # Cannot switch to Edit Account while Adding Account
-        """Handle edit account password button click"""
-        print("btn_EditAccountPassword clicked")
-        pass
+    # def on_edit_account_password_clicked(self): # Cannot switch to Edit Account while Adding Account
+    #     """Handle edit account password button click"""
+    #     print("btn_EditAccountPassword clicked")
+    #     pass
     
     def on_return_clicked(self):
         """Handle return button click"""
