@@ -140,6 +140,13 @@ class AccountChangePw2App:
             changepass_root = Tk()
             changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass_root.mainloop()
+        elif button_name == "btn_EditAccountInformation":
+            self.root.destroy()
+            from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
+            editinfo_root = Tk()
+            user_id = self.user_data[0] if self.user_data else None
+            editinfo = AccountEditInfoApp(editinfo_root, user_id=user_id)
+            editinfo_root.mainloop()
         elif button_name == "btn_Return": # Return to Account MainWindow
             self.root.destroy()
             from View.AccountManagement.AccountMan import AccountManagement

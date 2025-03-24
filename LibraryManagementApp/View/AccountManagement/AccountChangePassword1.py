@@ -140,6 +140,13 @@ class AccountChangePw1App:
             accountman_root = Tk()
             accountman = AccountManagement(accountman_root, user_data=self.user_data)
             accountman_root.mainloop()
+        elif button_name == "btn_EditAccountInformation":
+            self.root.destroy()
+            from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
+            editinfo_root = Tk()
+            user_id = self.user_data[0] if self.user_data else None
+            editinfo = AccountEditInfoApp(editinfo_root, user_id=user_id)
+            editinfo_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp
