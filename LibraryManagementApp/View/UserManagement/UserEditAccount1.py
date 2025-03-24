@@ -7,14 +7,14 @@ class UserEditAccountApp:
         # Initialize the main window
         self.root = root
         self.user_data = user_data
-        self.role = role
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
-            self.role = None or "user"
+            self.role = role if role is not None else "user"
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
@@ -196,14 +196,17 @@ class UserEditAccountApp:
         """Handle button click events"""
         print(f"{button_name} clicked")
         if button_name == "btn_AddAccount":
-            # Nothing happens
-            pass
+            from View.UserManagement.UserAddAccount import UserAddAccountApp
+            self.root.destroy()
+            add_user_root = Tk()
+            add_user = UserAddAccountApp(add_user_root, user_data=self.user_data)
+            add_user_root.mainloop()
         elif button_name == "btn_EditAccountPassword":
             # Switch back to first Edit Account Password
             from View.UserManagement.UserEditAccount import UserEditAccountApp
             self.root.destroy()
             reset_root = Tk()
-            reset = UserEditAccountApp(reset_root, user_data=self.user_data, role=self.role)
+            reset = UserEditAccountApp(reset_root, user_data=self.user_data)
             reset_root.mainloop()
         elif button_name == "btn_BackToHomepage":
             # Switch back to Homepage

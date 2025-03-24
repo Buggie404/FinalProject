@@ -15,10 +15,11 @@ from Controller.user_controller import add_account
 from Model.user_model import User
 
 class UserAddAccountApp:
-    def __init__(self, root, user_data=None, assets_path=None):
+    def __init__(self, root, user_data=None, assets_path=None, role=None):
         # Initialize the main window
         self.root = root
         self.user_data = user_data
+        self.role=role
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
@@ -316,7 +317,7 @@ class UserAddAccountApp:
                 self.root.destroy()
                 from UserAddAccount1 import UserAddAccount1App
                 user_management_root = Tk()
-                user_management = UserAddAccount1App(user_management_root, user_data['user_id'])  # Pass user_id
+                user_management = UserAddAccount1App(user_management_root, user_data['user_id'],  user_data=self.user_data, role=self.role)  # Pass user_id
                 user_management_root.mainloop()
             else:
                 messagebox.showerror("Error", message)
@@ -330,7 +331,7 @@ class UserAddAccountApp:
         
         elif button_name == "btn_AddAccount":
             self.root.destroy()
-            from UserManagement import UserManagementApp
+            from View.UserManagement.UserManagement import UserManagementApp
             add_user_root = Tk()
             add_user = UserManagementApp(add_user_root, user_data=self.user_data)
             add_user_root.mainloop()
@@ -344,8 +345,6 @@ class UserAddAccountApp:
         
         else:  # btn_BackToHomepage
             self.root.destroy()
-            parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            sys.path.append(parent_dir)
             from Homepage import HomepageApp
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)

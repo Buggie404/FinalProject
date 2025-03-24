@@ -4,14 +4,16 @@ import sys
 import os
 
 class UserAddAccount1App:
-    def __init__(self, root, user_id=None, user_data = None, assets_path=None):
+    def __init__(self, root, user_id=None, user_data = None,  role=None, assets_path=None):
         self.root = root
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.user_id = user_id  # Store the user ID
+
         from Model.user_model import User
-        self.user_data = User.get_id(self.user_id)
+        self.user_data = user_data if user_data else User.get_id(self.user_id)  
+              
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:

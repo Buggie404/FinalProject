@@ -174,14 +174,14 @@ class UserEditAccountApp:
             add_root = Tk()
             add = UserAddAccountApp(add_root, user_data = self.user_data)
             add_root.mainloop()
-        if button_name == "btn_EditAccountPassword":
+        elif button_name == "btn_EditAccountPassword":
             # Switch back to User Management
             self.root.destroy()
             from View.UserManagement.UserManagement import UserManagementApp
             user_root = Tk()
-            user = UserManagementApp(user_root, user_data = self.user_data, role=self.role)
+            user = UserManagementApp(user_root, user_data = self.user_data)
             user_root.mainloop()
-        if button_name == "btn_BackToHomepage":
+        elif button_name == "btn_BackToHomepage":
             # Switch to Homepage
             self.root.destroy()
             from View.Homepage import HomepageApp
