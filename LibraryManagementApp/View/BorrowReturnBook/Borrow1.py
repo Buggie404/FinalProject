@@ -231,11 +231,12 @@ class Borrow1App:
         if IndexError:
             messagebox.showerror("Error", "Cannot go to Homepage while Borrowing Book!")
 
-        self.root.destroy()
-        from View.Homepage import HomepageApp
-        homepage_root = Tk()
-        homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
-        homepage_root.mainloop()
+        else:
+            self.root.destroy()
+            from View.Homepage import HomepageApp
+            homepage_root = Tk()
+            homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
+            homepage_root.mainloop()
 
     def on_return_book_clicked(self): # Switch to Return Book window
         """Handle Return Book button click event"""

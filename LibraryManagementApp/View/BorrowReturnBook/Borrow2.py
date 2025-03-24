@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Button, PhotoImage, messagebox
 from Model.user_model import User 
 
 class Borrow2App:
@@ -260,7 +260,7 @@ class Borrow2App:
     def on_return_book_clicked(self): # Cannot switch to Return Book while in Borrowing Section
         """Handle return book button click"""
         print("btn_ReturnBook clicked")
-        pass
+        messagebox.showerror("Error", "Cannot switch to Return while in Borrow Books!")
 
     def on_borrow_book_clicked(self): # Switch to first Borrow window, the current cart will be cancel
         """Handle borrow book button click"""
@@ -330,7 +330,7 @@ class Borrow2App:
         book_data = Book.get_book_by_id(self.book_id)
 
         # Show Print_Receipt with book data and quantity
-        Print_Receipt(self.root, book_data, requested_quantity)
+        Print_Receipt(self.root, book_data, requested_quantity, self.user_data)
 
 if __name__ == "__main__":
     window = Tk()
