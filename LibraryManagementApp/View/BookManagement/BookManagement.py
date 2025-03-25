@@ -223,7 +223,6 @@ class BookManagementApp:
             selected_items = self.tbl_Book.selection()
             if selected_items:
                 selected_item = selected_items[0]
-                print(f"Deleting book: {self.tbl_Book.item(selected_item, 'values')}")
                 self.tbl_Book.delete(selected_item)
 
         elif button_name == "btn_Fiction":
@@ -263,7 +262,6 @@ class BookManagementApp:
         try:
             if self.active_category == category:
                 # If the same category is clicked again, clear filter and show all books
-                print(f"Clearing filter for category: {category}")
                 self.active_category = None
                 self.load_book()  # Reset to show all books
                 
@@ -271,7 +269,6 @@ class BookManagementApp:
                 self.reset_category_button_styles()
             else:
                 # Filter by the selected category
-                print(f"Setting filter to category: {category}")
                 self.active_category = category
                 self.filter_by_category(category)
                 
@@ -288,7 +285,7 @@ class BookManagementApp:
                            "btn_Technology", "btn_Biography"]
         
         for btn_name in category_buttons:
-            print(f"Resetting button style: {btn_name}")
+            pass
 
     def highlight_active_category_button(self, active_category):
         """Highlight the active category button"""
@@ -306,7 +303,7 @@ class BookManagementApp:
         # Highlight the active button
         btn_name = category_to_button.get(active_category)
         if btn_name:
-            print(f"Highlighting button: {btn_name}")
+            pass
 
     def search_books(self):
         """Search books by ISBN or title"""

@@ -218,7 +218,6 @@ class ReturnOverdueApp:
     def load_due_and_fine_data(self):
         from Controller.borrow_return_controller import ReturnOverdueController
         if not self.receipt_id:
-            print("Không có receipt_id!")
             return
 
         total_due_books, total_fine = ReturnOverdueController.calculate_due_and_fine(self.receipt_id)

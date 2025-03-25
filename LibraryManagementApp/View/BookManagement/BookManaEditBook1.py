@@ -22,7 +22,6 @@ class BookEdit1App:
         
         # Store the book data
         self.book_data = book_data
-        print(f"Book data received: {book_data}")
         
         self.output_path = Path(__file__).parent
         if assets_path:
@@ -147,7 +146,6 @@ class BookEdit1App:
         
         # Store button widget in dictionary
         self.buttons[button_name] = button
-        print("Confirm button created with binding to controller's update_book method")
     
     def create_entry_fields(self):
         """Create the entry fields for book information"""

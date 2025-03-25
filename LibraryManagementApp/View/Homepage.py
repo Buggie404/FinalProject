@@ -79,7 +79,6 @@ class HomepageApp:
     
     def create_button(self, image_name, x, y, width, height, command):
         if image_name not in self.images:
-            print(f"Warning: Image {image_name} not found")
             return None
             
         button = Button(

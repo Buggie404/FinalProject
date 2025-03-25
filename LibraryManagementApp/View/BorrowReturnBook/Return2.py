@@ -285,8 +285,6 @@ class Return2App:
         # Get receipt data from database
         receipt_data = Receipt.get_single_receipt_by_id(self.receipt_id)
 
-        print(f"Loaded receipt data: {receipt_data}")
-
         # Update text fields with receipt data
         self.canvas.itemconfigure(self.lbl_ReceiptID, text=str(receipt_data[0]))  # receipt_id
         self.canvas.itemconfigure(self.lbl_UserID, text=str(receipt_data[1]))     # user_id

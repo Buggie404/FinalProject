@@ -7,6 +7,7 @@ from tkinter import Tk, messagebox
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
+
 from datetime import datetime, timedelta
 from Model.receipt_model import Receipt
 from Model.book_model import Book
@@ -28,6 +29,7 @@ class ReturnController:
             return (False, "This receipt doesn't belong to your account!")
             
         return (True, "Valid receipt")
+    
     @staticmethod
     def validate_receipt_status(receipt_id):
         # Check if receipt exists
@@ -51,11 +53,9 @@ class ReturnController:
         if not is_valid:
             return (False, None, message)
 
-
         is_valid_status, status_message = ReturnController.validate_receipt_status(receipt_id)
         if not is_valid_status:
             return (False, None, status_message)
-
 
         # Lấy dữ liệu phiếu mượn
         receipt_data = Receipt.get_receipt_by_id(receipt_id)
@@ -69,7 +69,6 @@ class ReturnController:
                 try:
                     borrow_date = datetime.strptime(borrow_date, "%Y/%m/%d")
                 except ValueError:
-                    print(f"Could not parse date: {borrow_date}")
                     return (False, None, f"Invalid date format: {borrow_date}")
 
         # Tính hạn trả
@@ -90,8 +89,7 @@ class ReturnController:
         if not success:
             return (False, None, "Database update failed!")
 
-        # Cập nhật kho sách (trả về +quantity quyển)
-        
+        # Cập nhật kho sách (trả về + quantity quyển)     
         book_id = receipt_data[2]
         borrowed_quantity = Receipt.get_borrowed_quantity(receipt_id)
         Book.update_book_quantity_after_return(book_id, borrowed_quantity)
@@ -120,7 +118,6 @@ class ReturnOverdueController:
         total_fine = total_due_books * ReturnOverdueController.FINE_PER_BOOK
 
         return total_due_books, total_fine
-
 
 class BorrowController:
     # Maximum books a user can borrow in total
@@ -235,12 +232,7 @@ class BorrowController:
         (success, receipt_id, borrow_date, return_deadline) - Tuple with status and receipt info
         """
         if not cart_items:
-            print("Cart is empty, cannot complete borrowing")
             return False, None, None, None
-
-        print(f"Starting complete_borrowing for user {user_id} with {len(cart_items)} items")
-        for i, item in enumerate(cart_items):
-            print(f"  Item {i+1}: {item}")
 
         # Calculate borrow date (today) and return deadline (20 days from today)
         today = datetime.now()
@@ -259,10 +251,7 @@ class BorrowController:
             success = receipt.save_multi_receipt(cart_items)
 
             if not success:
-                print("Failed to save receipts")
                 return False, None, None, None
-
-            print(f"Successfully saved receipts with ID {receipt.receipt_id}")
 
             # Update book quantities
             for item in cart_items:
@@ -273,14 +262,10 @@ class BorrowController:
                     # Get current book data
                     book_data = Book.get_book_by_id(book_id)
                     if not book_data:
-                        print(f"Book not found: {book_id}")
                         continue
 
                     current_quantity = book_data[5]  # Assuming quantity is at index 5
                     new_quantity = current_quantity - quantity
-
-                    # Debug print
-                    print(f"Updating book {book_id}: current qty={current_quantity}, new qty={new_quantity}")
 
                     # Update book quantity
                     book = Book(book_id=book_id)
@@ -293,12 +278,11 @@ class BorrowController:
                     })
 
                     if not update_result:
-                        print(f"Failed to update book quantity for book_id: {book_id}")
+                        pass
                 except Exception as e:
                     print(f"Error updating book {book_id}: {e}")
                     import traceback
                     traceback.print_exc()
-                    # Continue with other books even if one fails
 
             # Return success status, receipt ID, borrow date, and return deadline
             return True, receipt.receipt_id, today_str, return_deadline_str
@@ -329,7 +313,6 @@ class BorrowingCart:
         try:
             quantity = int(quantity)
         except (ValueError, TypeError):
-            print(f"Invalid quantity: {quantity}, defaulting to 1")
             quantity = 1
 
         # If this is the first item, store the user_id
@@ -341,7 +324,6 @@ class BorrowingCart:
             if item['book_id'] == book_id:
                 # Update quantity instead of adding new item
                 item['quantity'] += quantity
-                print(f"Updated cart: book_id={book_id}, title={title}, new qty={item['quantity']}")
                 return True
 
         # Add new item
@@ -350,7 +332,6 @@ class BorrowingCart:
             'title': title,
             'quantity': quantity
         })
-        print(f"Added to cart: book_id={book_id}, title={title}, qty={quantity}")
         return True
 
     def remove_item(self, book_id):
@@ -366,27 +347,17 @@ class BorrowingCart:
         """Clear the cart"""
         self.items = []
         self.user_id = None
-        print("Cart cleared")
 
     def get_total_quantity(self):
         """Get total number of books in cart"""
         total = sum(item['quantity'] for item in self.items)
-        print(f"Cart total quantity: {total}")
         return total
 
     def is_empty(self):
         """Check if cart is empty"""
         is_empty = len(self.items) == 0
-        print(f"Cart is empty: {is_empty}")
         return is_empty
 
     def set_user(self, user_id):
         """Set the user for this cart"""
         self.user_id = user_id
-        print(f"Cart user_id set to: {user_id}")
-
-    def print_contents(self):
-        """Print the contents of the cart for debugging"""
-        print(f"Cart for user {self.user_id} contains {len(self.items)} items:")
-        for i, item in enumerate(self.items):
-            print(f"  {i+1}. Book ID: {item['book_id']}, Title: {item['title']}, Quantity: {item['quantity']}")

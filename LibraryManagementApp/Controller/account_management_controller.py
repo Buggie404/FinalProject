@@ -25,10 +25,7 @@ class AccountEditInfoController: # For Edit Account Information
         """
         self.user_data = user_data
         self.current_user = None
-        
-        # If user_id is provided, load the user
-        # if user_data:
-        #     user_data = User.get_id(user_data)
+
         if user_data:
             self.current_user = User(
                 user_id=user_data[0],
@@ -55,7 +52,6 @@ class AccountEditInfoController: # For Edit Account Information
             return (False, "Username cannot be empty!", False)
 
         # Check if username is the same as current (no change)
-        # This allows users to keep their current username
         if self.current_user and self.current_user.username == username:
             return (True, "", False)  # Valid, no error, not taken by someone else
 
@@ -97,14 +93,14 @@ class AccountEditInfoController: # For Edit Account Information
         # Try to parse different date formats
         date_of_birth = None
         
-        # Try YYYY-MM-DD format (the desired format)
+        # Try YYYY-MM-DD format
         if re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
             try:
                 date_of_birth = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
             except ValueError:
                 pass
         
-        # Try MM/DD/YYYY format (what the user might enter)
+        # Try MM/DD/YYYY format
         if date_of_birth is None and re.match(r'^\d{1,2}/\d{1,2}/\d{4}$', date_str):
             try:
                 date_of_birth = datetime.datetime.strptime(date_str, "%m/%d/%Y").date()
@@ -112,7 +108,6 @@ class AccountEditInfoController: # For Edit Account Information
             except ValueError:
                 pass
         
-        # If we couldn't parse the date in any recognized format
         if date_of_birth is None:
             return (False, "Invalid date format. Please use YYYY-MM-DD format.")
         
@@ -194,7 +189,7 @@ class AccountEditInfoController: # For Edit Account Information
         # Get current username for comparison
         current_username = self.current_user.username if self.current_user else None
         
-        # Check if username is unchanged (user wants to keep their current username)
+        # Check if username is unchanged
         if current_username and new_username == current_username:
             # Skip username validation if unchanged
             username_valid = True
@@ -204,7 +199,7 @@ class AccountEditInfoController: # For Edit Account Information
             # Validate username format and check if taken
             username_valid, username_error, username_taken = self.validate_username(new_username)
         
-        # If there's a format error with username (not related to it being taken)
+        # If there's a format error with username
         if not username_valid and not username_taken:
             messagebox.showerror("Invalid Username", username_error)
             return
@@ -215,8 +210,6 @@ class AccountEditInfoController: # For Edit Account Information
             messagebox.showerror("Invalid Date of Birth", dob_error)
             return
         
-        # At this point, all format validations have passed
-        # Now we check if the username is taken (which would redirect to AccountEditInfo2)
         if username_taken:
             # Close current window
             app.root.destroy()
@@ -224,8 +217,6 @@ class AccountEditInfoController: # For Edit Account Information
             self.show_failure_view()
             return
         
-        # Process the edit request - at this point both validations have passed
-        # and username is not taken
         result = self.current_user.edit_account_info(new_username, new_date_of_birth)
         
         # Close current window
@@ -235,10 +226,8 @@ class AccountEditInfoController: # For Edit Account Information
         if result:
             self.show_success_view()
         else:
-            # This should only occur if there's a database error or other issue
             messagebox.showerror("Error", "An unexpected error occurred while updating your information.")
 
-    
     def show_success_view(self):
         """Display the success view"""
         from View.AccountManagement.AccountEditInfo1 import AccountEditInfo1
@@ -404,7 +393,6 @@ class PasswordChangeController:
         # Check if passwords match
         match_valid, match_msg = self.validate_confirm_password(new_password, confirm_password)
         if not match_valid:
-            # For confirm password mismatch, we go to failure screen
             return False, match_msg, True, "confirm_password"
         
         # All validations passed, update password
@@ -469,7 +457,6 @@ class PasswordChangeController:
             view.root.destroy()
             from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
             editinfo_root = Tk()
-            # user_id = self.user_data[0] if self.user_data else None
             editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
             editinfo_root.mainloop()
             return True
@@ -484,8 +471,3 @@ class PasswordChangeController:
             return True
             
         return False
-
-# For testing purposes
-if __name__ == "__main__":
-    controller = AccountEditInfoController()
-    controller.start_edit_view()

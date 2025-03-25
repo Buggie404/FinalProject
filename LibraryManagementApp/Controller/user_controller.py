@@ -1,23 +1,21 @@
 """ To handle any function related to user management """
 # Import fetched data from Admin Model
-from Model.admin_model import Admin
-from Model.user_model import User
 from tkinter import messagebox
 from View.noti_tab_view_1 import Delete, Message_1, Message_2, Invalid
 from tkinter import messagebox
-import sqlite3
 import re
 import datetime
 import unidecode
 import os
 import sys
 
+from Model.admin_model import Admin
+from Model.user_model import User
+
 # Add parent directory to path to import from Model
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
-
-from Model.user_model import User
 
 class Search_users: # Handel search function
     def __init__(self):
@@ -92,8 +90,6 @@ class Search_users: # Handel search function
             # Reload all users
             load_user_func()
             return
-        
-        print(f"Filtering by user_id: {search_term}")
         
         try:
             # Use the filter_users_by_id method
@@ -207,8 +203,6 @@ class Search_users: # Handel search function
             load_user_func()
             return
         
-        print(f"Filtering by username: {search_term}")
-        
         try:
             # Use the filter_users_by_username method
             success, result = Search_users.filter_users_by_username(search_term)
@@ -283,7 +277,6 @@ class Search_users: # Handel search function
             is_id = search_term.isdigit()
             
             if is_id:
-                print(f"Filtering by user_id: {search_term}")
                 success, result = Search_users.filter_users_by_id(search_term)
                 
                 if success:
@@ -306,7 +299,6 @@ class Search_users: # Handel search function
                     Message_1(root, "search_account")
                     load_user_func()
             else:
-                print(f"Filtering by username: {search_term}")
                 # Try exact match first
                 success, result = Search_users.filter_users_by_username(search_term)
                 
@@ -793,33 +785,24 @@ class Delete_Users:
         self.admin = admin
         self.selected_user_id = None
 
-
     def on_user_select(self, event):
         """Handle user selection in the table"""
         selected_items = self.view.tbl_User.selection()
         if selected_items:
             item = self.view.tbl_User.item(selected_items[0])
             self.selected_user_id = item["values"][0]
-            print(f"Selected user ID: {self.selected_user_id}")
         else:
             self.selected_user_id = None
-
 
     def delete_selected_user(self):
         """Show delete confirmation dialog and handle deletion"""
         if not self.selected_user_id:
-            print(" No user selected.")
             Invalid(self.view.root, "account")
             return
-
-
-        print(f" Attempting to delete user ID: {self.selected_user_id}")
-
 
         # Create delete confirmation dialog
         delete_dialog = Delete(self.view.root, "account")
         delete_dialog.set_yes_callback(self.confirm_delete_user)
-
 
     def confirm_delete_user(self):
         """Delete the selected user from database and UI"""
@@ -831,32 +814,23 @@ class Delete_Users:
                 print(f" Failed to create admin: {e}")
                 return
 
-
         user_id_to_delete = self.selected_user_id
-
 
         selected_items = self.view.tbl_User.selection()
         selected_item = selected_items[0] if selected_items else None
 
-
         if not selected_item:
-            print("No item selected in the table")
             return
-
 
         # Delete user from database
         success = self.delete_user_from_db(user_id_to_delete)
 
-
         if success:
-            print(f"Successfully deleted user ID: {user_id_to_delete}")
             self.view.tbl_User.delete(selected_item)
             Message_1(self.view.root, "account")
             self.selected_user_id = None
         else:
-            print("Failed to delete user from database")
             Invalid(self.view.root, "database error")
-
 
     @staticmethod
     def delete_user_from_db(user_id):
@@ -982,8 +956,6 @@ class ResetPasswordController:
         user_data = self.validate_user_id(user_id)
         
         if user_data:
-            # Based on the user_model.py file structure, user_data would be a tuple
-            # with fields in the order defined in the __init__ method of User class
             return {
                 'user_id': user_data[0],
                 'name': user_data[1],
@@ -1055,9 +1027,7 @@ class ResetPasswordController:
                         if hasattr(widget, 'user_data'):
                             current_user_data = widget.user_data
                 
-                # print(f"Current role: {current_role}, User data: {current_user_data}")
-                
-                # If we still don't have a role but have user_data, check if user is admin
+                # check if user is admin
                 if current_role is None and current_user_data and len(current_user_data) > 6:
                     if current_user_data[6] == "Admin":
                         current_role = "admin"
@@ -1078,7 +1048,6 @@ class ResetPasswordController:
                     reset_1.role = "admin"
                 
                 # Update the labels with user data
-                # We need to wait for the canvas to be created
                 reset_1_root.update()
                 
                 # Now update the text of the labels

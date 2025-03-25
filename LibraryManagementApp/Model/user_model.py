@@ -19,12 +19,6 @@ class User:
         self.date_of_birth = date_of_birth
         self.role = role
         self.db = self.get_db() # Connect to databse
-    
-    # def save_user(self): #To save new user to database
-    #     self.db.cursor.execute("INSERT INTO Users (name, username, email, password, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?)", 
-    #                            (self.name, self.username, self.email, self.password, self.date_of_birth, self.role))
-    #     self.db.conn.commit()
-    #     self.user_id = self.db.cursor.lastrowid # Get the last inserted id
 
     def save_user(self):
         try:

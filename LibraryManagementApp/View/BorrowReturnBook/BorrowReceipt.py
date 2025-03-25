@@ -75,11 +75,9 @@ class BorrowReceiptApp:
         try:
             # Get primary receipt data
             receipt_data = Receipt.get_receipt_by_id(self.receipt_id)
-            print(f"Receipt data: {receipt_data}")
 
             if not receipt_data:
                 # If receipt not found, use placeholders
-                print("Receipt not found, using placeholders")
                 self.create_text_fields_with_placeholders()
                 return
 
@@ -94,8 +92,6 @@ class BorrowReceiptApp:
             # Get borrowed_quantity - this might be at index 6
             borrowed_quantity = receipt_data[6] if len(receipt_data) > 6 else 1
 
-            print(f"Parsed receipt data: id={receipt_id}, user={user_id}, book={book_id}, qty={borrowed_quantity}")
-
             # Get all related receipts (same user_id, same borrow_date)
             related_receipts = []
             if self.borrow_date:
@@ -104,8 +100,6 @@ class BorrowReceiptApp:
                 # If borrow_date wasn't provided, get it from the receipt
                 self.borrow_date = borrow_date
                 related_receipts = Receipt.get_related_receipts(user_id, borrow_date)
-
-            print(f"Found {len(related_receipts)} related receipts with same user_id and borrow_date")
 
             # Initialize display_book_id variable
             display_book_id = book_id
@@ -128,7 +122,6 @@ class BorrowReceiptApp:
                     # Check if borrowed_quantity is available at index 6
                     receipt_quantity = related_receipt[6] if len(related_receipt) > 6 else 1
                     total_quantity += receipt_quantity
-                    print(f"Adding quantity {receipt_quantity} from receipt {related_receipt[0]}")
 
                 # Use return_deadline if provided, otherwise calculate it
                 display_return_date = self.return_deadline
@@ -342,7 +335,6 @@ class BorrowReceiptApp:
     def create_button(self, image_name, x, y, width, height, command):
         """Helper method to create a button"""
         if image_name not in self.images:
-            print(f"Warning: Image {image_name} not found")
             return None
 
         button = Button(

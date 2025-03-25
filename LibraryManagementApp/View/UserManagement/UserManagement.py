@@ -310,24 +310,20 @@ class UserManagementApp:
                 return
                 
             user_id = user_values[0]  # First column is user_id
-            print(f"Attempting to delete user ID: {user_id}")
 
             # Define a direct callback function to handle deletion
             def confirm_delete_callback():
-                print(f"Executing delete callback for user ID: {user_id}")
                 try:
                     # Create admin and use its delete_user method
                     admin = Admin()
                     success = admin.delete_user(user_id)
 
                     if success:
-                        print(f"Successfully deleted user ID: {user_id}")
                         # Remove from UI
                         self.tbl_User.delete(selected_item)
                         # Show success message
                         Message_1(self.root, "account")
                     else:
-                        print(f"Failed to delete user ID: {user_id}")
                         messagebox.showerror("Error", "Failed to delete user")
                 except Exception as e:
                     print(f"Error during deletion: {e}")

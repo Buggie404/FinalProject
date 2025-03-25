@@ -196,7 +196,6 @@ class BookManaEditBook:
     def search_book(self):
         """Search for a book by ISBN and open edit screen if found"""
         if 'lnE_ISBN' not in self.entries:
-            print("Error: ISBN entry field not found")
             return
 
         isbn = self.entries['lnE_ISBN'].get().strip()

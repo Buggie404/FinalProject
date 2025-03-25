@@ -51,9 +51,6 @@ class Borrow1App:
         self.create_sidebar()
         self.create_main_content()
         self.create_buttons()
-        
-        # Debug print to verify user_id is available
-        print(f"Initialized Borrow1App with user_id: {self.user_id}")
 
     def relative_to_assets(self, path: str) -> Path:
         """Convert relative asset path to absolute path"""
@@ -142,7 +139,6 @@ class Borrow1App:
         if hasattr(self, 'lnE_ID') and hasattr(self, 'user_id') and self.user_id:
             self.lnE_ID.delete(0, 'end')
             self.lnE_ID.insert(0, str(self.user_id))
-            print(f"Set lnE_ID entry to user_id: {self.user_id}")
 
     def create_image(self, image_name, x, y):
         """Helper method to create an image"""
@@ -181,7 +177,6 @@ class Borrow1App:
             if hasattr(self, 'user_id') and self.user_id:
                 entry.delete(0, 'end')
                 entry.insert(0, str(self.user_id))
-                print(f"Populated lnE_ID with user_id: {self.user_id}")
         elif image_name == "lnE_ISBN.png":
             self.lnE_ISBN = entry
 

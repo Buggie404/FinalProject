@@ -32,10 +32,8 @@ class Admin(User): # Include all the ADMIN ONLY function
             self.db.conn.commit()
             # Verify deletion
             if self.db.cursor.rowcount > 0:
-                print(f"User with ID {user_id} successfully deleted")
                 return True
             else:
-                print(f"No rows affected when deleting user {user_id}")
                 return False
         except Exception as e:
             print(f"Error deleting user: {e}")
@@ -57,14 +55,7 @@ class Admin(User): # Include all the ADMIN ONLY function
             return True
         return False # Book not found
        
-    # def delete_book(self, book_id):
-    #     if not Book.get_book_by_id(book_id):
-    #         return False # Book not found
-    #     self.db.cursor.execute("DELETE FROM Books WHERE book_id = ?", (book_id,))
-    #     self.db.conn.commit()
-    #     return True
     def delete_book(self, book_id):
-        # Don't convert book_id to int, keep it as string to preserve leading zeros
         if not Book.get_book_by_id(book_id):
             return False  # Book not found
         self.db.cursor.execute("DELETE FROM Books WHERE book_id = ? ", (book_id,))

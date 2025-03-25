@@ -313,9 +313,6 @@ class Print_Receipt():
         )
         title_label.pack(pady=(20, 10))
 
-        # Debug print cart contents
-        self.cart.print_contents()
-
         # Create a frame for cart items with scrollbar
         cart_container = Frame(self.print_receipt, bg='white')
         cart_container.pack(fill='both', expand=True, padx=20, pady=10)
@@ -428,9 +425,6 @@ class Print_Receipt():
         if not self.cart.user_id:
             messagebox.showerror("Error", "No user ID associated with this cart.")
             return
-
-        # Print cart contents before completing
-        self.cart.print_contents()
 
         # Use the controller to complete the borrowing process
         try:

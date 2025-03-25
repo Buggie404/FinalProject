@@ -1,19 +1,17 @@
 import sys
 import os
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_dir)
 import re
 import datetime
 import unidecode
 from pathlib import Path
 from tkinter import Tk, messagebox
 
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
 from Model.book_model import Book
 from Model.admin_model import Admin
 from View.noti_tab_view_1 import Delete, Message_1, Invalid, Message_2
-
-# from View.BookManaAddBook import BookManagementAddBookApp
-# from View.BookManaAddBook1 import BookManaAddBook1App
 
 class SearchBooks:
     """Handle book search and filtering functionality"""
@@ -83,7 +81,6 @@ class SearchBooks:
             is_isbn = search_term.isdigit()
            
             if is_isbn:
-                print(f"Filtering by ISBN: {search_term}")
                
                 # Try exact match by ISBN
                 success, result = SearchBooks.search_by_id(search_term)
@@ -108,7 +105,6 @@ class SearchBooks:
                     Message_1(root, "search_book")
                     load_book_func()
             else:
-                print(f"Filtering by title: {search_term}")
                
                 # Try partial match by title
                 success, result = SearchBooks.search_by_title(search_term)
@@ -146,9 +142,7 @@ class SearchBooks:
             load_book_func()
             return
            
-        try:
-            print(f"Filtering by category: {category}")
-           
+        try: 
             # Get books by category
             success, result = SearchBooks.search_by_category(category)
            
@@ -200,24 +194,20 @@ class DeleteBook:
         if selected_items:
             item = self.view.tbl_Book.item(selected_items[0])
             self.selected_book_id = str(item["values"][0]).zfill(10)
-            print(f"Selected book ID: {self.selected_book_id}")
         else:
             self.selected_book_id = None
     
     def delete_selected_book(self):
         """Show delete confirmation dialog and handle deletion."""
         if not self.selected_book_id:
-            print("❌ No book selected.")
             return
         
-        print(f"🗑️ Attempting to delete book ID: {self.selected_book_id}")
         delete_dialog = Delete(self.view.root, "book")
         delete_dialog.set_yes_callback(self.confirm_delete_book)
     
     def confirm_delete_book(self):
         """Delete the selected book from database and UI."""
         if not self.admin:
-            print("❌ Admin not set")
             return
         
         book_id_to_delete = self.selected_book_id.zfill(10)
@@ -225,18 +215,15 @@ class DeleteBook:
         selected_item = selected_items[0] if selected_items else None
         
         if not selected_item:
-            print("❌ No item selected in the table")
             return
         
         success = self.admin.delete_book(book_id_to_delete)
         
         if success:
-            print(f"✅ Successfully deleted book ID: {book_id_to_delete}")
             self.view.tbl_Book.delete(selected_item)
             Message_1(self.view.root, "book")
             self.selected_book_id = None
         else:
-            print("❌ Failed to delete book from database")
             Invalid(self.view.root, "input")
 
 class add_book:
@@ -330,7 +317,6 @@ class add_book:
             field_errors['quantity'] = True
             return False, quantity_msg, {}
        
-        # If we got here, all validations passed
         # Create book data dictionary
         book_data = {
             'book_id': isbn,  # Using ISBN as book_id
@@ -399,6 +385,7 @@ class add_book:
         # Check for non-numeric characters
         if not isbn.isdigit():
             return False, "ISBN must be a series of numbers, no spaces."
+        
         #Check for exactly 13 digits
         if len(isbn) != 13:
             return False, "ISBN must be exactly 13 digits long."
@@ -501,8 +488,7 @@ class add_book:
         if re.search(r'\d', ascii_author):
             return False, "Special characters (@, #, $, %, *, etc.) and numbers are not allowed.", ""
        
-        # Check for allowed characters (after conversion to ASCII)
-        # Now including commas and ampersands for multiple authors
+        # Check for allowed characters (after conversion to ASCII) including commas and ampersands for multiple authors
         allowed_pattern = r'^[a-zA-Z\s\-\.,&]+$'
         if not re.match(allowed_pattern, ascii_author):
             return False, "Only letters, spaces, hyphens (-), periods (.), commas (,), and ampersands (&) are allowed.", ""
@@ -695,9 +681,6 @@ class BookEditController:
         self.view = view
         self.book_data = None
 
-        # Initialize controller with this view
-        # self.controller = BookEditController(self)
-
        # Update confirm button command
         if view and hasattr(view, 'buttons') and 'btn_Confirm' in view.buttons:
             view.buttons['btn_Confirm'].config(command=self.update_book)
@@ -709,7 +692,6 @@ class BookEditController:
     def search_book(self):
         """Search for a book by ISBN and navigate to edit screen if found."""
         if not hasattr(self.view, 'entries') or 'lnE_ISBN' not in self.view.entries:
-            print("Error: ISBN entry field not found")
             return
         
         isbn = self.view.entries['lnE_ISBN'].get().strip()
@@ -730,8 +712,6 @@ class BookEditController:
             self.view.entries['lnE_ISBN'].focus_set()
             return
         
-        print(f"Book found: {book}")  # Debug print
-        
         # Book found, navigate to edit screen
         self.view.root.destroy()
         
@@ -744,10 +724,8 @@ class BookEditController:
 
     def update_book(self):
         """Validate all fields and update book in database"""
-        print("Update book method called from controller!")
 
         if not self.view or not self.book_data:
-            print("Error: View or book data not available")
             return
 
         # Temporarily disable FocusOut validation to avoid duplicate triggers
@@ -859,8 +837,6 @@ class BookEditController:
             # Get original book ID
             book_id = self.book_data[0]  # Original ISBN/book_id (unchanged)
 
-            print(f"Updating book: ID={book_id}, title={formatted_title}, author={formatted_author}, year={year_int}, category={category}, quantity={quantity_int}")
-
             # Create dictionary with updated data
             updated_data = {
                 'title': formatted_title,
@@ -873,8 +849,6 @@ class BookEditController:
             # Update book in database
             book = Book(book_id=book_id)
             success = book.update_book(updated_data)
-
-            print(f"Database update result: {success}")
 
             if success:
                 # Show success message using notification system
@@ -1107,4 +1081,3 @@ class BookEditController:
             return False
         
         return True
-    

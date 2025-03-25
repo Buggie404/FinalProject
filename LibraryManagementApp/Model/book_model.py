@@ -41,35 +41,17 @@ class Book:
             print(f"Error updating book: {e}")
             return False
 
-        # """
-        # Update existing book details in the database.
-        # Only the title, author, category, published year, and quantity can be updated.
-        # """
-        # self.db.cursor.execute("UPDATE books SET title = ?, author = ?, category = ?, published_year = ?, quantity = ? WHERE book_id = ?", 
-        #                        (new_data['title'], new_data['author'], new_data['category'], new_data['published_year'], new_data['quantity'], self.book_id))
-        # self.db.conn.commit()
-
-    # @staticmethod
-    # def get_book_by_id(book_id):
-    #     # Search book by ID
-    #     db = Database()
-    #     # Ensure book_id is treated as string to preserve leading zeros
-    #     book_id = str(book_id)
-    #     db.cursor.execute("SELECT * FROM Books WHERE book_id = ? ", (book_id,))
-    #     return db.cursor.fetchone()
     @staticmethod
     def get_book_by_id(book_id):
         # Search book by ID
         db = Database()
         
-        # Ensure book_id is a string with 10 digits (padded with leading zeros if needed)
-        book_id = str(book_id).zfill(10)
+        # Ensure book_id is a string with 13 digits
+        book_id = str(book_id).zfill(13)
         
         db.cursor.execute("SELECT * FROM Books WHERE book_id = ? ", (book_id,))
         return db.cursor.fetchone()
 
-
-    
     @staticmethod
     def get_all_book(): #Display all books
         db = Database()
@@ -104,6 +86,7 @@ class Book:
             return result[0]  # Return quantity
         else:
             return None  # Handle case where book_id does not exist
+        
     @staticmethod
     def update_book_quantity_after_return(book_id, quantity):
         db = Database()
@@ -112,13 +95,9 @@ class Book:
         result = db.cursor.fetchone()
 
         if not result:
-            print(f"Book with ID {book_id} not found")
             return False
 
         current_quantity = result[0]
         new_quantity = current_quantity + quantity
         db.cursor.execute("UPDATE Books SET quantity = ? WHERE book_id = ?", (new_quantity, book_id))
         db.conn.commit()
- 
-
-

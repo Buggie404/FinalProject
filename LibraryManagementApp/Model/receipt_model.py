@@ -28,12 +28,9 @@ class Receipt:
     def save_multi_receipt(self, cart_items):
         """Create a receipt for a cart of books"""
         if not User.get_id(self.user_id):
-            print(f"User ID {self.user_id} not found")
             return False  # User doesn't exist
 
         try:
-            print(f"Starting save_multi_receipt with {len(cart_items)} items")
-            
             # If there's only one book in the cart, process it normally
             if len(cart_items) == 1:
                 book_id = cart_items[0]['book_id']
@@ -45,7 +42,6 @@ class Receipt:
                 )
                 self.db.conn.commit()
                 self.receipt_id = self.db.cursor.lastrowid
-                print(f"Created single receipt with ID: {self.receipt_id} for book {book_id}")
                 return True
             
             # For multiple books, create separate receipts for each book
@@ -57,7 +53,6 @@ class Receipt:
                 quantity = item['quantity']
                 
                 if not Book.get_book_by_id(book_id):
-                    print(f"Invalid book ID: {book_id}, skipping")
                     continue  # Skip invalid books
                 
                 try:
@@ -77,8 +72,6 @@ class Receipt:
                     # Store the first receipt_id to return
                     if i == 0:
                         self.receipt_id = receipt_id
-                    
-                    print(f"Created receipt {receipt_id} for book {book_id}, quantity {quantity}")
                 except Exception as e:
                     self.db.conn.rollback()
                     print(f"Error creating receipt for book {book_id}: {e}")
@@ -89,7 +82,6 @@ class Receipt:
             if self.receipt_id:
                 return True
             else:
-                print("No receipts were created successfully")
                 return False
                 
         except Exception as e:
