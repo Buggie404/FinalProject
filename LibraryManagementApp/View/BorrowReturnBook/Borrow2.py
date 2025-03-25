@@ -10,13 +10,13 @@ class Borrow2App:
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -246,7 +246,6 @@ class Borrow2App:
 
     def on_back_to_homepage_clicked(self): #Switch to Homepage
         """Handle back to homepage button click"""
-        print("btn_BackToHomepage clicked")
         self.root.destroy()
         from View.Homepage import HomepageApp
         from Controller.borrow_return_controller import BorrowingCart
@@ -256,15 +255,12 @@ class Borrow2App:
         homepage = HomepageApp(homepage_root, role = self.role, user_data=self.user_data)
         homepage_root.mainloop()
 
-
     def on_return_book_clicked(self): # Cannot switch to Return Book while in Borrowing Section
         """Handle return book button click"""
-        print("btn_ReturnBook clicked")
         messagebox.showerror("Error", "Cannot switch to Return while in Borrow Books!")
 
     def on_borrow_book_clicked(self): # Switch to first Borrow window, the current cart will be cancel
         """Handle borrow book button click"""
-        print("btn_BorrowBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         from Controller.borrow_return_controller import BorrowingCart
@@ -276,7 +272,6 @@ class Borrow2App:
 
     def on_confirm_clicked(self):
         """Handle confirm button click"""
-        print("btn_Confirm clicked")
         global user_id
 
         # Get requested quantity

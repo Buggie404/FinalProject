@@ -18,9 +18,7 @@ class AccountChangePw2App:
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -50,6 +48,7 @@ class AccountChangePw2App:
     def relative_to_assets(self, path):
         """Helper function to get the absolute path to assets"""
         return self.assets_path / Path(path)
+    
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius, color):
         """Vẽ hình chữ nhật có bo góc."""
         # Bo góc trên bên trái
@@ -136,26 +135,28 @@ class AccountChangePw2App:
 
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
+
         if button_name == "btn_ChangePassword" or button_name == "btn_Redo": # If clicked change pass in success/failed window -> go back to first AccountChangePass
             self.root.destroy()
             from View.AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
             changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass_root.mainloop()
+
         elif button_name == "btn_EditAccountInformation":
             self.root.destroy()
             from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
             editinfo_root = Tk()
-            # user_id = self.user_data[0] if self.user_data else None
             editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
             editinfo_root.mainloop()
+
         elif button_name == "btn_Return": # Return to Account MainWindow
             self.root.destroy()
             from View.AccountManagement.AccountMan import AccountManagement
             account_root = Tk()
             account = AccountManagement(account_root, user_data=self.user_data)
             account_root.mainloop()
+
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp
@@ -163,6 +164,7 @@ class AccountChangePw2App:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role = role, user_data=self.user_data)
             homepage_root.mainloop()
+
         else: # If clicked edit account information here, nothing happends
             pass
 

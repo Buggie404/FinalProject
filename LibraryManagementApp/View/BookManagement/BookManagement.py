@@ -4,19 +4,11 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, ttk, Frame
 import sys
 import os
 
-# Get the current directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Go up one level to the View directory
 parent_dir = os.path.dirname(current_dir)
-
-# Go up one more level to the project root directory
 project_root = os.path.dirname(parent_dir)
-
-# Add project root to sys.path
 sys.path.append(project_root)
 
-# Now import using the package path
 from Controller.book_management_controller import DeleteBook, SearchBooks 
 
 class BookManagementApp:
@@ -29,6 +21,7 @@ class BookManagementApp:
         self.admin_user = admin_user
         self.user_data = user_data or []
         self.role = role
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
@@ -39,7 +32,6 @@ class BookManagementApp:
 
         # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -226,13 +218,14 @@ class BookManagementApp:
     
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
+
         if button_name == "btn_DeleteBook":
             selected_items = self.tbl_Book.selection()
             if selected_items:
                 selected_item = selected_items[0]
                 print(f"Deleting book: {self.tbl_Book.item(selected_item, 'values')}")
                 self.tbl_Book.delete(selected_item)
+
         elif button_name == "btn_Fiction":
             self.toggle_category_filter("Fiction")
         elif button_name == "btn_Fantasy":
@@ -261,10 +254,6 @@ class BookManagementApp:
         if button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp
-            # if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
-            #     homepage_role = "admin"
-            # else:
-            #     homepage_role = self.role
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
@@ -272,8 +261,6 @@ class BookManagementApp:
     def toggle_category_filter(self, category):
         """Toggle filter by category - if same category clicked twice, show all books"""
         try:
-            print(f"Toggle category: {category}, current active: {self.active_category}")
-            
             if self.active_category == category:
                 # If the same category is clicked again, clear filter and show all books
                 print(f"Clearing filter for category: {category}")
@@ -297,21 +284,14 @@ class BookManagementApp:
 
     def reset_category_button_styles(self):
         """Reset the visual styles of all category buttons"""
-        # This is a placeholder for visual feedback - you might want to 
-        # implement actual visual changes to indicate active/inactive state
         category_buttons = ["btn_Fiction", "btn_Fantasy", "btn_Romance", 
                            "btn_Technology", "btn_Biography"]
         
         for btn_name in category_buttons:
-            # Reset button appearance to default
-            # You might need to implement this based on your UI design
             print(f"Resetting button style: {btn_name}")
-            # Example: self.buttons[btn_name].config(bg="#default_color")
 
     def highlight_active_category_button(self, active_category):
         """Highlight the active category button"""
-        # This is a placeholder for visual feedback - you might want to 
-        # implement actual visual changes to indicate active state
         category_to_button = {
             "Fiction": "btn_Fiction",
             "Fantasy": "btn_Fantasy",
@@ -327,7 +307,6 @@ class BookManagementApp:
         btn_name = category_to_button.get(active_category)
         if btn_name:
             print(f"Highlighting button: {btn_name}")
-            # Example: self.buttons[btn_name].config(bg="#highlight_color")
 
     def search_books(self):
         """Search books by ISBN or title"""
@@ -341,10 +320,10 @@ class BookManagementApp:
             # Call the controller's filter_books method
             from Controller.book_management_controller import SearchBooks
             SearchBooks.filter_books(
-                self.tbl_Book,    # The Treeview widget
-                search_term,      # The search term
-                self.load_book,   # The function to reload all books
-                self.root         # Pass the root window for notifications
+                self.tbl_Book,    
+                search_term,     
+                self.load_book,  
+                self.root       
             )
         except Exception as e:
             print(f"Error while searching books: {e}")
@@ -357,10 +336,10 @@ class BookManagementApp:
             # Call the controller's filter_by_category method
             from Controller.book_management_controller import SearchBooks
             SearchBooks.filter_by_category(
-                self.tbl_Book,    # The Treeview widget
-                category,         # The category to filter by
-                self.load_book,   # The function to reload all books
-                self.root         # Pass the root window for notifications
+                self.tbl_Book,  
+                category,        
+                self.load_book,   
+                self.root       
             )
         except Exception as e:
             print(f"Error while filtering books by category: {e}")
@@ -369,10 +348,6 @@ class BookManagementApp:
             # Reset active category on error
             self.active_category = None
             self.reset_category_button_styles()
-
-    # def run(self):
-    #     """Start the application main loop"""
-    #     self.root.mainloop()
     
     def create_book_table(self):
        """Create the user table using ttk.Treeview"""
@@ -443,12 +418,10 @@ class BookManagementApp:
     def load_book(self):
         """Try to load real user data if possible (fallback to sample data)"""
         try:
-            # Try to find the correct path to the Model directory
             current_dir = os.path.dirname(os.path.abspath(__file__))
             parent_dir = os.path.dirname(current_dir)
             grandparent_dir = os.path.dirname(parent_dir)
             
-            # Add possible paths to sys.path
             possible_paths = [
                 grandparent_dir,
                 os.path.join(grandparent_dir, "LibraryManagementApp"),
@@ -486,6 +459,7 @@ class BookManagementApp:
         except Exception as e:
             print(f"Error loading user data: {e}")
             return False
+        
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()

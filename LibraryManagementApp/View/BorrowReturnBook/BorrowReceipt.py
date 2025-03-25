@@ -3,6 +3,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 import sys
 import os
 import datetime
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
@@ -14,16 +15,17 @@ class BorrowReceiptApp:
         self.receipt_id = receipt_id
         self.borrow_date = borrow_date
         self.return_deadline = return_deadline  # Store the return deadline
+
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -365,7 +367,6 @@ class BorrowReceiptApp:
 
     def on_back_to_homepage_clicked(self): # Switch to Homepage
         """Handle back to homepage button click"""
-        print("btn_BackToHomepage clicked")
         self.root.destroy()
         from View.Homepage import HomepageApp
         homepage_root = Tk()
@@ -374,7 +375,6 @@ class BorrowReceiptApp:
 
     def on_return_book_clicked(self): # Switch to Return book section
         """Handle return book button click"""
-        print("btn_ReturnBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return_root = Tk()
@@ -383,7 +383,6 @@ class BorrowReceiptApp:
 
     def on_borrow_book_clicked(self): # Switch to Borrow book section
         """Handle borrow book button click"""
-        print("btn_BorrowBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow_root = Tk()
@@ -393,7 +392,6 @@ class BorrowReceiptApp:
 
     def on_back_clicked(self): # Switch to Borrow/Return window
         """Handle back button click"""
-        print("btn_Back clicked")
         self.root.destroy()
         from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
         borrow_return_root = Tk()

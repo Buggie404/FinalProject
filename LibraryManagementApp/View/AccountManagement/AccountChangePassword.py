@@ -27,9 +27,7 @@ class AccountChangePwApp:
         # Initialize the controller first, before using it
         self.controller = PasswordChangeController(user_data)
         
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -223,7 +221,6 @@ class AccountChangePwApp:
     
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
         
         if button_name == "btn_ChangePasswordConfirm":
             # Get values from entry fields

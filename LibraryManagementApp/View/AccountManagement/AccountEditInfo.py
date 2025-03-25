@@ -10,7 +10,6 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
         self.root = root
         self.user_data=user_data
         self.role=role
-        # self.user_id = user_id
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
@@ -20,17 +19,11 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
         else:
             self.role = role or "user"
 
-        # Import Model to take user data
-        # from Model.user_model import User
-        # self.user_data = User.get_id(self.user_id)
-
-        # import controller that hndel Edit Account Information
+        # import controller that handle Edit Account Information
         from Controller.account_management_controller import AccountEditInfoController 
         self.controller = AccountEditInfoController(user_data)
 
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -191,25 +184,28 @@ class AccountEditInfoApp: # Chưa có hàm để xử lý input của lineEdit (
 
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
+
         if button_name == "btn_EditAccountInformation": # switch back to Account Mainwindow
             self.root.destroy()
             from View.AccountManagement.AccountMan import AccountManagement
             account_root = Tk()
             account = AccountManagement(account_root, user_data=self.user_data)
             account.root.mainloop()
+
         elif button_name == "btn_ChangePassword": # switch to Change Password window
             self.root.destroy()
             from View.AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
             changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass.root.mainloop()
+
         elif button_name == "btn_BackToHomepage": # switch back to Homepage
             self.root.destroy()
             from View.Homepage import HomepageApp
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage.root.mainloop()
+            
         else: # For btn_Apply
             self.controller.handle_apply_click(self)
 

@@ -19,9 +19,7 @@ class UserAddAccount1App:
         else:
             self.role = None or "user"
 
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -188,7 +186,6 @@ class UserAddAccount1App:
     
     def on_back_to_homepage_clicked(self):
         """Handle back to homepage button click"""
-        print("btn_BackToHomepage clicked")
         self.root.destroy()
         from Homepage import HomepageApp
         homepage_root = Tk()
@@ -197,7 +194,6 @@ class UserAddAccount1App:
     
     def on_edit_account_password_clicked(self):
         """Handle edit account password click"""
-        print("btn_EditAccountPassword clicked")
         self.root.destroy()
         from UserEditAccount import UserEditAccountApp
         edit_pass_root = Tk()
@@ -206,21 +202,14 @@ class UserAddAccount1App:
     
     def on_add_account_clicked(self):
         """Handle add account button click"""
-        print("btn_AddAccount clicked")
         self.root.destroy()
         from UserAddAccount import UserAddAccountApp
         add_user_root = Tk()
         add_user = UserAddAccountApp(add_user_root, user_data=self.user_data)
         add_user_root.mainloop()
     
-    # def on_edit_account_password_clicked(self): # Cannot switch to Edit Account while Adding Account
-    #     """Handle edit account password button click"""
-    #     print("btn_EditAccountPassword clicked")
-    #     pass
-    
     def on_return_clicked(self):
         """Handle return button click"""
-        print("btn_Return clicked")
         self.root.destroy()
         from View.UserManagement.UserManagement import UserManagementApp
         add_user_root = Tk()
@@ -237,12 +226,6 @@ class UserAddAccount1App:
         user_data = User.get_id(self.user_id)
         
         if user_data:
-            # Update labels with user data
-            # Print the user_data to debug what's being returned
-            print(f"User data from database: {user_data}")
-            
-            # Check the structure of user_data and extract fields accordingly
-            # Assuming user_data is a tuple with fields in order of the database columns:
             user_id, name, username, email, password, date_of_birth, role = user_data
             
             # Update the text of the text fields

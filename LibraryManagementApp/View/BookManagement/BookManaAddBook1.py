@@ -3,17 +3,12 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 import os
 import sys
-# Get the absolute path to the current file's directory
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Go up two levels to reach the project root
-# If BookManaAddBook.py is in View/BookManagement, this goes up to the project root
 project_root = os.path.dirname(os.path.dirname(current_dir))
-
-# Add the project root to the Python path
 sys.path.append(project_root)
 
-# Now import from the Controller module
+# import the Controller module
 from Controller.book_management_controller import add_book
 class BookManaAddBook1App:
     def __init__(self, root, user_data = None, assets_path=None):
@@ -23,16 +18,13 @@ class BookManaAddBook1App:
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
-    
-
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -203,7 +195,6 @@ class BookManaAddBook1App:
 
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
 
         if button_name == "btn_AddBook":
             self.root.destroy()

@@ -18,9 +18,7 @@ class AccountChangePw1App:
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
 
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -133,20 +131,20 @@ class AccountChangePw1App:
 
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
         if button_name == "btn_Return": # Go back to AccountMan window
             self.root.destroy()
             from View.AccountManagement.AccountMan import AccountManagement
             accountman_root = Tk()
             accountman = AccountManagement(accountman_root, user_data=self.user_data)
             accountman_root.mainloop()
+
         elif button_name == "btn_EditAccountInformation":
             self.root.destroy()
             from View.AccountManagement.AccountEditInfo import AccountEditInfoApp
             editinfo_root = Tk()
-            # user_id = self.user_data[0] if self.user_data else None
             editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
             editinfo_root.mainloop()
+
         elif button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp
@@ -154,12 +152,14 @@ class AccountChangePw1App:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role = role,user_data=self.user_data)
             homepage_root.mainloop()
+
         elif button_name == "btn_ChangePassword": # When clicked change pass in success/failed window -> go back to first AccountChangePassword window
             self.root.destroy()
             from View.AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
             changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass_root.mainloop()
+            
         else: # If clicked on Edit Pass Account Information, nothing happends 
             pass
 

@@ -2,6 +2,7 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 import os, sys
 import datetime
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 project_root = os.path.dirname(parent_dir)
@@ -14,13 +15,13 @@ class ReturnOverdueApp:
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.receipt_id = receipt_id
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -177,7 +178,6 @@ class ReturnOverdueApp:
     
     def on_back_to_homepage_clicked(self):
         """Handle back to homepage button click"""
-        print("btn_BackToHomepage clicked")
         self.root.destroy()
         from View.Homepage import HomepageApp
         homepage_root = Tk()
@@ -186,7 +186,6 @@ class ReturnOverdueApp:
 
     def on_return_book_clicked(self):
         """Handle return book button click"""
-        print("btn_ReturnBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return1_root = Tk()
@@ -195,7 +194,6 @@ class ReturnOverdueApp:
 
     def on_borrow_book_clicked(self):
         """Handle borrow book button click"""
-        print("btn_BorrowBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow1_root = Tk()
@@ -204,10 +202,10 @@ class ReturnOverdueApp:
     
     def on_pay_fine_clicked(self):
         """Handle pay fine button click"""
-        print("btn_PayFine clicked")
         from View.noti_tab_view_1 import Message_2
         from Controller.borrow_return_controller import ReturnController
         message = Message_2(self.root, 'pay_fine')
+
         def custom_switch_to_borrowreturn():
             ReturnController.update_after_payment(self.receipt_id)
             self.root.destroy()
@@ -216,8 +214,7 @@ class ReturnOverdueApp:
             borrow_return = BorrowReturnApp(borrow_return_root,user_data=self.user_data)
             borrow_return_root.mainloop()
         message.back_to_subfun = custom_switch_to_borrowreturn
-
-        
+ 
     def load_due_and_fine_data(self):
         from Controller.borrow_return_controller import ReturnOverdueController
         if not self.receipt_id:

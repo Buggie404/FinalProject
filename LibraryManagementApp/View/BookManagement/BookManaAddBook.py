@@ -13,16 +13,16 @@ class BookManagementAddBookApp:
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
         # Set font that supports Vietnamese characters
-        self.vietnamese_font = ("Arial Unicode MS", 10)  # or another Unicode font
-        # Set up asset paths
+        self.vietnamese_font = ("Arial Unicode MS", 10)
+
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -228,6 +228,7 @@ class BookManagementAddBookApp:
                    
                     widget._shown_warning = False  # Reset flag if validation passes
                 break  # Exit loop after handling the matched field
+
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
         self.images[image_name] = PhotoImage(
@@ -292,7 +293,6 @@ class BookManagementAddBookApp:
    
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
        
         if button_name == "btn_Confirm":
             # Temporarily disable FocusOut validation to avoid duplicate triggers
@@ -377,6 +377,7 @@ class BookManagementAddBookApp:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
+    
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()

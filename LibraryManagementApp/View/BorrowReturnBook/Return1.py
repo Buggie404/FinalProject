@@ -2,10 +2,12 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 import sys
 import os
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 project_root = os.path.dirname(parent_dir)
 sys.path.append(project_root)
+
 from Model.receipt_model import Receipt
 from tkinter import messagebox
 
@@ -16,13 +18,13 @@ class Return1App:
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.user_data = user_data
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -192,7 +194,6 @@ class Return1App:
     
     # Event handlers
     def on_borrow_book_click(self):
-        print("btn_BorrowBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow1_root = Tk()
@@ -200,7 +201,6 @@ class Return1App:
         borrow1_root.mainloop()
         
     def on_return_book_click(self):
-        print("btn_ReturnBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return1_root = Tk()
@@ -208,7 +208,6 @@ class Return1App:
         return1_root.mainloop()
     
     def on_back_to_homepage_click(self):
-        print("btn_BackToHomepage clicked")
         self.root.destroy()
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         sys.path.append(os.path.join(base_dir, "View"))
@@ -244,20 +243,13 @@ class Return1App:
             AlreadyReturnedNotification(self.root, status_message)
             return
     
-
-         # Nếu tìm thấy, đóng cửa sổ Return1 và mở Return2, truyền receipt_id qua
         self.root.destroy()
         from View.BorrowReturnBook.Return2 import Return2App 
         return2_root = Tk()
         return2 = Return2App(return2_root, receipt_id = receipt_id, user_data=self.user_data)
         return2_root.mainloop()
 
-# Entry point
 if __name__ == "__main__":
     window = Tk()
     app = Return1App(window)
-    window.mainloop()
-
-
-
-    
+    window.mainloop() 

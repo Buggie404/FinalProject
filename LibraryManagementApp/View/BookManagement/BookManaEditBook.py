@@ -8,17 +8,16 @@ class BookManaEditBook:
         # Initialize the main window
         self.root = root
         self.user_data = user_data
-        self.root.geometry("898x605+0+0") #Set vị trí của UI
+        self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
-        # Set up asset paths 
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -169,21 +168,24 @@ class BookManaEditBook:
 
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
+
         if button_name == "btn_BackToHomepage":
             self.root.destroy()
             from View.Homepage import HomepageApp
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
+
         elif button_name == "btn_EditBookInformation":
             self.root.destroy()
             from View.BookManagement.BookManagement import BookManagementApp
             edit_book_root = Tk()
             edit_book = BookManagementApp(edit_book_root, user_data=self.user_data)
             edit_book_root.mainloop()
+
         elif button_name == "btn_Search":
             self.search_book()
+
         elif button_name == "btn_AddBook":
             self.root.destroy()
             from View.BookManagement.BookManaAddBook import BookManagementAddBookApp

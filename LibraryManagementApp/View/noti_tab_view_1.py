@@ -1,11 +1,6 @@
 # Import Lib
 from tkinter import *
 
-
-# Import First_Sub_Win and Current_sub_Win
-# from first-sub-win import frst-sub class
-# from current-sub-win import current-sub class
-
 class Delete():  # To confirm delection
     def __init__(self, root, delete_type,yes_callback=None):
         """delete_type: 'book' or 'account'
@@ -40,9 +35,11 @@ class Delete():  # To confirm delection
         # No Button
         Button(self.delete_noti, width=13, text="No", highlightbackground='white', highlightthickness=1,
                command=lambda: self.choice('no')).pack(pady=10)
+        
     def set_yes_callback(self, callback):
         """Set the callback function for the 'Yes' button"""
         self.yes_callback = callback
+
     # Choice function
     def choice(self, option):
         if option == 'yes':  # When clicked 'Yes' button -> switch to notify mess
@@ -53,7 +50,7 @@ class Delete():  # To confirm delection
                 # Default behavior if no callback is provided
                 Message_1(self.root, self.delete_type)
         else:        
-            print('Action canceled')
+            pass
         self.delete_noti.destroy()
 
 
@@ -163,12 +160,12 @@ class Invalid():  # To notify Invalid input  # nhớ thêm Invalid user Id forma
 
         # Dynamic Title and Message
         invalid_map = {
-    'account': ("Invalid Account", "Please double-check your email and password! "),
-    'quantity': ('Invalid Quantities', "No. of books borrow need to be larger than zero \n and lower or equal to Available quantities"),
-    'Input': ("Invalid input", "Please double-check your input"),
-    'search_book': ("Book Not Found", "No books match your search criteria.\n Please try a different search term."),
-    'borrowing_limit': ("Borrowing Limit Exceeded", "You have reached your borrowing limit.\n Please return some books before borrowing more.")
-}
+            'account': ("Invalid Account", "Please double-check your email and password! "),
+            'quantity': ('Invalid Quantities', "No. of books borrow need to be larger than zero \n and lower or equal to Available quantities"),
+            'Input': ("Invalid input", "Please double-check your input"),
+            'search_book': ("Book Not Found", "No books match your search criteria.\n Please try a different search term."),
+            'borrowing_limit': ("Borrowing Limit Exceeded", "You have reached your borrowing limit.\n Please return some books before borrowing more.")
+        }
 
         # Title Label
         Label(self.invalid, text=invalid_map[invalid_type][0], font=("Montserrat", 18, 'bold'), bg='white',
@@ -304,7 +301,6 @@ class Print_Receipt():
 
         # If we have book data, add it to cart
         if book_data and quantity:
-            print(f"Adding to cart: {book_data[0]}, {book_data[1]}, qty: {quantity}")
             self.cart.add_item(book_data[0], book_data[1], quantity)
 
         # Title Label
@@ -331,9 +327,6 @@ class Print_Receipt():
         # Create inner frame for cart items
         cart_frame = Frame(cart_container, bg='white')
         cart_frame.pack(fill='both', expand=True)
-
-        # Configure scrollbar
-        # Note: This is simplified - for a real scrollable area you might need a Canvas
 
         # Headers
         Label(cart_frame, text="Book ID", width=12, bg='white', font=('Arial', 10, 'bold')).grid(row=0, column=0, padx=5, pady=5)
@@ -392,12 +385,8 @@ class Print_Receipt():
         )
         self.cancel_btn.pack(side='left', padx=10)
 
-        # Debug print
-        print(f"Print_Receipt initialized with cart containing {len(self.cart.items)} items")
-
     def add_more_books(self):
         """Return to Borrow1 to add more books"""
-        print("Add more books clicked")
         self.print_receipt.destroy()
 
         # Import Borrow1App
@@ -420,7 +409,6 @@ class Print_Receipt():
 
     def complete_borrowing(self):
         """Complete the borrowing process and create receipts"""
-        print("Complete borrowing clicked")
         if self.cart.is_empty():
             from tkinter import messagebox
             messagebox.showinfo("Empty Cart", "Your borrowing cart is empty.")
@@ -455,8 +443,6 @@ class Print_Receipt():
                 messagebox.showerror("Error", "Failed to create receipts. Please try again.")
                 return
 
-            print(f"Successfully completed borrowing with receipt ID: {receipt_id}")
-
             # Clear the cart
             self.cart.clear()
 
@@ -476,13 +462,11 @@ class Print_Receipt():
             new_window.mainloop()
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
-            print(f"Error in complete_borrowing: {e}")
             import traceback
             traceback.print_exc()
 
     def cancel_borrowing(self):
         """Cancel the borrowing process"""
-        print("Cancel borrowing clicked")
         
         # Clear the cart
         self.cart.clear()

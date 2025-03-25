@@ -3,14 +3,11 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 import os
 import sys
 
-# Get the current directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# Go up one level to the View directory
 parent_dir = os.path.dirname(current_dir)
-# Go up one more level to the project root directory
 project_root = os.path.dirname(parent_dir)
-# Add project root to sys.path
 sys.path.append(project_root)
+
 from Controller.user_controller import add_account
 from Model.user_model import User
 
@@ -23,14 +20,13 @@ class UserAddAccountApp:
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -286,7 +282,6 @@ class UserAddAccountApp:
 
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
 
         if button_name == "btn_Confirm":
             # Temporarily disable FocusOut validation to avoid duplicate triggers

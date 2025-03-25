@@ -2,10 +2,12 @@ from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 import os, sys
 from datetime import datetime, timedelta
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 project_root = os.path.dirname(parent_dir)
 sys.path.append(project_root)
+
 from View.noti_tab_view_1 import Drop_Off
 class Return2App:
     def __init__(self, root, receipt_id=None, user_data=None, assets_path=None):
@@ -16,13 +18,13 @@ class Return2App:
         self.root.resizable(False, False)
         self.receipt_id = receipt_id
         self.user_data = user_data
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
         
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -225,22 +227,18 @@ class Return2App:
         """Handle return book button click"""
         messagebox.showerror("Error", "Cannot go to other tab while Returning Books!")
 
-
     def on_borrow_book_clicked(self):
         """Handle borrow book button click"""
         messagebox.showerror("Error", "Cannot go to other tab while Returning Books!")
-
 
     def on_drop_off_clicked(self):
         from Controller.borrow_return_controller import ReturnController
         from View.noti_tab_view_1 import Drop_Off, AlreadyReturnedNotification  
         from tkinter import messagebox
 
-        print("btn_DropOff clicked")
         try:
             # Extract user_id from self.user_data if available
             user_id = self.user_data[0] if self.user_data else None
-
 
             success, receipt_status, message = ReturnController.process_return(self.receipt_id,user_id)
         
@@ -253,14 +251,13 @@ class Return2App:
                     messagebox.showerror("Error", message)
                 return
 
-   
             # Display Drop Off notification
             Drop_Off(self.root, receipt_status, self.receipt_id, self.user_data)
         except Exception as e:
             print(f"Error in on_drop_off_clicked: {e}")
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
-        # Load receipt data from database
+    # Load receipt data from database
     def load_receipt_data(self):
         """Load and display receipt data for the given receipt_id"""
         if not self.receipt_id:
@@ -280,9 +277,9 @@ class Return2App:
             print(message)
             messagebox.showerror("Error", message)
             return
+        
         # Check if the receipt is already returned or overdue
         is_valid_status, status_message = ReturnController.validate_receipt_status(self.receipt_id)
-
 
         from Model.receipt_model import Receipt
         # Get receipt data from database
@@ -291,7 +288,6 @@ class Return2App:
         print(f"Loaded receipt data: {receipt_data}")
 
         # Update text fields with receipt data
-        # Assuming receipt_data format: (receipt_id, user_id, book_id, borrow_date, return_date, status, borrowed_quantity)
         self.canvas.itemconfigure(self.lbl_ReceiptID, text=str(receipt_data[0]))  # receipt_id
         self.canvas.itemconfigure(self.lbl_UserID, text=str(receipt_data[1]))     # user_id
         self.canvas.itemconfigure(self.lbl_ISBN, text=str(receipt_data[2]))       # book_id (ISBN)
@@ -302,7 +298,7 @@ class Return2App:
         else:
             self.canvas.itemconfigure(self.lbl_Quantity, text="1")  # Default quantity
             
-        # Ngày mượn sách
+        # For borrow_date
         if receipt_data[3]:
             borrow_date_obj = receipt_data[3]
             if isinstance(borrow_date_obj, str):

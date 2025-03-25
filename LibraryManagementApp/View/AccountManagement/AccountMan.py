@@ -24,14 +24,11 @@ class AccountManagement:
         else:
             self.role = role or "user"
 
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
             self.assets_path = self.output_path.parent / Path(r"Ultilities/build/assets/frameAccountManagement")
-
 
         # Create canvas
         self.canvas = Canvas(
@@ -91,11 +88,7 @@ class AccountManagement:
         """Load an image and place it on the canvas"""
         file_path = self.relative_to_assets(f"{image_name}.png")
 
-        # Debug: Kiểm tra file có tồn tại không
-        print(f"🔍 Đang tìm ảnh: {file_path}")
-
         if not os.path.exists(file_path):
-            print(f"❌ LỖI: Không tìm thấy file {file_path}")
             return
 
         # Nếu file tồn tại, load vào chương trình
@@ -189,10 +182,6 @@ class AccountManagement:
     def update_profile_info(self):
         """Update profile information with actual user data"""
         if self.user_data:
-            # Update labels with user data using itemconfig
-            # assuming user_data is a tuple from database with values in specific order
-            # user_id(0), name(1), username(2), email(3), password(4), date_of_birth(5), role(6)
-            
             # Update user profile info
             self.canvas.itemconfig(self.lbl_Name, text=self.user_data[1])  # name
             self.canvas.itemconfig(self.lbl_ID, text=self.user_data[0])  # user_id
@@ -202,17 +191,6 @@ class AccountManagement:
             self.canvas.itemconfig(self.lbl_Username, text=self.user_data[2])  # username
             self.canvas.itemconfig(self.lbl_EmailAddress, text=self.user_data[3])  # email
             self.canvas.itemconfig(self.lbl_DateOfBirth, text=self.user_data[5])  # date_of_birth
-
-    # def load_image(self, image_name, position):
-    #     """Load an image and place it on the canvas"""
-    #     self.images[image_name] = PhotoImage(
-    #         file=self.relative_to_assets(f"{image_name}.png")
-    #     )
-    #     self.canvas.create_image(
-    #         position[0],
-    #         position[1],
-    #         image=self.images[image_name]
-    #     )
 
     def create_button(self, button_name, dimensions):
         """Create a button with the given name and dimensions"""
@@ -237,23 +215,25 @@ class AccountManagement:
 
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
+
         if button_name == "btn_ChangePassword":
             self.root.destroy()
             from AccountManagement.AccountChangePassword import AccountChangePwApp
             changepass_root = Tk()
             changepass = AccountChangePwApp(changepass_root, user_data=self.user_data)
             changepass_root.mainloop()
+
         elif button_name == "btn_EditAccountInformation":
             self.root.destroy()
             from AccountManagement.AccountEditInfo import AccountEditInfoApp
-            # user_id = self.user_data[0]
             editinfo_root = Tk()
             editinfo = AccountEditInfoApp(editinfo_root, user_data=self.user_data)
             editinfo_root.mainloop()
+
         elif button_name == "btn_SignOut":
             from noti_tab_view_1 import Sign_Out
             Sign_Out(self.root)
+
         else:
             self.root.destroy()
             from Homepage import HomepageApp

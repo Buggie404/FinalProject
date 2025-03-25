@@ -24,7 +24,6 @@ class Borrow1App:
         self.root.resizable(False, False)
 
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -227,10 +226,8 @@ class Borrow1App:
 
     def on_back_to_homepage_clicked(self): # Switch back to Hokmepage window
         """Handle Back to Homepage button click event"""
-        print("btn_BackToHomepage clicked")
         if IndexError:
             messagebox.showerror("Error", "Cannot go to Homepage while Borrowing Book!")
-
         else:
             self.root.destroy()
             from View.Homepage import HomepageApp
@@ -240,7 +237,6 @@ class Borrow1App:
 
     def on_return_book_clicked(self): # Switch to Return Book window
         """Handle Return Book button click event"""
-        print("btn_ReturnBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return_root = Tk()
@@ -249,7 +245,6 @@ class Borrow1App:
 
     def on_borrow_book_clicked(self): # Switch back to Borrow/Return window
         """Handle Borrow Book button click event"""
-        print("btn_BorrowBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
         borrow_return_root = Tk()
@@ -258,8 +253,6 @@ class Borrow1App:
 
     def on_search_clicked(self):
         """Handle Search button click event"""
-        print("btn_Search clicked")
-
         # Get user input
         book_id = self.lnE_ISBN.get().strip()
         # Fill user_id with logged-in account

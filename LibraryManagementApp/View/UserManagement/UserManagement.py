@@ -13,14 +13,13 @@ class UserManagementApp:
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -61,12 +60,6 @@ class UserManagementApp:
             0.0, 0.0, 262.0, 605.0,
             fill="#0A66C2", outline=""
         )
-        
-        # We remove the tbl_User rectangle as it will be replaced by the Treeview
-        # self.tbl_User = self.canvas.create_rectangle(
-        #    285.0, 121.0, 871.0, 507.0,
-        #    fill="#F0F0F0", outline=""
-        # )
 
     def create_sidebar(self):
         """Create the sidebar logo and buttons"""
@@ -90,7 +83,6 @@ class UserManagementApp:
         """Create the user table using ttk.Treeview"""
         # Configure the ttk style
         style = ttk.Style()
-        # style.theme_use("classic")
         
         # Configure the Treeview style
         style.configure(
@@ -156,12 +148,10 @@ class UserManagementApp:
     def load_user(self):
         """ Try to load data if possible"""
         try:
-            # Try to find correct path to Model file
             current_dir = os.path.dirname(os.path.abspath(__file__))
             parent_dir = os.path.dirname(current_dir)
             grandparent_dir = os.path.dirname(parent_dir)
 
-            # Add possible path
             possible_paths = [
                 grandparent_dir,
                 os.path.join(grandparent_dir, "LibraryManagementApp"),
@@ -198,8 +188,6 @@ class UserManagementApp:
             print(f"Error loading user data: {e}")
             return False
     
-
-
     def filter_by_user_id(self):
         """Filter the user table by user_id or username"""
         search_term = self.entries["lnE_Search"].get()
@@ -219,8 +207,7 @@ class UserManagementApp:
             print(f"Error while filtering users: {e}")
             # Reload all users if filtering fails
             self.load_user()
-
-        
+      
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
         self.images[image_name] = PhotoImage(
@@ -305,7 +292,6 @@ class UserManagementApp:
 
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
         
         if button_name == "btn_DeleteAccount":
             from Controller.user_controller import Delete_Users
@@ -354,27 +340,26 @@ class UserManagementApp:
             self.root.destroy()
             from UserAddAccount import UserAddAccountApp
             add_user_root = Tk()
-            add_user = UserAddAccountApp(add_user_root, user_data = self.user_data)
+            add_user = UserAddAccountApp(add_user_root, user_data=self.user_data)
             add_user_root.mainloop()
+
         elif button_name == 'btn_EditAccountPassword':
             self.root.destroy()
             from UserEditAccount import UserEditAccountApp
             edit_pass_root = Tk()
-            edit_pass = UserEditAccountApp(edit_pass_root, user_data = self.user_data)
+            edit_pass = UserEditAccountApp(edit_pass_root, user_data=self.user_data)
             edit_pass_root.mainloop()
+
         else:
             self.root.destroy()
             from Homepage import HomepageApp
             homepage_root = Tk()
-            homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
+            homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
-
 
     def run(self):
         """Start the application main loop"""
         self.root.mainloop()
-
-
 
 
 if __name__ == "__main__":

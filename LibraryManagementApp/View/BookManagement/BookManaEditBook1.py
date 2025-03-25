@@ -14,6 +14,7 @@ class BookEdit1App:
         self.root.geometry("898x605+0+0")
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
@@ -23,7 +24,6 @@ class BookEdit1App:
         self.book_data = book_data
         print(f"Book data received: {book_data}")
         
-        # Set up asset paths
         self.output_path = Path(__file__).parent
         if assets_path:
             self.assets_path = Path(assets_path)
@@ -177,7 +177,7 @@ class BookEdit1App:
                 image=self.images[image_name]
             )
         except Exception as e:
-            print(f"Error loading image {image_name}: {e}")
+            pass
     
     def create_button(self, button_name, dimensions):
         """Create a button with the given name and dimensions"""
@@ -204,7 +204,7 @@ class BookEdit1App:
             # Store button widget in dictionary
             self.buttons[button_name] = button
         except Exception as e:
-            print(f"Error creating button {button_name}: {e}")
+            pass
     
     def create_entry_field(self, entry_name, bg_position, dimensions):
         """Create an entry field with background image"""
@@ -239,7 +239,7 @@ class BookEdit1App:
             # Add validation flag attribute
             entry._shown_warning = False
         except Exception as e:
-            print(f"Error creating entry field {entry_name}: {e}")
+            pass
     
     def populate_fields(self):
         """Fill entry fields with book data"""
@@ -294,7 +294,6 @@ class BookEdit1App:
     
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
         
         if button_name == "btn_BackToHomepage":
             self.root.destroy()
@@ -302,12 +301,14 @@ class BookEdit1App:
             homepage_root = Tk()
             homepage = HomepageApp(homepage_root, role = self.role, user_data = self.user_data)
             homepage_root.mainloop()
+
         elif button_name == "btn_AddBook": 
             self.root.destroy()
             from View.BookManagement.BookManaAddBook import BookManagementAddBookApp
             add_book_root = Tk()
             add_book = BookManagementAddBookApp(add_book_root, user_data=self.user_data)
             add_book_root.mainloop()
+            
         elif button_name == "btn_EditBookInformation":
             self.root.destroy()
             from View.BookManagement.BookManaEditBook import BookManaEditBook

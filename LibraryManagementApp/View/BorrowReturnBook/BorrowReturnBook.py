@@ -10,13 +10,13 @@ class BorrowReturnApp:
         self.root.configure(bg="#FFFFFF")
         self.root.resizable(False, False)
         self.user_data = user_data
+
         if self.user_data and len(self.user_data) > 6 and self.user_data[6] == "Admin":
             self.role = "admin"
         else:
             self.role = None or "user"
 
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -90,7 +90,6 @@ class BorrowReturnApp:
         return button
     
     def on_back_to_homepage_clicked(self):
-        print("btn_BackToHomepage clicked")
         self.root.destroy()
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         sys.path.append(os.path.join(base_dir, "View"))
@@ -101,7 +100,6 @@ class BorrowReturnApp:
         homepage_root.mainloop()
 
     def on_borrow_book_clicked(self):
-        print("btn_BorrowBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Borrow1 import Borrow1App
         borrow1_root = Tk()
@@ -109,7 +107,6 @@ class BorrowReturnApp:
         borrow1_root.mainloop()
 
     def on_return_book_clicked(self):
-        print("btn_ReturnBook clicked")
         self.root.destroy()
         from View.BorrowReturnBook.Return1 import Return1App
         return1_root = Tk()

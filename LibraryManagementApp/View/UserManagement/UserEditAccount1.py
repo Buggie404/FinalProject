@@ -1,7 +1,6 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
-
 class UserEditAccountApp:
     def __init__(self, root, user_data=None, assets_path=None, role = None):
         # Initialize the main window
@@ -24,9 +23,7 @@ class UserEditAccountApp:
             else:
                 self.role = "user"
 
-        # Set up asset paths
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
@@ -202,13 +199,13 @@ class UserEditAccountApp:
 
     def button_click(self, button_name):
         """Handle button click events"""
-        print(f"{button_name} clicked")
         if button_name == "btn_AddAccount":
             from View.UserManagement.UserAddAccount import UserAddAccountApp
             self.root.destroy()
             add_user_root = Tk()
             add_user = UserAddAccountApp(add_user_root, user_data=self.user_data)
             add_user_root.mainloop()
+
         elif button_name == "btn_EditAccountPassword":
             # Switch back to first Edit Account Password
             from View.UserManagement.UserEditAccount import UserEditAccountApp
@@ -216,17 +213,16 @@ class UserEditAccountApp:
             reset_root = Tk()
             reset = UserEditAccountApp(reset_root, user_data=self.user_data, role=self.role)
             reset_root.mainloop()
+
         elif button_name == "btn_BackToHomepage":
             # Switch back to Homepage
             self.root.destroy()
             from View.Homepage import HomepageApp
             homepage_root = Tk()
-            # Make sure role is being printed for debugging
-            # print(f"Returning to homepage with role: {self.role}")
             homepage = HomepageApp(homepage_root, role=self.role, user_data=self.user_data)
             homepage_root.mainloop()
+
         elif button_name == "btn_ResetPassword":
-            # This will be handled by the controller via the command 
             pass
 
     def run(self):

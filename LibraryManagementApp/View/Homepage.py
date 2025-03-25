@@ -12,7 +12,6 @@ sys.path.append(base_dir)
 class HomepageApp:
     def __init__(self, root, role=None, assets_path=None, user_data=None):
         self.root = root
-        # self.role = "user"  # Default role
         self.role = role
 
         # Store on root window for consistency
@@ -52,7 +51,7 @@ class HomepageApp:
             try:
                 self.images[image_file] = PhotoImage(file=full_path)
             except Exception as e:
-                print(f"Error loading image {full_path}: {e}")
+                pass
     
     def create_sidebar(self):
         """Create sidebar with logo"""
@@ -99,7 +98,6 @@ class HomepageApp:
         return button
     
     def on_account_management_clicked(self):
-        print("btn_AccountManagement clicked")
         self.root.destroy()
         from AccountManagement.AccountMan import AccountManagement 
         accountmnt_root = Tk()
@@ -107,7 +105,6 @@ class HomepageApp:
         accountmnt_root.mainloop()
     
     def on_user_management_clicked(self):
-        print("btn_UserManagement clicked")
         self.root.destroy()
         from UserManagement.UserManagement import UserManagementApp
         usermgmt_root = Tk()
@@ -115,7 +112,6 @@ class HomepageApp:
         usermgmt_root.mainloop()
     
     def on_borrow_return_clicked(self):
-        print("btn_BorrowReturnBook clicked")
         self.root.destroy()
         from BorrowReturnBook.BorrowReturnBook import BorrowReturnApp
         borrow_return_root = Tk()
@@ -123,7 +119,6 @@ class HomepageApp:
         borrow_return_root.mainloop()
     
     def on_book_management_clicked(self):
-        print("btn_BookManagement clicked")
         self.root.destroy()
         from BookManagement.BookManagement import BookManagementApp
         bookmgmt_root = Tk()

@@ -13,11 +13,9 @@ class LogInApp:
         self.root.resizable(False, False)
 
         self.output_path = Path(__file__).parent
-        # Allow assets_path to be configurable
         if assets_path:
             self.assets_path = Path(assets_path)
         else:
-            # Fix path
             self.assets_path = self.output_path / Path(r"Ultilities/build/assets/frameLogIn")
         
         # Store image references to prevent garbage collection
@@ -62,7 +60,7 @@ class LogInApp:
             try:
                 self.images[image_file] = PhotoImage(file=full_path)
             except Exception as e:
-                print(f"Error loading image {full_path}: {e}")
+                pass
     
     def create_sidebar(self):
         """Create the blue sidebar rectangle and its content"""
@@ -199,7 +197,7 @@ class LogInApp:
         """Track when password field has content and apply bullet mask"""
         entry = event.widget
         if entry.is_password:
-            # If we have any content and it's not just the placeholder, show bullets
+            # If have any content and it's not just the placeholder, show bullets
             if entry.get() != "" and entry.get() != entry.placeholder:
                 entry.config(show="•")
                 entry.has_content = True
@@ -247,7 +245,6 @@ class LogInApp:
         parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         sys.path.append(parent_dir)
         from Controller.auth_controller import Authen
-        print("btn_LogIn clicked")
         email = self.lnE_Email.get()
         password = self.lnE_Password.get()
 
