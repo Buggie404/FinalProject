@@ -93,6 +93,9 @@ class AccountChangePw2App:
         # Title image
         self.load_image("image_1", (578.0, 129.0))
 
+        #Additional image
+        self.load_image("image_3", (578.0, 275.0))
+
         # Create action buttons
         self.create_button("btn_Redo", (421.0, 360.0, 313.0, 48.0))
         self.create_button("btn_Return", (421.0, 448.0, 313.0, 48.0))
