@@ -554,6 +554,11 @@ class add_account:
         # Check if name is in Title Case (each word starts with uppercase, rest lowercase)
         name_parts = name.strip().split()
         for part in name_parts:
+            # Skip single-letter parts
+            if len(part) == 1:
+                continue
+            
+            # Check if first letter is uppercase and rest are lowercase
             if not part[0].isupper() or not part[1:].islower():
                 return False, "Name must be in Title Case."
         
@@ -703,8 +708,9 @@ class add_account:
         last_name = name_parts[-1]
         first_letters = "".join([unidecode.unidecode(part[0]).lower() for part in name_parts[:-1]])
         
-        # Generate username and email
-        user_id_str = str(user_id)
+        # Ensure 4-digit user ID with leading zeros
+        user_id_str = f"{user_id:04d}"  # This guarantees 4 digits with leading zeros
+        
         username = unidecode.unidecode(last_name).lower() + first_letters + user_id_str
         
         # Determine email domain based on role
