@@ -435,9 +435,8 @@ class add_account:
         # Get next user ID
         user_id = add_account.get_next_user_id()
         
-        # Generate username and email
         try:
-            username, email = add_account.generate_username_and_email(name, user_id)
+            username, email = add_account.generate_username_and_email(name, user_id, formatted_role)
             if not username or not email:
                 return False, "Could not generate username and email. Please check the name format.", {}
         except Exception as e:
@@ -685,13 +684,14 @@ class add_account:
             return 167  # Default fallback value
     
     @staticmethod
-    def generate_username_and_email(name, user_id):
+    def generate_username_and_email(name, user_id, role):
         """
-        Generate username and email based on full name and user ID
+        Generate username and email based on full name, user ID, and role
         
         Args:
             name (str): Full name of the user
             user_id (int): User ID
+            role (str): User role ('User' or 'Admin')
             
         Returns:
             tuple: (username, email)
@@ -706,7 +706,9 @@ class add_account:
         # Generate username and email
         user_id_str = str(user_id)
         username = unidecode.unidecode(last_name).lower() + first_letters + user_id_str
-        email = f"{unidecode.unidecode(last_name).lower()}{first_letters}{user_id_str}@user.libma"
+        
+        # Determine email domain based on role
+        email = f"{unidecode.unidecode(last_name).lower()}{first_letters}{user_id_str}@{'admin' if role == 'Admin' else 'user'}.libma"
         
         return username, email
     
