@@ -679,11 +679,15 @@ class add_account:
         """
         try:
             users = User.get_all_user()
-            if users:
-                # Find the highest user_id
-                max_id = max([int(user[0]) for user in users])
-                return max_id + 1
-            return 1  # Default if no users
+            if not users:
+                return 1  # Default if no users
+                
+            # Get all existing user IDs and sort them
+            existing_ids = sorted([int(user[0]) for user in users])
+            
+            # Return next ID after the highest
+            next_id = existing_ids[-1] + 1
+            return next_id
         except Exception as e:
             print(f"Error getting next user ID: {str(e)}")
             return 167  # Default fallback value
@@ -711,7 +715,7 @@ class add_account:
         # Ensure 4-digit user ID with leading zeros
         user_id_str = f"{user_id:04d}"  # This guarantees 4 digits with leading zeros
         
-        username = unidecode.unidecode(last_name).lower() + first_letters + user_id_str
+        username = unidecode.unidecode(last_name).lower() + first_letters + f"{user_id:04d}"
         
         # Determine email domain based on role
         email = f"{unidecode.unidecode(last_name).lower()}{first_letters}{user_id_str}@{'admin' if role == 'Admin' else 'user'}.libma"

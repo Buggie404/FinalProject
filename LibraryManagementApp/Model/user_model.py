@@ -22,10 +22,17 @@ class User:
 
     def save_user(self):
         try:
-            self.db.cursor.execute("INSERT INTO Users (name, username, email, password, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?)", 
-                            (self.name, self.username, self.email, self.password, self.date_of_birth, self.role))
+            if self.user_id is None:
+                # Let SQLite auto-generate ID if none is provided
+                self.db.cursor.execute("INSERT INTO Users (name, username, email, password, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?)", 
+                                (self.name, self.username, self.email, self.password, self.date_of_birth, self.role))
+                self.user_id = self.db.cursor.lastrowid
+            else:
+                # Use the provided user_id
+                self.db.cursor.execute("INSERT INTO Users (user_id, name, username, email, password, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?, ?)", 
+                                (self.user_id, self.name, self.username, self.email, self.password, self.date_of_birth, self.role))
+            
             self.db.conn.commit()
-            self.user_id = self.db.cursor.lastrowid
             return True
         except Exception as e:
             self.db.conn.rollback()  # Rollback on error
