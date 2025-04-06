@@ -224,6 +224,9 @@ class AccountEditInfoController: # For Edit Account Information
         
         # Open success view since validation passed
         if result:
+             # Refresh the user data from database
+            updated_user_data = User.get_id(self.current_user.user_id)
+            self.user_data = updated_user_data  # Update the controller's copy
             self.show_success_view()
         else:
             messagebox.showerror("Error", "An unexpected error occurred while updating your information.")
