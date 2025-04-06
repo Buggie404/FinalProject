@@ -392,7 +392,7 @@ class add_account:
         Args:
             name (str): Full name of the user
             role (str): User role (either 'User' or 'Admin')
-            date_of_birth (str): Date of birth in format YY/MM/DD
+            date_of_birth (str): Date of birth in format YYYY-MM-DD
             
         Returns:
             tuple: (success_flag, message, user_data)
@@ -404,16 +404,21 @@ class add_account:
             'date_of_birth': False
         }
         
-        # Validate all fields at once and collect errors
-        valid_name, name_msg = add_account.validate_name(name)
+        # Format and validate name (auto-convert to Title Case)
+        formatted_name = add_account.format_name(name)
+        valid_name, name_msg = add_account.validate_name(formatted_name)
         if not valid_name:
             field_errors['name'] = True
             
-        valid_role, role_msg, formatted_role = add_account.validate_role(role)
+        # Format and validate role (auto-convert to proper case)
+        formatted_role = add_account.format_role(role)
+        valid_role, role_msg, formatted_role = add_account.validate_role(formatted_role)
         if not valid_role:
             field_errors['role'] = True
             
-        valid_date, date_msg = add_account.validate_date_format(date_of_birth)
+        # Format and validate date (handle different formats)
+        formatted_date = add_account.format_date_input(date_of_birth)
+        valid_date, date_msg = add_account.validate_date_format(formatted_date)
         if not valid_date:
             field_errors['date_of_birth'] = True
         
@@ -436,23 +441,23 @@ class add_account:
         user_id = add_account.get_next_user_id()
         
         try:
-            username, email = add_account.generate_username_and_email(name, user_id, formatted_role)
+            username, email = add_account.generate_username_and_email(formatted_name, user_id, formatted_role)
             if not username or not email:
                 return False, "Could not generate username and email. Please check the name format.", {}
         except Exception as e:
             return False, f"Error generating username and email: {str(e)}", {}
         
-        # Format date for database
-        formatted_date = add_account.format_date_for_database(date_of_birth)
+        # Format date for database (already in YYYY-MM-DD format now)
+        db_date = formatted_date
         
         # Create user data dictionary
         user_data = {
             'user_id': user_id,
-            'name': name,
+            'name': formatted_name,
             'username': username,
             'email': email,
             'password': add_account.default_password,
-            'date_of_birth': formatted_date,
+            'date_of_birth': db_date,
             'role': formatted_role
         }
         
@@ -460,11 +465,11 @@ class add_account:
         try:
             user = User(
                 user_id=user_id, 
-                name=name, 
+                name=formatted_name, 
                 username=username, 
                 email=email, 
                 password=add_account.default_password, 
-                date_of_birth=formatted_date, 
+                date_of_birth=db_date, 
                 role=formatted_role
             )
             
@@ -489,49 +494,185 @@ class add_account:
             return False, f"Error creating user: {str(e)}", {}
     
     @staticmethod
+    def format_name(name):
+        """
+        Format name to Title Case
+        
+        Args:
+            name (str): Name to format
+            
+        Returns:
+            str: Name formatted in Title Case
+        """
+        if not name or name.strip() == "":
+            return ""
+        
+        # Split name into parts and title each part
+        name_parts = name.strip().split()
+        formatted_parts = [part.capitalize() for part in name_parts]
+        
+        # Join parts back together
+        return " ".join(formatted_parts)
+    
+    @staticmethod
+    def format_role(role):
+        """
+        Format role to proper case ('User' or 'Admin')
+        
+        Args:
+            role (str): Role to format
+            
+        Returns:
+            str: Formatted role
+        """
+        if not role or role.strip() == "":
+            return ""
+        
+        role_lower = role.strip().lower()
+        
+        # Check if role matches exactly "user" or "admin" (case insensitive)
+        if role_lower == "user":
+            return "User"
+        elif role_lower == "admin":
+            return "Admin"
+        else:
+            return role
+    
+    @staticmethod
+    def format_date_input(date_text):
+        """
+        Format date input to YYYY-MM-DD format, rejecting non-numeric characters
+        
+        Args:
+            date_text (str): Date text to format
+            
+        Returns:
+            str: Date in YYYY-MM-DD format or original input if invalid format detected
+        """
+        if not date_text or date_text.strip() == "":
+            return ""
+        
+        # First check if input contains only numbers and separators (hyphens or slashes)
+        if not re.match(r'^[0-9/-]+$', date_text.strip()):
+            return date_text  # Return original to trigger validation error
+        
+        # Remove any characters that are not numbers, hyphens, or slashes
+        cleaned_date = re.sub(r'[^0-9/-]', '', date_text.strip())
+        
+        # Check if date is already in YYYY-MM-DD format
+        if re.match(r'^(\d{4})-(\d{2})-(\d{2})$', cleaned_date):
+            return cleaned_date
+            
+        # Try to handle YYYY/MM/DD format
+        if re.match(r'^(\d{4})/(\d{2})/(\d{2})$', cleaned_date):
+            year, month, day = cleaned_date.split('/')
+            return f"{year}-{month}-{day}"
+            
+        # Try to handle other common formats like DD/MM/YYYY or MM/DD/YYYY
+        if '/' in cleaned_date and len(cleaned_date.split('/')) == 3:
+            parts = cleaned_date.split('/')
+            
+            # If one part is a 4-digit year, assume it's the year
+            for i, part in enumerate(parts):
+                if len(part) == 4 and part.isdigit():
+                    year = part
+                    remaining = [p for j, p in enumerate(parts) if j != i]
+                    
+                    # Assume month then day (could be improved with more logic)
+                    month, day = remaining
+                    
+                    # Ensure two digits for month and day
+                    month = month.zfill(2)
+                    day = day.zfill(2)
+                    
+                    return f"{year}-{month}-{day}"
+            
+            # If no 4-digit year found, assume last part is year and add century if needed
+            day, month, year = parts
+            if len(year) == 2:
+                current_year = datetime.datetime.now().year
+                century = str(current_year)[:2]
+                year = century + year
+                
+            # Ensure two digits for month and day
+            month = month.zfill(2)
+            day = day.zfill(2)
+            
+            return f"{year}-{month}-{day}"
+            
+        # For hyphen format (YYYY-MM-DD or DD-MM-YYYY)
+        if '-' in cleaned_date and len(cleaned_date.split('-')) == 3:
+            parts = cleaned_date.split('-')
+            
+            # If first part is a 4-digit number, assume YYYY-MM-DD
+            if len(parts[0]) == 4 and parts[0].isdigit():
+                return cleaned_date  # Already in correct format
+                
+            # Otherwise assume DD-MM-YYYY
+            day, month, year = parts
+            
+            # Add century if needed
+            if len(year) == 2:
+                current_year = datetime.datetime.now().year
+                century = str(current_year)[:2]
+                year = century + year
+                
+            # Ensure two digits for month and day
+            month = month.zfill(2)
+            day = day.zfill(2)
+            
+            return f"{year}-{month}-{day}"
+        
+        # If all else fails, return the original (validation will catch errors)
+        return cleaned_date
+    
+    @staticmethod
     def validate_name_on_event(name):
         """
-        Validate name field when focus leaves the field
+        Format and validate name field when focus leaves the field
         
         Args:
             name (str): Name to validate
             
         Returns:
-            tuple: (is_valid, error_message)
+            tuple: (is_valid, error_message, formatted_name)
         """
-        valid, message = add_account.validate_name(name)
+        formatted_name = add_account.format_name(name)
+        valid, message = add_account.validate_name(formatted_name)
         add_account.field_validation_errors['name'] = not valid
-        return valid, message
+        return valid, message, formatted_name
     
     @staticmethod
     def validate_role_on_event(role):
         """
-        Validate role field when focus leaves the field
+        Format and validate role field when focus leaves the field
         
         Args:
             role (str): Role to validate
             
         Returns:
-            tuple: (is_valid, error_message)
+            tuple: (is_valid, error_message, formatted_role)
         """
-        valid, message, _ = add_account.validate_role(role)
+        formatted_role = add_account.format_role(role)
+        valid, message, formatted_role = add_account.validate_role(formatted_role)
         add_account.field_validation_errors['role'] = not valid
-        return valid, message
+        return valid, message, formatted_role
     
     @staticmethod
     def validate_date_on_event(date_text):
         """
-        Validate date field when focus leaves the field
+        Format and validate date field when focus leaves the field
         
         Args:
             date_text (str): Date to validate
             
         Returns:
-            tuple: (is_valid, error_message)
+            tuple: (is_valid, error_message, formatted_date)
         """
-        valid, message = add_account.validate_date_format(date_text)
+        formatted_date = add_account.format_date_input(date_text)
+        valid, message = add_account.validate_date_format(formatted_date)
         add_account.field_validation_errors['date_of_birth'] = not valid
-        return valid, message
+        return valid, message, formatted_date
     
     @staticmethod
     def validate_name(name):
@@ -550,24 +691,13 @@ class add_account:
         # Check for numbers or special characters
         if re.search(r'[^a-zA-ZÀ-ỹ\s]', name):
             return False, "Name should contain only letters and spaces."
-
-        # Check if name is in Title Case (each word starts with uppercase, rest lowercase)
-        name_parts = name.strip().split()
-        for part in name_parts:
-            # Skip single-letter parts
-            if len(part) == 1:
-                continue
-            
-            # Check if first letter is uppercase and rest are lowercase
-            if not part[0].isupper() or not part[1:].islower():
-                return False, "Name must be in Title Case."
         
         return True, ""
     
     @staticmethod
     def validate_role(role):
         """
-        Validate that role is either 'User' or 'Admin' (case-sensitive)
+        Validate that role is exactly 'User' or 'Admin'
         
         Args:
             role (str): Role to validate
@@ -578,18 +708,19 @@ class add_account:
         if not role or role.strip() == "":
             return False, "Role cannot be empty.", ""
         
-        # Case-sensitive comparison (no longer using lowercase)
-        if role == "User":
-            return True, "", "User"
-        elif role == "Admin":
-            return True, "", "Admin"
+        formatted_role = add_account.format_role(role)
+        
+        # Check if role is exactly "User" or "Admin" after formatting
+        if formatted_role in ["User", "Admin"]:
+            return True, "", formatted_role
         else:
-            return False, "Role must be exactly 'User' or 'Admin'.", ""
+            return False, "Role must be either 'User' or 'Admin'.", ""
     
     @staticmethod
     def validate_date_format(date_text):
         """
-        Validate date format (YYYY/MM/DD) and check if user is at least 10 years old
+        Validate date format (YYYY-MM-DD), check if it contains only numbers and separators, 
+        and check if user is at least 10 years old
         
         Args:
             date_text (str): Date text to validate
@@ -600,17 +731,17 @@ class add_account:
         if not date_text or date_text.strip() == "":
             return False, "Date of birth cannot be empty."
         
-        # Allow only numbers and / character
-        if re.search(r'[^0-9/]', date_text):
-            return False, "Date should contain only numbers and / character."
+        # First check if input contains only numbers and separators (hyphens or slashes)
+        if not re.match(r'^[0-9/-]+$', date_text.strip()):
+            return False, "Date must contain only numbers and date separators (- or /)."
         
         try:
             # Check format
-            if not re.match(r'^(\d{4})/(\d{2})/(\d{2})$', date_text):
-                return False, "Invalid date format. Use YYYY/MM/DD."
+            if not re.match(r'^(\d{4})-(\d{2})-(\d{2})$', date_text):
+                return False, "Invalid date format. Use YYYY-MM-DD."
             
             # Parse date
-            year, month, day = date_text.split('/')
+            year, month, day = date_text.split('-')
             
             # Convert to integers
             year_int = int(year)
@@ -638,36 +769,7 @@ class add_account:
             return True, ""
             
         except ValueError:
-            return False, "Invalid date. Please use YYYY/MM/DD format."
-    
-    # Rest of the existing methods remain unchanged
-    @staticmethod
-    def format_date_for_database(date_text):
-        """
-        Convert date from YY/MM/DD to YYYY-MM-DD for database
-        
-        Args:
-            date_text (str): Date in YY/MM/DD format
-            
-        Returns:
-            str: Date in YYYY-MM-DD format
-        """
-        if not date_text or date_text.strip() == "":
-            return None
-            
-        try:
-            date_parts = date_text.split('/')
-            if len(date_parts) == 3:
-                year, month, day = date_parts
-                # Add century to year if needed
-                if len(year) == 2:
-                    current_year = datetime.datetime.now().year
-                    century = str(current_year)[:2]
-                    year = century + year
-                return f"{year}-{month}-{day}"
-            return None
-        except Exception:
-            return None
+            return False, "Invalid date. Please use YYYY-MM-DD format."
     
     @staticmethod
     def get_next_user_id():
@@ -722,7 +824,6 @@ class add_account:
         
         return username, email
     
-    # Account model methods remain unchanged
     @staticmethod
     def to_dict(user):
         """

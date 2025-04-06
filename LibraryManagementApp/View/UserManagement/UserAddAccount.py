@@ -107,7 +107,7 @@ class UserAddAccountApp:
         self.create_entry_with_icon("lnE_DateOfBirth", "image_5", (542.0, 370.0, 273.0, 46.0), (678.5, 394.0), (409.0, 394.0))
         
         # Add placeholder for date field
-        self.date_placeholder = "YYYY/MM/DD"
+        self.date_placeholder = "YYYY-MM-DD"
         self.entries["lnE_DateOfBirth"].insert(0, self.date_placeholder)
         self.entries["lnE_DateOfBirth"].config(fg="grey")  # Set placeholder text color to grey
 
@@ -155,26 +155,18 @@ class UserAddAccountApp:
         """Clear placeholder text when field receives focus"""
         widget = event.widget
         
-        if widget == self.entries["lnE_DateOfBirth"]:
-            if widget.get() == self.date_placeholder:
-                widget.delete(0, "end")
-                widget.config(fg="#000716")  # Change to normal text color
-            # Reset warning flag when user starts editing
-            widget._shown_warning = False
+        placeholders = {
+            self.entries["lnE_DateOfBirth"]: self.date_placeholder,
+            self.entries["lnE_Role"]: self.role_placeholder,
+            self.entries["lnE_Name"]: self.name_placeholder
+        }
         
-        elif widget == self.entries["lnE_Role"]:
-            if widget.get() == self.role_placeholder:
+        for entry, placeholder in placeholders.items():
+            if widget == entry and widget.get() == placeholder:
                 widget.delete(0, "end")
                 widget.config(fg="#000716")  # Change to normal text color
-            # Reset warning flag when user starts editing
-            widget._shown_warning = False
-        
-        elif widget == self.entries["lnE_Name"]:
-            if widget.get() == self.name_placeholder:
-                widget.delete(0, "end")
-                widget.config(fg="#000716")  # Change to normal text color
-            # Reset warning flag when user starts editing
-            widget._shown_warning = False
+                widget._shown_warning = False  # Reset warning flag when user starts editing
+                break
 
     def on_input_field_focus_out(self, event):
         """Restore placeholder text if field is empty and validate field content."""
@@ -182,14 +174,14 @@ class UserAddAccountApp:
 
         # Define mapping of fields to their attributes
         field_mapping = {
-            "lnE_Name": (self.name_placeholder, add_account.validate_name_on_event),
-            "lnE_Role": (self.role_placeholder, add_account.validate_role_on_event),
-            "lnE_DateOfBirth": (self.date_placeholder, add_account.validate_date_on_event)
+            self.entries["lnE_Name"]: (self.name_placeholder, add_account.validate_name_on_event),
+            self.entries["lnE_Role"]: (self.role_placeholder, add_account.validate_role_on_event),
+            self.entries["lnE_DateOfBirth"]: (self.date_placeholder, add_account.validate_date_on_event)
         }
 
-        # Identify which field triggered the event
-        for field_name, (placeholder, validation_func) in field_mapping.items():
-            if widget == self.entries[field_name]:
+        # Process the field that triggered the event
+        for entry, (placeholder, validation_func) in field_mapping.items():
+            if widget == entry:
                 field_value = widget.get()
 
                 # Restore placeholder if empty
@@ -199,22 +191,27 @@ class UserAddAccountApp:
                     widget._shown_warning = False  # Reset warning flag when placeholder is restored
                     return
 
-                # Validate field only if flag is not set
-                valid, message = validation_func(field_value)
+                # Validate field and get formatted value
+                valid, message, formatted_value = validation_func(field_value)
 
-                if not valid:
+                # Update field with formatted value if valid
+                if valid and formatted_value:
+                    current_value = widget.get()
+                    if current_value != formatted_value:
+                        widget.delete(0, "end")
+                        widget.insert(0, formatted_value)
+                    widget._shown_warning = False  # Reset flag if validation passes
+                elif not valid:
                     # Show warning only if not already shown
                     if not widget._shown_warning:
-                        messagebox.showwarning(f"Invalid {field_name.split('_')[-1]}", message)
+                        messagebox.showwarning("Validation Error", message)
                         widget._shown_warning = True  # Set flag to prevent duplicate warnings
                         # Schedule focus to happen after the messagebox is closed
                         self.root.after(100, lambda w=widget: w.focus_set())
                     else:
                         # Even if we've shown the warning before, still keep focus on this field
-                        widget.focus_set()
-                else:
-                    widget._shown_warning = False  # Reset flag if validation passes
-                break  # Exit loop after handling the matched field
+                        self.root.after(100, lambda w=widget: w.focus_set())
+                break
 
     def load_image(self, image_name, position):
         """Load an image and place it on the canvas"""
@@ -287,32 +284,47 @@ class UserAddAccountApp:
             # Temporarily disable FocusOut validation to avoid duplicate triggers
             for field_name in ["lnE_Name", "lnE_Role", "lnE_DateOfBirth"]:
                 self.entries[field_name].unbind("<FocusOut>")
-            
-            # Allow safe focus change without triggering validation
-            self.root.focus_set()
-            
-            # Retrieve values from entry fields
+
             name = self.entries["lnE_Name"].get()
             role = self.entries["lnE_Role"].get()
             date_of_birth = self.entries["lnE_DateOfBirth"].get()
             
-            # Skip if placeholders are detected
+            # Check for placeholders
             if name == self.name_placeholder:
+                messagebox.showwarning("Missing Information", "Please enter your name.")
                 self.root.after(100, lambda: self.entries["lnE_Name"].focus_set())
+                return
             elif role == self.role_placeholder:
+                messagebox.showwarning("Missing Information", "Please select a role.")
                 self.root.after(100, lambda: self.entries["lnE_Role"].focus_set())
+                return
             elif date_of_birth == self.date_placeholder:
+                messagebox.showwarning("Missing Information", "Please enter your date of birth.")
                 self.root.after(100, lambda: self.entries["lnE_DateOfBirth"].focus_set())
-                
+                return
+            
+            valid_name, name_msg, formatted_name = add_account.validate_name_on_event(name)       
+            valid_role, role_msg, formatted_role = add_account.validate_role_on_event(role)
+            valid_dob, dob_msg, formatted_dob = add_account.validate_date_on_event(date_of_birth)
+            
+            # Update entry fields with formatted values
+            self.entries["lnE_Name"].delete(0, "end")
+            self.entries["lnE_Name"].insert(0, formatted_name)
+            
+            self.entries["lnE_Role"].delete(0, "end")
+            self.entries["lnE_Role"].insert(0, formatted_role)
+            
+            self.entries["lnE_DateOfBirth"].delete(0, "end")
+            self.entries["lnE_DateOfBirth"].insert(0, formatted_dob)
+                    
             # Process the form if all validations pass
-            success, message, user_data = add_account.process_user_form(name, role, date_of_birth)
+            success, message, user_data = add_account.process_user_form(formatted_name, formatted_role, formatted_dob)
 
-            # In UserAddAccount.py - Modify the button_click method (btn_Confirm section)
             if success:
                 self.root.destroy()
                 from UserAddAccount1 import UserAddAccount1App
                 user_management_root = Tk()
-                user_management = UserAddAccount1App(user_management_root, user_data['user_id'],  user_data=self.user_data, role=self.role)  # Pass user_id
+                user_management = UserAddAccount1App(user_management_root, user_data['user_id'], user_data=self.user_data, role=self.role)
                 user_management_root.mainloop()
             else:
                 messagebox.showerror("Error", message)
