@@ -152,6 +152,9 @@ class BorrowController:
         book_data = Book.get_book_by_id(book_id)
         if not book_data:
             return False, None, None, "No match ISBN!"
+        
+        # Get adjuted available quantity
+        adjusted_quantity = BorrowController.get_adjusted_available_quantity(book_id)
 
         # Check if book is available (quantity > 0)
         available_quantity = book_data[5]  
@@ -189,35 +192,29 @@ class BorrowController:
     @staticmethod
     def check_borrowing_limit(user_id, requested_quantity=1):
         """
-        Check if borrowing the requested quantity would exceed the user's limit
-
+        Check if borrowing the requested quantity would exceed the session limit of 5 books
+        
         Parameters:
         user_id - The ID of the user
         requested_quantity - How many books the user wants to borrow
-
+        
         Returns:
-        (can_borrow, remaining, total_borrowed) - Tuple with borrowing status
+        (can_borrow, remaining, cart_total)
+        Tuple with borrowing status
         """
-        # Get database connection
-        db = Receipt().db
+        # Get the cart instance
+        cart = BorrowingCart.get_instance()
 
-        # Query the database to count currently borrowed books
-        db.cursor.execute(
-            "SELECT SUM(borrowed_quantity) FROM receipts "
-            "WHERE user_id = ? AND status = 'Borrowed'", (user_id,)
-        )
-        result = db.cursor.fetchone()
-
-        # If no books borrowed yet or NULL result
-        total_borrowed = result[0] if result and result[0] else 0
+        # Count books in current cart
+        cart_total = cart.get_total_quantity()
 
         # Calculate remaining allowed borrows
-        remaining = BorrowController.MAX_TOTAL_BOOKS - total_borrowed
+        remaining = BorrowController.MAX_TOTAL_BOOKS - cart_total
 
         # Check if requested quantity fits within limit
         can_borrow = requested_quantity <= remaining
 
-        return can_borrow, remaining, total_borrowed
+        return can_borrow, remaining, cart_total
 
     @staticmethod
     def complete_borrowing(user_id, cart_items):
@@ -264,7 +261,7 @@ class BorrowController:
                     if not book_data:
                         continue
 
-                    current_quantity = book_data[5]  # Assuming quantity is at index 5
+                    current_quantity = book_data[5]  
                     new_quantity = current_quantity - quantity
 
                     # Update book quantity
@@ -276,22 +273,69 @@ class BorrowController:
                         'published_year': book_data[3],
                         'quantity': new_quantity
                     })
-
                     if not update_result:
-                        pass
+                        print(f"Warning: Failed to update quantity for book {book_id}")
                 except Exception as e:
                     print(f"Error updating book {book_id}: {e}")
                     import traceback
                     traceback.print_exc()
-
+                    
             # Return success status, receipt ID, borrow date, and return deadline
             return True, receipt.receipt_id, today_str, return_deadline_str
+            
+        except Exception as e:
+            print(f"Error in complete_borrowing: {e}")
+            import traceback
+            traceback.print_exc()
+            return False, None, None, None
+
+            #         if not update_result:
+            #             pass
+            #     except Exception as e:
+            #         print(f"Error updating book {book_id}: {e}")
+            #         import traceback
+            #         traceback.print_exc()
+
+            # # Return success status, receipt ID, borrow date, and return deadline
+            # return True, receipt.receipt_id, today_str, return_deadline_str
 
         except Exception as e:
             print(f"Error in complete_borrowing: {e}")
             import traceback
             traceback.print_exc()
             return False, None, None, None
+        
+    @staticmethod
+    def get_adjusted_available_quantity(book_id):
+        """
+        Get the available quantity of a book, adjusted for what's already in the cart
+        
+        Parameters:
+        book_id - The ID of the book
+        
+        Returns:
+        adjusted_quantity - The available quantity minus what's in the cart
+        """
+
+        # Get database quantity
+        db_quantity = Book.get_book_by_id(book_id)[5]
+
+        if db_quantity is None:
+            return 0
+        
+        # Get the cart instance
+        cart = BorrowingCart.get_instance()
+
+        # Find if this book is in the cart
+        cart_quantity = 0
+        for item in cart.items:
+            if item['book_id']== book_id:
+                cart_quantity = item['quantity']
+
+        # Calculate adjusted quantitiy
+        adjusted_quantity = db_quantity - cart_quantity
+
+        return max(0, adjusted_quantity)
 
 class BorrowingCart:
     _instance = None

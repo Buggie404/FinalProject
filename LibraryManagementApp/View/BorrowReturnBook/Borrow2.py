@@ -310,7 +310,6 @@ class Borrow2App:
         )
 
         if not can_borrow:
-            from tkinter import messagebox
             messagebox.showwarning(
                 "Borrowing Limit Exceeded",
                 f"You cannot borrow {requested_quantity} more books.\n"

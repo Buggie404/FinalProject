@@ -458,6 +458,9 @@ class Print_Receipt():
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
             import traceback
             traceback.print_exc()
+    def get_total_quantity(self):
+        """Get the total quantity of books in the cart"""
+        return sum(item['quantity'] for item in self.cart.items)
 
     def cancel_borrowing(self):
         """Cancel the borrowing process"""

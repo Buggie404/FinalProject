@@ -279,6 +279,8 @@ class Borrow1App:
                 Message_1(self.root, 'edit_book_id')
             elif error_message == "ID cannot be empty!":
                 messagebox.showerror("Error", "ID cannot be empty")
+            elif error_message == "Book not available for borrowing":
+                messagebox.showerror("Error", "Book not available for borrowing")
             else:
                 messagebox.showerror("Error", "ISBN cannot be empty!")
             return
@@ -293,7 +295,7 @@ class Borrow1App:
         borrowing.canvas.itemconfig(borrowing.lbl_ISBN, text=book_id)
 
         # Get and set available quantity
-        available_quantity = Book.get_quantity(book_id)
+        available_quantity = BorrowController.get_adjusted_available_quantity(book_id)
         borrowing.canvas.itemconfig(borrowing.lbl_AvailableQuantities, text=available_quantity)
         borrowing_root.mainloop()
 
