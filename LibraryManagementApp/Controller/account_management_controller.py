@@ -293,7 +293,7 @@ class PasswordChangeController:
         self.validation_errors['current_password'] = False
         return True, ""
 
-    def validate_new_password(self, new_password):
+    def validate_new_password(self, new_password, current_password):
         """Validate new password requirements"""
         if not new_password:
             return False, "New password cannot be empty."
@@ -306,6 +306,10 @@ class PasswordChangeController:
         if len(new_password) > 15:
             self.validation_errors['new_password'] = True
             return False, "Password must be less than 15 characters."
+        
+        if new_password == current_password:
+            self.validation_errors['new_password'] = True
+            return False, "New password cannot be the same as the current password."
 
         # Check for spaces
         if ' ' in new_password:
@@ -345,7 +349,7 @@ class PasswordChangeController:
         valid, message = self.validate_current_password(current_password)
         return valid, message, not valid
     
-    def validate_new_password_field(self, new_password):
+    def validate_new_password_field(self, new_password, current_password):
         """Validate new password field - for FocusOut event
         Returns: (is_valid, error_message, should_show_error)
         """
@@ -353,7 +357,7 @@ class PasswordChangeController:
         if not new_password:
             return True, "", False
             
-        valid, message = self.validate_new_password(new_password)
+        valid, message = self.validate_new_password(new_password, current_password)
         return valid, message, not valid
     
     def validate_confirm_password_field(self, new_password, confirm_password):
@@ -389,7 +393,7 @@ class PasswordChangeController:
             return False, current_msg, False, "current_password"
             
         # Validate new password format
-        new_valid, new_msg = self.validate_new_password(new_password)
+        new_valid, new_msg = self.validate_new_password(new_password, current_password)
         if not new_valid:
             return False, new_msg, False, "new_password"
             

@@ -141,8 +141,9 @@ class AccountChangePwApp:
     
     def on_new_password_focusout(self, event):
         """Handle focus out event for new password field"""
+        current_password = self.entries["lnE_CurrentPassword"].get()
         new_password = self.entries["lnE_NewPassword"].get()
-        valid, message, show_error = self.controller.validate_new_password_field(new_password)
+        valid, message, show_error = self.controller.validate_new_password_field(new_password, current_password)
         
         if show_error:
             messagebox.showerror("Password Error", message)
