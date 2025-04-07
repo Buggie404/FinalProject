@@ -193,13 +193,15 @@ class DeleteBook:
         selected_items = self.view.tbl_Book.selection()
         if selected_items:
             item = self.view.tbl_Book.item(selected_items[0])
-            self.selected_book_id = str(item["values"][0]).zfill(10)
+            self.selected_book_id = str(item["values"][0]).zfill(13)
         else:
             self.selected_book_id = None
     
     def delete_selected_book(self):
         """Show delete confirmation dialog and handle deletion."""
         if not self.selected_book_id:
+            from tkinter import messagebox
+            messagebox.showwarning("No Selection", "Please select a book to delete.")
             return
         
         delete_dialog = Delete(self.view.root, "book")
@@ -208,9 +210,14 @@ class DeleteBook:
     def confirm_delete_book(self):
         """Delete the selected book from database and UI."""
         if not self.admin:
-            return
+            try:
+                from Model.admin_model import Admin
+                self.admin = Admin(None, None)
+            except Exception as e:
+                print(f" Failed to create admin: {e}")
+                return
         
-        book_id_to_delete = self.selected_book_id.zfill(10)
+        book_id_to_delete = self.selected_book_id.zfill(13)
         selected_items = self.view.tbl_Book.selection()
         selected_item = selected_items[0] if selected_items else None
         
