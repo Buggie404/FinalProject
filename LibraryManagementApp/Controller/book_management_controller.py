@@ -795,6 +795,22 @@ class BookEditController:
             # Restore FocusOut bindings
             self.restore_field_bindings()
             return
+        
+        # Check for adjacent different special characters
+        invalid_combinations = [
+            r'\-\.', r'\-,', r'\-&',  # Hyphen followed by others
+            r'\.\-', r'\.&',          # Period followed by others (except comma)
+            r',\.', r',\-', r',&',    # Comma followed by others
+            r'&\.', r'&\-', r'&,'     # Ampersand followed by others
+        ]
+        
+        pattern = '|'.join(invalid_combinations)
+        if re.search(pattern, author):
+            self.view.entries["lnE_Author"].focus_set()
+            messagebox.showwarning("Invalid Author", "Most special characters (., -, comma, &) cannot be adjacent, except period followed by comma.")
+            # Restore FocusOut bindings
+            self.restore_field_bindings()
+            return
 
         # Validate Published Year
         year = field_values["published_year"]
@@ -1005,6 +1021,21 @@ class BookEditController:
         if re.search(r'[\-]{2,}|[\. ]{2,}|[,]{2,}|[&]{2,}', author):
             if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
                 messagebox.showwarning("Invalid Author", "Special characters (., -, comma, &) cannot appear consecutively.")
+                event.widget._shown_warning = True
+            return False
+        
+        # Check for adjacent different special characters (with exception for period followed by comma)
+        invalid_combinations = [
+            r'\-\.', r'\-,', r'\-&',  # Hyphen followed by others
+            r'\.\-', r'\.&',          # Period followed by others (except comma)
+            r',\.', r',\-', r',&',    # Comma followed by others
+            r'&\.', r'&\-', r'&,'     # Ampersand followed by others
+        ]
+        
+        pattern = '|'.join(invalid_combinations)
+        if re.search(pattern, author):
+            if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
+                messagebox.showwarning("Invalid Author", "Most special characters (., -, comma, &) cannot be adjacent, except period followed by comma.")
                 event.widget._shown_warning = True
             return False
         
