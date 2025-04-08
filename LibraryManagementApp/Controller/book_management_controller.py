@@ -1018,7 +1018,7 @@ class BookEditController:
             return False
         
         # Check for consecutive special characters
-        if re.search(r'[\-]{2,}|[\. ]{2,}|[,]{2,}|[&]{2,}', author):
+        if re.search(r'[\-]{2,}|[\.]{2,}|[,]{2,}|[&]{2,}', author):
             if not hasattr(event, 'skip_message') and not event.widget._shown_warning:
                 messagebox.showwarning("Invalid Author", "Special characters (., -, comma, &) cannot appear consecutively.")
                 event.widget._shown_warning = True
