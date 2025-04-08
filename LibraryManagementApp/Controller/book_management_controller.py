@@ -503,7 +503,10 @@ class add_book:
         # Check for consecutive special characters (2 or more) - EXCLUDING SPACES
         if re.search(r'[\-]{2,}|[\.]{2,}|[,]{2,}|[&]{2,}', author):
             return False, "Special characters (., -, comma, &) cannot appear consecutively.", ""
-       
+        # Check for adjacent different special characters
+        if re.search(r'[.,&\-][.,&\-]', author):
+            return False, "Different special characters (., -, comma, &) cannot be adjacent to each other.", ""
+
         # Improved title case function that preserves case after periods and hyphens
         def smart_title_case(text):
             # Split by spaces
