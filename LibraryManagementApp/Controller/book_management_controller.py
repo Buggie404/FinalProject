@@ -504,8 +504,16 @@ class add_book:
         if re.search(r'[\-]{2,}|[\.]{2,}|[,]{2,}|[&]{2,}', author):
             return False, "Special characters (., -, comma, &) cannot appear consecutively.", ""
         # Check for adjacent different special characters
-        if re.search(r'[.,&\-][.,&\-]', author):
-            return False, "Different special characters (., -, comma, &) cannot be adjacent to each other.", ""
+        invalid_combinations = [
+        r'\-\.', r'\-,', r'\-&',  # Hyphen followed by others
+        r'\.\-', r'\.&',          # Period followed by others (except comma)
+        r',\.', r',\-', r',&',    # Comma followed by others
+        r'&\.', r'&\-', r'&,'     # Ampersand followed by others
+    ]
+    
+        pattern = '|'.join(invalid_combinations)
+        if re.search(pattern, author):
+            return False, "Most special characters (., -, comma, &) cannot be adjacent, except period followed by comma.", ""
 
         # Improved title case function that preserves case after periods and hyphens
         def smart_title_case(text):
