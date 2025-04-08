@@ -56,8 +56,8 @@ class AccountEditInfoController: # For Edit Account Information
             return (True, "", False)  # Valid, no error, not taken by someone else
 
         # Check for new_username format
-        if len(username) > 15:
-            return (False, "Username must be maximum 15 characters!", False)
+        if len(username) > 15 or len(username) < 8:
+            return (False, "Username must be 8-15 characters!", False)
 
         if " " in username:
             return (False, "Username must not contain space", False)
@@ -104,7 +104,7 @@ class AccountEditInfoController: # For Edit Account Information
         if date_of_birth is None and re.match(r'^\d{1,2}/\d{1,2}/\d{4}$', date_str):
             try:
                 date_of_birth = datetime.datetime.strptime(date_str, "%m/%d/%Y").date()
-                return (False, "Please use YYYY-MM-DD format (e.g., 2010-06-03 instead of 06/03/2010).")
+                return (False, "Please use YYYY-MM-DD format")
             except ValueError:
                 pass
         
